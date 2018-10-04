@@ -3,7 +3,7 @@
 # FROM drupal:7
 # from https://www.drupal.org/requirements/php#drupalversions
 # Assume a version of php compatible with the code below, currently 7.0, 7.1, maybe 7.2?
-ARG VSITE_PHP_VERSION
+ARG VSITE_PHP_VERSION=7.0
 FROM php:${VSITE_PHP_VERSION}-apache
 # TODO: is the following necessary?
 RUN a2enmod rewrite expires
@@ -50,8 +50,8 @@ RUN apt-get purge -y --auto-remove $buildDeps
 WORKDIR /var/www/html
 
 # e.g. https://www.drupal.org/node/3060/release
-ARG DRUPAL_VERSION
-ARG DRUPAL_MD5 
+ARG DRUPAL_VERSION=7.59
+ARG DRUPAL_MD5=7e09c6b177345a81439fe0aa9a2d15fc
 RUN curl -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_VERSION}.tar.gz" -o drupal.tar.gz  \ 
         && echo "${DRUPAL_MD5} *drupal.tar.gz" | md5sum -c - \
 	&& tar -xz --strip-components=1 -f drupal.tar.gz \
