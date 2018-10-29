@@ -14,9 +14,9 @@ if [ ! -f /var/www/html/sites/default/settings.php ]; then
    --db-url="mysql://$MYSQL_USER:$MYSQL_PASSWORD@vsql/$DRUPAL_DATABASE" \
    --yes \
    --site-name=$VSITE_NAME \
-   --site-mail=$VSITE_MAIL \
+   --site-mail=$VSITE_ADMIN_MAIL \
    --account-name=$VSITE_ADMIN \
-   --account-mail=$VSITE_MAIL \
+   --account-mail=$VSITE_ADMIN_MAIL \
    --db-su=root \
    --db-su-pw=$MYSQL_ROOT_PASSWORD 
 # install civicrm if available but not yet installed
