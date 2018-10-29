@@ -14,9 +14,9 @@ if [ ! -f /var/www/html/sites/default/settings.php ]; then
    --db-url="mysql://$MYSQL_USER:$MYSQL_PASSWORD@vsql/$DRUPAL_DATABASE" \
    --yes \
    --site-name=$VSITE_NAME \
-   --site-mail=$VSITE_MAIL \
+   --site-mail=$VSITE_ADMIN_MAIL \
    --account-name=$VSITE_ADMIN \
-   --account-mail=$VSITE_MAIL \
+   --account-mail=$VSITE_ADMIN_MAIL \
    --db-su=root \
    --db-su-pw=$MYSQL_ROOT_PASSWORD 
 # install civicrm if available but not yet installed
@@ -36,10 +36,6 @@ if [ ! -f /var/www/html/sites/default/settings.php ]; then
   fi
   sudo -E -u www-data drush -y vset admin_theme ${VSITE_THEME:-seven}
   sudo -E -u www-data drush -y vset civicrm_theme_admin ${VSITE_THEME:-seven}
-# allow for initial setup using a site feature, defaults to ctools
-  sudo -E -u www-data drush -y pm-enable ${VSITE_FEATURE:-ctools}
-  sudo -E -u www-data drush -y features-revert-all
-  sudo -E -u www-data drush sql-query "UPDATE block SET status = 0 WHERE NOT(module = 'system' AND (delta = 'main' OR delta = 'help'))"
   echo "Site Installation Completed"
   # TODO: report back to root that I have completed!
 else
