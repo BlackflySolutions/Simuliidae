@@ -1,2 +1,2 @@
 # Simuliidae
-An Opinionated Drupal CiviCRM Container Stack
+An open source opinionated Drupal CiviCRM Container Stack
