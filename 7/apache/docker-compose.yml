@@ -56,7 +56,7 @@ services:
       - DRUPAL_DATABASE
       - CIVICRM_DATABASE
       - VSITE_NAME
-      - VSITE_ADMIN
+      - VSITE_ADMIN_NAME
       - VSITE_ADMIN_MAIL
 
     depends_on:
