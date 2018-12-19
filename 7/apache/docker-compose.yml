@@ -58,6 +58,11 @@ services:
       - VSITE_NAME
       - VSITE_ADMIN_NAME
       - VSITE_ADMIN_MAIL
+      - VSITE_USER_NAME
+      - VSITE_USER_MAIL
+      - VSITE_USER_ROLE
+      - VSITE_FEATURE
+      - VSITE_THEME
 
     depends_on:
       - vsql

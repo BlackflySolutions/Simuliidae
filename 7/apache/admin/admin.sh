@@ -19,6 +19,8 @@ if [ ! -f /var/www/html/sites/default/settings.php ]; then
    --account-mail=$VSITE_ADMIN_MAIL \
    --db-su=root \
    --db-su-pw=$MYSQL_ROOT_PASSWORD 
+  sudo -E -u www-data drush -y vset theme_default ${VSITE_THEME:-bartik}
+  sudo -E -u www-data drush -y vset admin_theme ${VSITE_THEME:-seven}
 # install civicrm if available but not yet installed
   if [ -d /var/www/html/sites/all/modules/civicrm/drupal/drush ]; then
     if [ ! -f /var/www/html/sites/default/civicrm_settings.php ]; then
@@ -35,20 +37,24 @@ if [ ! -f /var/www/html/sites/default/settings.php ]; then
       chmod +x /usr/local/bin/cv
       cv api setting.create customCSSURL=/vendor/org.civicrm.shoreditch/css/custom-civicrm.css
       sudo -E -u www-data drush -y pm-enable civicrmtheme
+      sudo -E -u www-data drush -y vset civicrm_theme_admin ${VSITE_THEME:-seven}
     fi
   fi
-  if [ ! -z ${VSITE_THEME} ]
-    sudo -E -u www-data drush -y vset theme_default ${VSITE_THEME}
-  fi
-  sudo -E -u www-data drush -y vset admin_theme ${VSITE_THEME:-seven}
-  sudo -E -u www-data drush -y vset civicrm_theme_admin ${VSITE_THEME:-seven}
   # allow for initial setup using a site feature
-  if [ -z ${VSITE_FEATURE} ]
-    sudo -E -u www-data drush -y pm-enable ${VSITE_FEATURE}
+  if [ -n $VSITE_FEATURE ]; then
+    sudo -E -u www-data drush -y pm-enable $VSITE_FEATURE
     sudo -E -u www-data drush -y features-revert-all
   fi
   sudo -E -u www-data drush sql-query "UPDATE block SET status = 0 WHERE NOT(module = 'system' AND (delta = 'main' OR delta = 'help'))"
-  sudo -E -u www-data drush user-create ${VSITE_USER_EMAIL} --mail ${VSITE_USER_EMAIL}
+  if [ -n $VSITE_USER_MAIL ]; then
+    if [ -z $VSITE_USER_NAME ]; then
+      VSITE_USER_NAME=$VSITE_USER_MAIL
+    fi
+    sudo -E -u www-data drush user-create $VSITE_USER_NAME --mail=$VSITE_USER_MAIL
+    if [ -n $VSITE_USER_ROLE ]; then
+      sudo -E -u www-data drush user-add-role "$VSITE_USER_ROLE" --mail=$VSITE_USER_MAIL 
+    fi
+  fi
   echo "Site Installation Completed"
   # TODO: report back to root that I have completed!
 else
