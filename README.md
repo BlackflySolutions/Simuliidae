@@ -12,7 +12,7 @@ The purpose of the project is to provide a platform on which to build automated 
 The structure of the project mirrors that of the official Drupal docker project. Specifically, it follows that project's top level directory structure for Drupal versioning with subdirectories for image variants. To start with, I have only generated the latest Drupal 7 with Apache.
 
 ## Status
-This is the public first release, a work-in-progress.
+This is the public first release, a work-in-progress. No warranty express or implied.
 
 ## What It Is, What It Includes
 This project includes instructions, docker compose files and Docker files for an "admin" container. 
@@ -25,6 +25,3 @@ The Mariadb database image definition is here: https://github.com/BlackflySoluti
 2. Either install docker-compose or configure your docker node as a (usually stand-alone) swarm.
 3. Use `compose.sh test_evaluator up -d` or `stack.sh test_evaluator deploy`
 4. Access the site via your browser at the corresponding url (for compose, it'll be an non-routable ip that you can find using docker inspect, for swarm it'll be a port that was auto-assigned when the stack was created).
-
-## Quick Start on Blackfly's Test System
-1. Visit https://discover.civicrm.ca/ and follow the instructions. It uses this project with some additional automation.
