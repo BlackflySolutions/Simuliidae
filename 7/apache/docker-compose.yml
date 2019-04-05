@@ -15,7 +15,7 @@ services:
       - MYSQL_DATABASE
    
   vhttp:
-    image: blackflysolutions/drupal:7-apache-civicrm-5-stable
+    image: blackflysolutions/drupal:7-apache
     domainname: ${VSITE_DOMAIN}
     expose:
            - "80"
@@ -30,14 +30,13 @@ services:
       - MYSQL_ROOT_PASSWORD
       - MYSQL_DATABASE
       - DRUPAL_DATABASE
-      - CIVICRM_DATABASE
     depends_on:
       - vsql
 
   admin:
     # create a new, empty site at this location
     # build a temporary super-set of the vhttp container above, run some scripts, and then (maybe) exit.
-    image: blackflysolutions/simuliidae-admin:7-apache-civicrm-5-stable
+    image: blackflysolutions/simuliidae-admin:7-apache
     #image: simuliidae_admin:latest
     #build:
     #  context: admin
@@ -48,13 +47,11 @@ services:
       - VSITE_SITE
       - VSITE_SITE_NAME
       - VSITE_DOMAIN
-      - VSITE_CIVICRM_VER
       - MYSQL_USER
       - MYSQL_PASSWORD
       - MYSQL_ROOT_PASSWORD
       - MYSQL_DATABASE
       - DRUPAL_DATABASE
-      - CIVICRM_DATABASE
       - VSITE_NAME
       - VSITE_ADMIN_NAME
       - VSITE_ADMIN_MAIL

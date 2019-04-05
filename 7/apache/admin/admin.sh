@@ -21,25 +21,6 @@ if [ ! -f /var/www/html/sites/default/settings.php ]; then
    --db-su-pw=$MYSQL_ROOT_PASSWORD 
   sudo -E -u www-data drush -y vset theme_default ${VSITE_THEME:-bartik}
   sudo -E -u www-data drush -y vset admin_theme ${VSITE_THEME:-seven}
-# install civicrm if available but not yet installed
-  if [ -d /var/www/html/sites/all/modules/civicrm/drupal/drush ]; then
-    if [ ! -f /var/www/html/sites/default/civicrm_settings.php ]; then
-      cp -Rp /var/www/html/sites/all/modules/civicrm/drupal/drush  /var/www/.drush/civicrm-install
-      chown -R www-data /var/www/.drush/civicrm-install
-      sudo -E -u www-data drush -y cc drush
-      chmod u+w /var/www/html/sites/default
-      mysql -u root -p$MYSQL_PASSWORD -h vsql  -e "create database if not exists $CIVICRM_DATABASE; grant all on $CIVICRM_DATABASE.* to $MYSQL_USER@'%'; UPDATE $DRUPAL_DATABASE.system SET status = 1 where name = 'civicrm'"
-      sudo -E -u www-data drush -y civicrm-install --dbhost=vsql --dbname=$CIVICRM_DATABASE --dbpass=$MYSQL_PASSWORD --dbuser=$MYSQL_USER --site_url=$VSITE_DOMAIN --ssl=on --destination=sites/all/modules
-      chmod u-w /var/www/html/sites/default
-      sudo -E -u www-data drush -y civicrm-ext-install ca.civicrm.logviewer 
-      sudo -E -u www-data drush -y civicrm-ext-install org.civicrm.shoreditch
-      curl -LsS https://download.civicrm.org/cv/cv.phar -o /usr/local/bin/cv
-      chmod +x /usr/local/bin/cv
-      cv api setting.create customCSSURL=/vendor/org.civicrm.shoreditch/css/custom-civicrm.css
-      sudo -E -u www-data drush -y pm-enable civicrmtheme
-      sudo -E -u www-data drush -y vset civicrm_theme_admin ${VSITE_THEME:-seven}
-    fi
-  fi
   # allow for initial setup using a site feature
   if [ -n $VSITE_FEATURE ]; then
     sudo -E -u www-data drush -y pm-enable $VSITE_FEATURE

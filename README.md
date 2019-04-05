@@ -23,5 +23,6 @@ The Mariadb database image definition is here: https://github.com/BlackflySoluti
 ## Quick Start On Your Own System
 1. Install docker on your system.
 2. Either install docker-compose or configure your docker node as a (usually stand-alone) swarm.
+3. Grab this project into a directory, and checkout the 7-apache-civicrm-5 branch.
 3. Use `compose.sh test_evaluator up -d` or `stack.sh test_evaluator deploy`
 4. Access the site via your browser at the corresponding url (for compose, it'll be an non-routable ip that you can find using docker inspect, for swarm it'll be a port that was auto-assigned when the stack was created).
