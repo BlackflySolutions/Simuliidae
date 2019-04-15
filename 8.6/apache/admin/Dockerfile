@@ -2,8 +2,11 @@ FROM blackflysolutions/drupal:8-6-apache-civicrm-5
 # an extended version of the webserver image, adding extra packages and scripts
 RUN apt-get update \
   && apt-get install -y mariadb-client sudo vim git zip unzip netcat \
+  && apt-get install -y wget \
   && apt-get purge -y
 COPY drush.phar /usr/local/bin/drush
+RUN curl --silent --show-error https://getcomposer.org/installer | php
+
 COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
 # combine admin with previous line once it's settled down
 COPY admin.sh /usr/local/bin/admin.sh
