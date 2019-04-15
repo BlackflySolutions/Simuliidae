@@ -16,7 +16,7 @@ services:
    
   vhttp:
     # image: drupal:8.6-apache
-    image: blackflysolutions/drupal:8-apache-civicrm-5
+    image: blackflysolutions/drupal:8-6-apache-civicrm-5
     domainname: "{VSITE_DOMAIN}"
     expose:
            - "80"
@@ -38,7 +38,7 @@ services:
   admin:
     # create a new, empty site at this location
     # build a temporary super-set of the vhttp container above, run some scripts, and then (maybe) exit.
-    image: blackflysolutions/simuliidae-admin:8-apache-civicrm-5
+    image: blackflysolutions/simuliidae-admin:8-6-apache-civicrm-5
     #    image: blackflysolutions/simuliidae-admin:7-apache-civicrm-5-stable
     #image: simuliidae_admin:latest
     #build:
