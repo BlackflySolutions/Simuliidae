@@ -16,10 +16,13 @@ services:
    
   vhttp:
     # image: drupal:8.6-apache
-    image: blackflysolutions/drupal:8-apache-civicrm-5
+    image: blackflysolutions/drupal:8-6-apache
     domainname: "{VSITE_DOMAIN}"
-    expose:
-           - "80"
+    deploy:
+      labels:
+        simuliidae.domain: "{VSITE_DOMAIN}"
+    ports:
+      - 80/tcp
     volumes:
       - vsite:/var/www/html/sites/default
     environment:
@@ -36,10 +39,8 @@ services:
       - vsql
 
   admin:
-    # create a new, empty site at this location
-    # build a temporary super-set of the vhttp container above, run some scripts, and then (maybe) exit.
-    image: blackflysolutions/simuliidae-admin:8-apache-civicrm-5
-    #    image: blackflysolutions/simuliidae-admin:7-apache-civicrm-5-stable
+    # use an extended version of the above image for administrative tasks
+    image: blackflysolutions/simuliidae-admin:8-6-apache
     #image: simuliidae_admin:latest
     #build:
     #  context: admin

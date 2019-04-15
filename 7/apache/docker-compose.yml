@@ -4,8 +4,6 @@ services:
 
   vsql:
     image: blackflysolutions/mariadb:10.1
-    expose:
-           - "3306"
     volumes:
       - vdb:/var/lib/mysql
     environment:
@@ -15,7 +13,9 @@ services:
       - MYSQL_DATABASE
    
   vhttp:
-    image: blackflysolutions/drupal:7-apache-civicrm-5-stable
+    image: blackflysolutions/drupal:7-apache
+    ports:
+           - "80/tcp"
     domainname: ${VSITE_DOMAIN}
     expose:
            - "80"
@@ -37,7 +37,7 @@ services:
   admin:
     # create a new, empty site at this location
     # build a temporary super-set of the vhttp container above, run some scripts, and then (maybe) exit.
-    image: blackflysolutions/simuliidae-admin:7-apache-civicrm-5-stable
+    image: blackflysolutions/simuliidae-admin:7-apache
     #image: simuliidae_admin:latest
     #build:
     #  context: admin
