@@ -1,15 +1,29 @@
-FROM blackflysolutions/drupal:8.6-apache-civicrm-5-stable
-# an extended version of the webserver image, adding extra packages and scripts
+# an extended version of the webserver image for administration
+FROM blackflysolutions/drupal:8-6-apache
+#FROM drupal:8-6-apache
+# run apache as minimally as possible with a custom conf file
+COPY admin.conf /etc/apache2/conf-available
+RUN a2enconf admin
+# add extra packages and scripts
 RUN apt-get update \
   && apt-get install -y mariadb-client sudo vim git zip unzip netcat \
   && apt-get purge -y
-COPY drush.phar /usr/local/bin/drush
+# drush launcher: drush is/was installed by composer
+RUN curl -L -o /usr/local/bin/drush https://github.com/drush-ops/drush-launcher/releases/download/0.6.0/drush.phar
+RUN chmod ugo+x /usr/local/bin/drush
+# wait-for-it script because I need a working sql container before installing
 COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
-# combine admin with previous line once it's settled down
+# add composer
+RUN curl --silent --show-error https://getcomposer.org/installer | php -- --filename=composer --install-dir=/usr/local/bin
+# create a user to own the drupal code and run the build process
+# note that this user does not exist in the vhttp/run image!
+RUN useradd -u 1978 -g www-data -ms /bin/bash drupal
+RUN chown drupal:www-data /var/www/drupal
+COPY admindb.sh /usr/local/bin/admindb.sh
+# the admin.sh script will initialize the volumes if it's an empty site
 COPY admin.sh /usr/local/bin/admin.sh
-RUN chmod ugo+x /usr/local/bin/drush && chmod ugo+x /usr/local/bin/*.sh 
-COPY admin.conf /etc/apache2/conf-available
-RUN a2enconf admin
-# CMD["apache2-foreground"]
+RUN chmod ugo+x /usr/local/bin/*.sh 
+#CMD["apache2-foreground"]
 # Run the same initialization script that vhttp does, and then the admin one.
+# CMD apache2-foreground
 CMD /usr/local/bin/admin.sh && apache2-foreground
