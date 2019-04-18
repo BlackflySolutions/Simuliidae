@@ -5,6 +5,12 @@ RUN apt-get update \
   && apt-get install -y mariadb-client sudo vim git zip unzip netcat \
   && apt-get purge -y
 COPY drush.phar /usr/local/bin/drush
+# addiitional bits for d8-civicrm, composer + other build dependencies
+# TODO: there may be better docker-specific ways to do this?
+RUN curl --silent --show-error https://getcomposer.org/installer | php -- --filename=composer --install-dir=/usr/local/bin
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
+RUN apt-get install -y nodejs
+RUN npm install -g bower
 COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
 # combine admin with previous line once it's settled down
 COPY admin.sh /usr/local/bin/admin.sh
