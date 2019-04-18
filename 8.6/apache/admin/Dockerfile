@@ -1,4 +1,5 @@
-FROM blackflysolutions/drupal:8.6-apache-civicrm-5-stable
+FROM blackflysolutions/drupal:8.6-apache-civicrm-5
+#FROM drupal:8-6-apache-civicrm-5
 # an extended version of the webserver image, adding extra packages and scripts
 RUN apt-get update \
   && apt-get install -y mariadb-client sudo vim git zip unzip netcat \
@@ -12,4 +13,5 @@ COPY admin.conf /etc/apache2/conf-available
 RUN a2enconf admin
 # CMD["apache2-foreground"]
 # Run the same initialization script that vhttp does, and then the admin one.
+#CMD apache2-foreground
 CMD /usr/local/bin/admin.sh && apache2-foreground

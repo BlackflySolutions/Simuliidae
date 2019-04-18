@@ -4,8 +4,6 @@ services:
 
   vsql:
     image: blackflysolutions/mariadb:10.1
-    expose:
-           - "3306"
     volumes:
       - vdb:/var/lib/mysql
     environment:
@@ -19,6 +17,8 @@ services:
     domainname: ${VSITE_DOMAIN}
     expose:
            - "80"
+    ports:
+           - "80/tcp"
     volumes:
       - vsite:/var/www/html/sites/default
     environment:

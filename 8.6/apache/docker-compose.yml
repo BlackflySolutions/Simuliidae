@@ -24,7 +24,7 @@ services:
     ports:
       - 80/tcp
     volumes:
-      - vsite:/var/www/html/sites/default
+      - vdrupal:/var/www/drupal
     environment:
       - VSITE
       - VSITE_SITE
@@ -45,7 +45,7 @@ services:
     #build:
     #  context: admin
     volumes:
-      - vsite:/var/www/html/sites/default
+      - vdrupal:/var/www/drupal
     environment:
       - VSITE
       - VSITE_SITE
@@ -67,5 +67,5 @@ services:
       - vhttp
 
 volumes:
-    vsite:
-    vdb:
+  vdrupal:
+  vdb:
