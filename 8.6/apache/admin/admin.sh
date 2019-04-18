@@ -1,15 +1,25 @@
 #!/bin/bash
-# setup a .drush folder for my www-data user
-if [ ! -d "/var/www/.drush" ]; then
-  mkdir /var/www/.drush
-  chown www-data:www-data /var/www/.drush
-  sudo -E -u www-data drush -y @none dl --destination=/var/www/.drush registry_rebuild-8.x
+# Use my composer to build code if the base directory is empty
+# Use the composer-drupal-optimizations to reduce memory use!
+if [ -z "$(ls -A /var/www/drupal)" ]; then
+  cd /var/www/drupal
+  chown drupal .
+  sudo -u drupal composer create-project drupal-composer/drupal-project:8.x-dev . --no-interaction  --no-install
+  sudo -u drupal composer require --no-update zaporylie/composer-drupal-optimizations:^1.0
+  sudo -u drupal composer install
+  mkdir -p /var/www/drupal/config/sync
+  chown www-data:www-data /var/www/drupal/config/sync
 fi
-# Use my drush to do a standard Drupal install, if no settings file exists
-if [ ! -f /var/www/html/sites/default/settings.php ]; then
+cd /var/www/drupal
+# Use drush to do a standard Drupal install, if settings file doesn't have my password
+#if [ ! -f /var/www/drupal/web/sites/default/settings.php ]; then
+if grep -q $MYSQL_PASSWORD /var/www/drupal/web/sites/default/settings.php; then
+  # if I have a configured settings file, just run the updatedb and wait for further attention in bash
+  sudo -E -u www-data drush cr
+  sudo -E -u www-data drush updatedb
+else
   /usr/local/bin/wait-for-it.sh vsql:3306
   # this will destroy any existing db, should I check first?
-  cd /var/www/html
   sudo -E -u www-data drush site-install minimal \
    --db-url="mysql://$MYSQL_USER:$MYSQL_PASSWORD@vsql/$DRUPAL_DATABASE" \
    --yes \
@@ -34,15 +44,12 @@ if [ ! -f /var/www/html/sites/default/settings.php ]; then
       sudo -E -u www-data drush -y pm-enable civicrmtheme
     fi
   fi
-  sudo -E -u www-data drush -y vset admin_theme ${VSITE_THEME:-seven}
-  sudo -E -u www-data drush -y vset civicrm_theme_admin ${VSITE_THEME:-seven}
+  sudo -E -u www-data drush -y pm:enable toolbar
+  sudo -E -u www-data drush -y theme:enable seven
+  sudo -E -u www-data drush -y config-set system.theme admin seven
+  sudo -E -u www-data drush -y config-set system.theme default ${VSITE_THEME:-seven}
   echo "Site Installation Completed"
   # TODO: report back to root that I have completed!
-else
-# if I have a settings files, just run the updatedb and wait for further attention in bash
-  cd /var/www/html/sites/default
-  sudo -E -u www-data drush cc drush
-  sudo -E -u www-data drush updatedb
 fi
 echo "Site is ready at https://${VSITE_DOMAIN}"
 echo "Login using the following url"
