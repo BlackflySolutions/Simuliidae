@@ -56,6 +56,7 @@ else
   echo "Site Installation Completed"
   echo "Login using the following url"
   sudo -E -u www-data drush --uri="https://${VSITE_DOMAIN}" uli
+  # TODO: report back to root that I have completed!
 fi
 #echo "Login using the following url"
 #sudo -E -u www-data drush uli

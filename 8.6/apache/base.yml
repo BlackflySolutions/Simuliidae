@@ -4,6 +4,8 @@ services:
 
   vsql:
     image: blackflysolutions/mariadb:10.1
+    expose:
+           - "3306"
     volumes:
       - vdb:/var/lib/mysql
     environment:
@@ -13,14 +15,14 @@ services:
       - MYSQL_DATABASE
    
   vhttp:
-    image: blackflysolutions/drupal:7-apache-civicrm-5
-    domainname: ${VSITE_DOMAIN}
-    expose:
-           - "80"
+    image: blackflysolutions/drupal:8-6-apache
+    deploy:
+      labels:
+        simuliidae.domain: "{VSITE_DOMAIN}"
     ports:
-           - "80/tcp"
+      - 80/tcp
     volumes:
-      - vsite:/var/www/html/sites/default
+      - vdrupal:/var/www/drupal
     environment:
       - VSITE
       - VSITE_SITE
@@ -30,19 +32,18 @@ services:
       - MYSQL_ROOT_PASSWORD
       - MYSQL_DATABASE
       - DRUPAL_DATABASE
-      - CIVICRM_DATABASE
+        #      - CIVICRM_DATABASE
     depends_on:
       - vsql
 
   admin:
-    # create a new, empty site at this location
-    # build a temporary super-set of the vhttp container above, run some scripts, and then (maybe) exit.
-    image: blackflysolutions/simuliidae-admin:7-apache-civicrm-5
+    # use an extended version of the above image for administrative tasks
+    image: blackflysolutions/simuliidae-admin:8-6-apache
     #image: simuliidae_admin:latest
     #build:
     #  context: admin
     volumes:
-      - vsite:/var/www/html/sites/default
+      - vdrupal:/var/www/drupal
     environment:
       - VSITE
       - VSITE_SITE
@@ -56,18 +57,13 @@ services:
       - DRUPAL_DATABASE
       - CIVICRM_DATABASE
       - VSITE_NAME
-      - VSITE_ADMIN_NAME
+      - VSITE_ADMIN
       - VSITE_ADMIN_MAIL
-      - VSITE_USER_NAME
-      - VSITE_USER_MAIL
-      - VSITE_USER_ROLE
-      - VSITE_FEATURE
-      - VSITE_THEME
 
     depends_on:
       - vsql
       - vhttp
 
 volumes:
-    vsite:
-    vdb:
+  vdrupal:
+  vdb:
