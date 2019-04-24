@@ -9,10 +9,10 @@ The purpose of the project is to provide a platform on which to build automated 
 4. A basis for a multi-site host.
 
 ## Structure
-The structure of the project mirrors that of the official Drupal docker project. Specifically, it follows that project's top level directory structure for Drupal versioning with subdirectories for image variants. To start with, I have only generated the latest Drupal 7 with Apache.
+The structure of the project mirrors that of the official Drupal docker project. Specifically, it follows that project's top level directory structure for Drupal versioning with subdirectories for image variants. Currently, the 7/apache and 8.6/apache have working implementations.
 
 ## Status
-This is the public first release, a work-in-progress.
+This is a work-in-progress.
 
 ## What It Is, What It Includes
 This project includes instructions, docker compose files and Docker files for an "admin" container. 
