@@ -15,9 +15,7 @@ services:
       - MYSQL_DATABASE
    
   vhttp:
-    # image: drupal:8.6-apache
     image: blackflysolutions/drupal:8-6-apache
-    domainname: "{VSITE_DOMAIN}"
     deploy:
       labels:
         simuliidae.domain: "{VSITE_DOMAIN}"

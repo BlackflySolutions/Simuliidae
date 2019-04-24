@@ -16,7 +16,6 @@ services:
     image: blackflysolutions/drupal:7-apache
     ports:
            - "80/tcp"
-    domainname: ${VSITE_DOMAIN}
     expose:
            - "80"
     volumes:
