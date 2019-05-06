@@ -1,4 +1,4 @@
-FROM blackflysolutions/drupal:7-apache
+FROM blackflysolutions/drupal:7-apache-civicrm-5
 # an extended version of the webserver image, adding extra packages and scripts
 RUN apt-get update \
   && apt-get install -y mariadb-client sudo vim git zip unzip netcat \
