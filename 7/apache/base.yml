@@ -13,7 +13,7 @@ services:
       - MYSQL_DATABASE
    
   vhttp:
-    image: blackflysolutions/drupal:7-apache-civicrm-5
+    image: blackflysolutions/prosimulium:7-apache
     ports:
            - "80/tcp"
     expose:
@@ -36,7 +36,7 @@ services:
   admin:
     # create a new, empty site at this location
     # build a temporary super-set of the vhttp container above, run some scripts, and then (maybe) exit.
-    image: blackflysolutions/simuliidae-admin:7-apache
+    image: blackflysolutions/prosimulium:7-apache-admin
     #image: simuliidae_admin:latest
     #build:
     #  context: admin
@@ -44,7 +44,7 @@ services:
       - vsite:/var/www/html/sites/default
     environment:
       - VSITE
-      - VSITE_SITE
+      - VSITE_SITES
       - VSITE_SITE_NAME
       - VSITE_DOMAIN
       - VSITE_CIVICRM_VER

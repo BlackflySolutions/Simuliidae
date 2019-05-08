@@ -1,0 +1,29 @@
+# additions and changes to base.yml for D8 sites migrated from Louise
+# provide host-mounted shared code like a distro
+version: '3'
+
+services:
+
+  vhttp:
+    volumes:
+    - /var/www/drupal/git_deploy_cache:/tmp/git_deploy:rw
+    - /var/www/drupal/8-host:/var/www/sites/all/host:ro
+    - /var/www/drupal/8-libraries:/var/www/libraries:ro
+    - /var/www/drupal/8-modules:/var/www/sites/all/modules/contrib:ro
+    - /var/www/drupal/8-features:/var/www/sites/all/modules/features:ro
+    - /var/www/drupal/8-themes:/var/www/sites/all/themes/contrib:ro
+
+  admin:
+    volumes:
+    - /home/drupal/.ssh:/home/drupal/.ssh:ro
+    - /home/backup/.ssh:/root/.backup-ssh:ro
+    - /var/www/drupal/git_deploy_cache:/tmp/git_deploy:rw
+    - /var/www/drupal/8-host:/var/www/sites/all/host:ro
+    - /var/www/drupal/8-libraries:/var/www/libraries:ro
+    - /var/www/drupal/8-modules:/var/www/sites/all/modules/contrib:ro
+    - /var/www/drupal/8-features:/var/www/sites/all/modules/features:ro
+    - /var/www/drupal/8-themes:/var/www/sites/all/themes/contrib:ro
+    - /var/backup/louise/scripts:/var/restore/scripts:ro
+    - /var/backup/louise/var/www/vhosts:/var/restore/vhosts:ro
+    - /var/backup/louise/var/backup/mysql:/var/restore/mysql:ro
+    - /var/backup/louise/var/backup/mysql/adhoc:/var/restore/mysql/adhoc:rw

@@ -1,0 +1,15 @@
+# add in redis - this requires some supporting bits still
+version: '3'
+services:
+  vredis:
+    image: "blackflysolutions/redis"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname=={VSITE_NODE-ectemnia}
+      resources:
+        limits:
+          cpus: "1"
+          memory: "120M"
+

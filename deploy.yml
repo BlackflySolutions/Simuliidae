@@ -1,0 +1,58 @@
+# additions and changes to base.yml for sites migrated from Louise
+# 1. deploy for production settings
+# 2. provide host-mounted backup directories
+#    note: the deploy script will need to ensure the host directories exist/are created
+version: '3'
+
+services:
+
+  vsql:
+    deploy:
+      placement:
+        constraints:
+          - node.hostname=={VSITE_NODE-ectemnia}
+      replicas: 1
+      resources:
+        limits:
+          cpus: "2"
+          memory: "{VSITE_SQL_MEMORY-4000M}"
+      restart_policy:
+        max_attempts: "2"
+    
+  vhttp:
+    environment:
+      - VSITE_CIVIMAIL_SMTP_DEFAULT
+    deploy:
+      placement:
+        constraints:
+          - node.hostname=={VSITE_NODE-ectemnia}
+      labels:
+        simuliidae.domain: "{VSITE_DOMAIN}"
+        simuliidae.domainaliases: "{VSITE_DOMAIN_ALIASES}"
+      replicas: 1
+      resources:
+        limits:
+          cpus: "2"
+          memory: "{VSITE_HTTP_MEMORY-500M}"
+      restart_policy:
+        max_attempts: "2"
+
+  admin:
+    volumes:
+    - /var/backup/docker/{VSITE}/volume:/var/backup/volume:ro
+    - /var/backup/docker/{VSITE}/vsql:/var/backup/vsql:ro
+    - /var/backup/{VSITE_ADMIN_RESTOREDB_DIR-null}:/var/restore/vdb:ro
+    - /var/backup/{VSITE_ADMIN_RESTORESITE_DIR-null}:/var/restore/vsite:ro
+    environment:
+      - VSITE_CIVIMAIL_SMTP_DEFAULT
+    deploy:
+      placement:
+        constraints:
+          - node.hostname=={VSITE_NODE-ectemnia}
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: "2000M"
+      restart_policy:
+        condition: none

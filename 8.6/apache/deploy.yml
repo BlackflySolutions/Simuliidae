@@ -1,0 +1,86 @@
+services:
+  admin:
+    depends_on:
+    - vhttp
+    - vsql
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2000M
+      restart_policy:
+        condition: none
+    environment:
+      CIVICRM_DATABASE: null
+      DRUPAL_DATABASE: null
+      MYSQL_DATABASE: null
+      MYSQL_PASSWORD: null
+      MYSQL_ROOT_PASSWORD: null
+      MYSQL_USER: null
+      VSITE: null
+      VSITE_ADMIN: null
+      VSITE_ADMIN_MAIL: null
+      VSITE_CIVICRM_VER: null
+      VSITE_DOMAIN: null
+      VSITE_NAME: null
+      VSITE_SITE: null
+      VSITE_SITE_NAME: null
+    image: blackflysolutions/simuliidae-admin:8-6-apache
+    volumes:
+    - /var/backup/docker/${VSITE}/volume:/var/backup/volume:ro
+    - /var/backup/docker/${VSITE}/vsql:/var/backup/vsql:ro
+    - /var/backup/${VSITE_ADMIN_RESTOREDB_DIR-null}:/var/restore/vdb:ro
+    - /var/backup/${VSITE_ADMIN_RESTORESITE_DIR-null}:/var/restore/vsite:ro
+    - vdrupal:/var/www/drupal:rw
+  vhttp:
+    depends_on:
+    - vsql
+    deploy:
+      labels:
+        simuliidae.domain: '${VSITE_DOMAIN}'
+      replicas: 1
+      resources:
+        limits:
+          cpus: '2'
+          memory: '${VSITE_HTTP_MEMORY-500M}'
+      restart_policy:
+        max_attempts: 2
+    environment:
+      DRUPAL_DATABASE: null
+      MYSQL_DATABASE: null
+      MYSQL_PASSWORD: null
+      MYSQL_ROOT_PASSWORD: null
+      MYSQL_USER: null
+      VSITE: null
+      VSITE_DOMAIN: null
+      VSITE_SITE: null
+    image: blackflysolutions/drupal:8-6-apache
+    ports:
+    - 80/tcp
+    volumes:
+    - vdrupal:/var/www/drupal:rw
+  vsql:
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '2'
+          memory: '${VSITE_SQL_MEMORY-2000M}'
+      restart_policy:
+        max_attempts: 2
+    environment:
+      MYSQL_DATABASE: null
+      MYSQL_PASSWORD: null
+      MYSQL_ROOT_PASSWORD: null
+      MYSQL_USER: null
+    expose:
+    - '3306'
+    image: blackflysolutions/mariadb:10.1
+    volumes:
+    - vdb:/var/lib/mysql:rw
+version: '3.0'
+volumes:
+  vdb: {}
+  vdrupal: {}
+

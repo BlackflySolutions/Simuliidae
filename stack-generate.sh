@@ -2,10 +2,20 @@
 # 1. project variant (directory)
 # 2. compose file additions
 export VSITE_COMPOSE_PROJECT_VARIANT=$1
-BASE=${3:-base}.yml
-if [[ -z $3 ]]; then
-  GENNAME=$2.yml
-else
-  GENNAME=${3}-$2.yml
-fi
-docker-compose -f ${VSITE_COMPOSE_PROJECT_VARIANT}/$BASE -f ${2}.yml config | sed 's/{VSITE/\${VSITE/g' | sed "s/ \([^[:space:]]*\): ''$/ - \1/" > ${VSITE_COMPOSE_PROJECT_VARIANT}/$GENNAME
+shift
+BASE="base"
+GENNAME=""
+CONFIGS=""
+# iterate
+while test ${#} -gt 0
+do
+  ADD=$1
+  if [[ -z $GENNAME ]]; then
+    GENNAME=${ADD}
+  else
+    GENNAME=${GENNAME}-${ADD}
+  fi
+  CONFIGS="$CONFIGS -f $ADD.yml"
+  shift
+done
+docker-compose -f ${VSITE_COMPOSE_PROJECT_VARIANT}/${BASE}.yml $CONFIGS config | sed 's/{VSITE/\${VSITE/g' | sed "s/ \([^[:space:]]*\): ''$/ - \1/" > ${VSITE_COMPOSE_PROJECT_VARIANT}/${GENNAME}.yml

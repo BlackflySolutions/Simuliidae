@@ -1,0 +1,35 @@
+# additions and changes to base.yml for sites migrated from Louise
+# provide host-mounted shared code like a distro
+version: '3'
+
+services:
+
+  vhttp:
+    volumes:
+    - /var/www/drupal/git_deploy_cache:/tmp/git_deploy:rw
+    - /var/www/drupal/7-host:/var/www/html/sites/all/host:ro
+    - /var/www/drupal/libraries:/var/www/html/sites/all/libraries:ro
+    - /var/www/civicrm/{VSITE_CIVICRM_VER-none}:/var/www/html/sites/all/modules/civicrm:ro
+    - /var/www/drupal/7-modules:/var/www/html/sites/all/modules/contrib:ro
+    - /var/www/drupal/7-features:/var/www/html/sites/all/modules/features:ro
+    - /var/www/drupal/7-themes:/var/www/html/sites/all/themes/contrib:ro
+    - /var/www/civicrm/vendor:/var/www/html/vendor:ro
+
+  admin:
+    # avoid building a new empty site
+    # command: apache2-foreground
+    volumes:
+    - /home/drupal/.ssh:/home/drupal/.ssh:ro
+    - /home/backup/.ssh:/root/.backup-ssh:ro
+    - /var/www/drupal/git_deploy_cache:/tmp/git_deploy:rw
+    - /var/www/drupal/7-host:/var/www/html/sites/all/host:ro
+    - /var/www/drupal/libraries:/var/www/html/sites/all/libraries:ro
+    - /var/www/civicrm/{VSITE_CIVICRM_VER-none}:/var/www/html/sites/all/modules/civicrm:ro
+    - /var/www/drupal/7-modules:/var/www/html/sites/all/modules/contrib:ro
+    - /var/www/drupal/7-features:/var/www/html/sites/all/modules/features:ro
+    - /var/www/drupal/7-themes:/var/www/html/sites/all/themes/contrib:ro
+    - /var/www/civicrm/vendor:/var/www/html/vendor:ro
+    - /var/backup/louise/scripts:/var/restore/scripts:ro
+    - /var/backup/louise/var/www/vhosts:/var/restore/vhosts:ro
+    - /var/backup/louise/var/backup/mysql:/var/restore/mysql:ro
+    - /var/backup/louise/var/backup/mysql/adhoc:/var/restore/mysql/adhoc:rw
