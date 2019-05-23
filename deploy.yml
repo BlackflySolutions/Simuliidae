@@ -39,10 +39,10 @@ services:
 
   admin:
     volumes:
-    - /var/backup/docker/{VSITE}/volume:/var/backup/volume:ro
-    - /var/backup/docker/{VSITE}/vsql:/var/backup/vsql:ro
-    - /var/backup/{VSITE_ADMIN_RESTOREDB_DIR-null}:/var/restore/vdb:ro
-    - /var/backup/{VSITE_ADMIN_RESTORESITE_DIR-null}:/var/restore/vsite:ro
+    - /var/backup/docker/{VSITE}/volume:/var/backup/volume
+    - /var/backup/docker/{VSITE}/vsql:/var/backup/vsql
+    - /var/backup/{VSITE_ADMIN_RESTOREDB_DIR-null}:/var/restore/vdb
+    - /var/backup/{VSITE_ADMIN_RESTORESITE_DIR-null}:/var/restore/vsite
     environment:
       - VSITE_CIVIMAIL_SMTP_DEFAULT
     deploy:

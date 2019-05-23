@@ -13,7 +13,7 @@ services:
       - MYSQL_DATABASE
    
   vhttp:
-    image: blackflysolutions/prosimulium:7-apache
+    image: prosimulium:7-commerce-kickstart
     ports:
            - "80/tcp"
     expose:
@@ -37,7 +37,7 @@ services:
   admin:
     # create a new, empty site at this location
     # build a temporary super-set of the vhttp container above, run some scripts, and then (maybe) exit.
-    image: blackflysolutions/prosimulium:7-apache-admin
+    image: prosimulium:7-commerce-kickstart-admin
     #image: simuliidae_admin:latest
     #build:
     #  context: admin

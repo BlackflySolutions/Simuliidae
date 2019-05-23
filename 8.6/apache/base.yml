@@ -15,7 +15,7 @@ services:
       - MYSQL_DATABASE
    
   vhttp:
-    image: blackflysolutions/prosimulium:8-6-apache
+    image: prosimulium:8-6-apache
     deploy:
       labels:
         simuliidae.domain: "{VSITE_DOMAIN}"
@@ -38,7 +38,7 @@ services:
 
   admin:
     # use an extended version of the above image for administrative tasks
-    image: blackflysolutions/prosimulium:8-6-apache-admin
+    image: prosimulium:8-6-apache-admin
     #image: simuliidae_admin:latest
     #build:
     #  context: admin
