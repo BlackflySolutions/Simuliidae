@@ -10,7 +10,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.hostname=={VSITE_NODE-ectemnia}
+          - node.hostname=={VSITE_NODE-$THIS_NODE}
       replicas: 1
       resources:
         limits:
@@ -25,7 +25,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.hostname=={VSITE_NODE-ectemnia}
+          - node.hostname=={VSITE_NODE-$THIS_NODE}
       labels:
         simuliidae.domain: "{VSITE_DOMAIN}"
         simuliidae.domainaliases: "{VSITE_DOMAIN_ALIASES}"
@@ -48,7 +48,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.hostname=={VSITE_NODE-ectemnia}
+          - node.hostname=={VSITE_NODE-$THIS_NODE}
       replicas: 1
       resources:
         limits:

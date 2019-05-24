@@ -1,6 +1,8 @@
 #!/bin/bash
 # 1. project variant (directory)
 # 2. compose file additions
+export THIS_NODE=`hostname`
+echo "Using $THIS_NODE"
 export VSITE_COMPOSE_PROJECT_VARIANT=$1
 shift
 BASE="base"
