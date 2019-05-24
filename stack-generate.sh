@@ -17,7 +17,11 @@ do
   else
     GENNAME=${GENNAME}-${ADD}
   fi
-  CONFIGS="$CONFIGS -f $ADD.yml"
+  if [[ -f "${VSITE_COMPOSE_PROJECT_VARIANT}/-${ADD}.yml" ]]; then
+    CONFIGS="$CONFIGS -f ${VSITE_COMPOSE_PROJECT_VARIANT}/-${ADD}.yml"
+  else
+    CONFIGS="$CONFIGS -f $ADD.yml"
+  fi
   shift
 done
 docker-compose -f ${VSITE_COMPOSE_PROJECT_VARIANT}/${BASE}.yml $CONFIGS config | sed 's/{VSITE/\${VSITE/g' | sed "s/ \([^[:space:]]*\): ''$/ - \1/" > ${VSITE_COMPOSE_PROJECT_VARIANT}/${GENNAME}.yml
