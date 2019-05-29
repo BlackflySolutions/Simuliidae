@@ -17,8 +17,6 @@ services:
     image: prosimulium:6-apache
     ports:
            - "80/tcp"
-    expose:
-           - "80"
     volumes:
       - vsite:/var/www/html/sites/{VSITE_SITES}
     environment:
@@ -27,8 +25,6 @@ services:
       - VSITE_DOMAIN
       - MYSQL_USER
       - MYSQL_PASSWORD
-      - MYSQL_ROOT_PASSWORD
-      - MYSQL_DATABASE
       - DRUPAL_DATABASE
       - CIVICRM_DATABASE
     depends_on:
@@ -47,16 +43,13 @@ services:
     environment:
       - VSITE
       - VSITE_SITES
-      - VSITE_SITE_NAME
       - VSITE_DOMAIN
-      - VSITE_CIVICRM_VER
       - MYSQL_USER
       - MYSQL_PASSWORD
       - MYSQL_ROOT_PASSWORD
       - MYSQL_DATABASE
       - DRUPAL_DATABASE
       - CIVICRM_DATABASE
-
     depends_on:
       - vsql
       - vhttp
