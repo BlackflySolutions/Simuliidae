@@ -1,5 +1,5 @@
 # an extended version of the webserver image for administration
-FROM blackflysolutions/drupal:8-6-apache-civicrm-5
+FROM ${REPOSITORY_FROM:-}drupal:8-6-apache-civicrm-5
 # FROM drupal:8-6-apache-civicrm-5
 # run apache as minimally as possible with a custom conf file
 COPY admin.conf /etc/apache2/conf-available
