@@ -1,5 +1,5 @@
-# additions and changes to base.yml for sites migrated from Louise
-# 1. deploy for production settings
+# additions and changes to base.yml for deployment with swarm
+# 1. deploy for typical production settings
 # 2. provide host-mounted backup directories
 #    note: the deploy script will need to ensure the host directories exist/are created
 version: '3'
@@ -41,8 +41,6 @@ services:
     volumes:
     - /var/backup/docker/{VSITE}/volume:/var/backup/volume
     - /var/backup/docker/{VSITE}/vsql:/var/backup/vsql
-    - /var/backup/{VSITE_ADMIN_RESTOREDB_DIR-null}:/var/restore/vdb
-    - /var/backup/{VSITE_ADMIN_RESTORESITE_DIR-null}:/var/restore/vsite
     environment:
       - VSITE_CIVIMAIL_SMTP_DEFAULT
     deploy:
