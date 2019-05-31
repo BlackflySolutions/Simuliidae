@@ -15,7 +15,7 @@ services:
       - MYSQL_DATABASE
    
   vhttp:
-    image: prosimulium:8-6-apache
+    image: blackflysolutions/drupal:8-apache
     deploy:
       labels:
         simuliidae.domain: "{VSITE_DOMAIN}"
@@ -29,16 +29,16 @@ services:
       - VSITE_DOMAIN
       - MYSQL_USER
       - MYSQL_PASSWORD
-      - MYSQL_ROOT_PASSWORD
       - MYSQL_DATABASE
       - DRUPAL_DATABASE
-        #      - CIVICRM_DATABASE
+      - CIVICRM_DATABASE
     depends_on:
       - vsql
 
   admin:
     # use an extended version of the above image for administrative tasks
-    image: prosimulium:8-6-apache-admin
+    #image: blackflysolutions/simuliidae-admin:8-apache
+    image: simuliidae-admin:8-apache
     #image: simuliidae_admin:latest
     #build:
     #  context: admin
@@ -47,18 +47,13 @@ services:
     environment:
       - VSITE
       - VSITE_SITES
-      - VSITE_SITE_NAME
       - VSITE_DOMAIN
-      - VSITE_CIVICRM_VER
       - MYSQL_USER
       - MYSQL_PASSWORD
       - MYSQL_ROOT_PASSWORD
       - MYSQL_DATABASE
       - DRUPAL_DATABASE
       - CIVICRM_DATABASE
-      - VSITE_NAME
-      - VSITE_ADMIN
-      - VSITE_ADMIN_MAIL
 
     depends_on:
       - vsql
