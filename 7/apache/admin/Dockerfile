@@ -1,4 +1,4 @@
-ARG REPOSITORY_FROM
+ARG REPOSITORY_FROM=blackflysolutions/
 FROM ${REPOSITORY_FROM}drupal:7-apache-civicrm-5
 # an extended version of the webserver image, adding extra packages and scripts
 RUN apt-get update \
