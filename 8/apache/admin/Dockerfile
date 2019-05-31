@@ -1,5 +1,6 @@
 # an extended version of the webserver image for administration
-FROM ${REPOSITORY_FROM:-}drupal:8-apache-civicrm-5
+ARG REPOSITORY_FROM
+FROM ${REPOSITORY_FROM}drupal:8-apache-civicrm-5
 # run apache as minimally as possible with a custom conf file
 COPY admin.conf /etc/apache2/conf-available
 RUN a2enconf admin
