@@ -1,4 +1,5 @@
-FROM blackflysolutions/drupal:7-apache
+ARG REPOSITORY_FROM=blackflysolutions/
+FROM ${REPOSITORY_FROM}drupal:7-apache
 # an extended version of the webserver image, adding extra packages and scripts
 RUN apt-get update \
   && apt-get install -y mariadb-client sudo vim git zip unzip netcat \
