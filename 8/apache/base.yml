@@ -15,7 +15,7 @@ services:
       - MYSQL_DATABASE
    
   vhttp:
-    image: prosimulium:8-apache
+    image: blackflysolutions/drupal:8-apache
     deploy:
       labels:
         simuliidae.domain: "{VSITE_DOMAIN}"
@@ -29,6 +29,7 @@ services:
       - VSITE_DOMAIN
       - MYSQL_USER
       - MYSQL_PASSWORD
+      - MYSQL_DATABASE
       - DRUPAL_DATABASE
       - CIVICRM_DATABASE
     depends_on:
@@ -36,7 +37,8 @@ services:
 
   admin:
     # use an extended version of the above image for administrative tasks
-    image: prosimulium:8-apache-admin
+    image: blackflysolutions/simuliidae-admin:8-apache
+    # image: simuliidae-admin:8-apache
     #image: simuliidae_admin:latest
     volumes:
       - vdrupal:/var/www/drupal

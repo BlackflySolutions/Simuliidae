@@ -34,21 +34,6 @@ else
    --account-mail=$VSITE_ADMIN_MAIL \
    --db-su=root \
    --db-su-pw=$MYSQL_ROOT_PASSWORD 
-# install civicrm if available but not yet installed
-  if [ -d /var/www/html/sites/all/modules/civicrm/drupal/drush ]; then
-    if [ ! -f /var/www/html/sites/default/civicrm_settings.php ]; then
-      cp -Rp /var/www/html/sites/all/modules/civicrm/drupal/drush  /var/www/.drush/civicrm-install
-      chown -R www-data /var/www/.drush/civicrm-install
-      sudo -E -u www-data drush -y cc drush
-      chmod u+w /var/www/html/sites/default
-      mysql -u root -p$MYSQL_PASSWORD -h vsql  -e "create database if not exists $CIVICRM_DATABASE; grant all on $CIVICRM_DATABASE.* to $MYSQL_USER@'%'; UPDATE $DRUPAL_DATABASE.system SET status = 1 where name = 'civicrm'"
-      sudo -E -u www-data drush -y civicrm-install --dbhost=vsql --dbname=$CIVICRM_DATABASE --dbpass=$MYSQL_PASSWORD --dbuser=$MYSQL_USER --site_url=$VSITE_DOMAIN --ssl=on --destination=sites/all/modules
-      chmod u-w /var/www/html/sites/default
-      curl -LsS https://download.civicrm.org/cv/cv.phar -o /usr/local/bin/cv
-      chmod +x /usr/local/bin/cv
-      sudo -E -u www-data drush -y pm-enable civicrmtheme
-    fi
-  fi
   sudo -E -u www-data drush -y pm:enable toolbar
   sudo -E -u www-data drush -y theme:enable seven
   sudo -E -u www-data drush -y config-set system.theme admin seven
@@ -56,7 +41,26 @@ else
   echo "Site Installation Completed"
   echo "Login using the following url"
   sudo -E -u www-data drush --uri="https://${VSITE_DOMAIN}" uli
-  # TODO: report back to root that I have completed!
 fi
-#echo "Login using the following url"
+# install civicrm if not yet installed
+if [ -d "/var/www/drupal/vendor" ]; then
+  echo "Detected existing CiviCRM codebase."
+else
+  # this should go away when we get to 5.13.x?
+  sudo -u drupal composer config repositories.zetacomponents-mail vcs https://github.com/civicrm/zetacomponents-mail.git
+  sudo -u drupal composer require civicrm/civicrm-core:~5 civicrm/civicrm-drupal-8 roundearth/civicrm-composer-plugin
+  # and enable/auto-install
+  if [ ! -f /var/www/drupal/web/sites/default/civicrm_settings.php ]; then
+    chmod ug+w /var/www/drupal/web/sites/default
+    mysql -u root -p$MYSQL_PASSWORD -h vsql  -e "create database if not exists $CIVICRM_DATABASE; grant all on $CIVICRM_DATABASE.* to $MYSQL_USER@'%';"
+    #UPDATE $DRUPAL_DATABASE.system SET status = 1 where name = 'civicrm'"
+    sudo -E -u www-data drush -y pm:enable civicrm
+    #civicrm-install --dbhost=vsql --dbname=$CIVICRM_DATABASE --dbpass=$MYSQL_PASSWORD --dbuser=$MYSQL_USER --site_url=$VSITE_DOMAIN --ssl=on --destination=sites/all/modules
+    chmod ug-w /var/www/drupal/web/sites/default
+    curl -LsS https://download.civicrm.org/cv/cv.phar -o /usr/local/bin/cv
+    chmod +x /usr/local/bin/cv
+    sudo -E -u www-data drush -y pm:enable civicrmtheme
+  fi
+fi
+echo "admin.sh initialization script complete."
 #sudo -E -u www-data drush uli
