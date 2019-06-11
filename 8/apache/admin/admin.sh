@@ -20,30 +20,16 @@ if grep -q $MYSQL_PASSWORD /var/www/drupal/web/sites/default/settings.php; then
 else
   /usr/local/bin/wait-for-it.sh vsql:3306
   # this will destroy any existing db, should I check first?
+  VSITE_DEFAULT_MAIL="${VSITE}@civicrm.ca"
   sudo -E -u www-data drush site-install minimal \
    --db-url="mysql://$MYSQL_USER:$MYSQL_PASSWORD@vsql/$DRUPAL_DATABASE" \
    --yes \
-   --site-name=$VSITE_NAME \
-   --site-mail=$VSITE_ADMIN_MAIL \
-   --account-name=$VSITE_ADMIN \
-   --account-mail=$VSITE_ADMIN_MAIL \
+   --site-name=${VSITE_NAME:-$VSITE} \
+   --site-mail=${VSITE_ADMIN_MAIL:-$VSITE_DEFAULT_MAIL} \
+   --account-name=${VSITE_ADMIN:-$VSITE} \
+   --account-mail=${VSITE_ADMIN_MAIL:-$VSITE_DEFAULT_MAIL} \
    --db-su=root \
    --db-su-pw=$MYSQL_ROOT_PASSWORD 
-# install civicrm if available but not yet installed
-  if [ -d /var/www/html/sites/all/modules/civicrm/drupal/drush ]; then
-    if [ ! -f /var/www/html/sites/default/civicrm_settings.php ]; then
-      cp -Rp /var/www/html/sites/all/modules/civicrm/drupal/drush  /var/www/.drush/civicrm-install
-      chown -R www-data /var/www/.drush/civicrm-install
-      sudo -E -u www-data drush -y cc drush
-      chmod u+w /var/www/html/sites/default
-      mysql -u root -p$MYSQL_PASSWORD -h vsql  -e "create database if not exists $CIVICRM_DATABASE; grant all on $CIVICRM_DATABASE.* to $MYSQL_USER@'%'; UPDATE $DRUPAL_DATABASE.system SET status = 1 where name = 'civicrm'"
-      sudo -E -u www-data drush -y civicrm-install --dbhost=vsql --dbname=$CIVICRM_DATABASE --dbpass=$MYSQL_PASSWORD --dbuser=$MYSQL_USER --site_url=$VSITE_DOMAIN --ssl=on --destination=sites/all/modules
-      chmod u-w /var/www/html/sites/default
-      curl -LsS https://download.civicrm.org/cv/cv.phar -o /usr/local/bin/cv
-      chmod +x /usr/local/bin/cv
-      sudo -E -u www-data drush -y pm-enable civicrmtheme
-    fi
-  fi
   sudo -E -u www-data drush -y pm:enable toolbar
   sudo -E -u www-data drush -y theme:enable seven
   sudo -E -u www-data drush -y config-set system.theme admin seven
