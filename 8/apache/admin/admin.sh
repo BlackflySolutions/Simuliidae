@@ -44,11 +44,11 @@ else
   sudo -E -u www-data drush --uri="https://${VSITE_DOMAIN}" uli
 fi
 # install civicrm if not yet installed
-if [ -d "/var/www/drupal/vendor" ]; then
+if [ -d "/var/www/drupal/vendor/civicrm" ]; then
   echo "Detected existing CiviCRM codebase."
 else
   # this should go away when we get to 5.13.x?
-  sudo -u drupal composer config repositories.zetacomponents-mail vcs https://github.com/civicrm/zetacomponents-mail.git
+  # sudo -u drupal composer config repositories.zetacomponents-mail vcs https://github.com/civicrm/zetacomponents-mail.git
   sudo -u drupal composer require civicrm/civicrm-core:~5 civicrm/civicrm-drupal-8 roundearth/civicrm-composer-plugin
   # and enable/auto-install
   if [ ! -f /var/www/drupal/web/sites/default/civicrm_settings.php ]; then
