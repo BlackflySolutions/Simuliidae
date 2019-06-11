@@ -25,13 +25,14 @@ if grep -q $MYSQL_PASSWORD /var/www/drupal/web/sites/default/settings.php; then
 else
   /usr/local/bin/wait-for-it.sh vsql:3306
   # this will destroy any existing db, should I check first?
+  VSITE_DEFAULT_MAIL="${VSITE}@civicrm.ca"
   sudo -E -u www-data drush site-install minimal \
    --db-url="mysql://$MYSQL_USER:$MYSQL_PASSWORD@vsql/$DRUPAL_DATABASE" \
    --yes \
-   --site-name=$VSITE_NAME \
-   --site-mail=$VSITE_ADMIN_MAIL \
-   --account-name=$VSITE_ADMIN \
-   --account-mail=$VSITE_ADMIN_MAIL \
+   --site-name=${VSITE_NAME:-$VSITE} \
+   --site-mail=${VSITE_ADMIN_MAIL:-$VSITE_DEFAULT_MAIL} \
+   --account-name=${VSITE_ADMIN:-$VSITE} \
+   --account-mail=${VSITE_ADMIN_MAIL:-$VSITE_DEFAULT_MAIL} \
    --db-su=root \
    --db-su-pw=$MYSQL_ROOT_PASSWORD 
   sudo -E -u www-data drush -y pm:enable toolbar
