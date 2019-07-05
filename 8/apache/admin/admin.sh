@@ -61,6 +61,7 @@ else
     curl -LsS https://download.civicrm.org/cv/cv.phar -o /usr/local/bin/cv
     chmod +x /usr/local/bin/cv
     sudo -E -u www-data drush -y pm:enable civicrmtheme
+    cv api Setting.create userFrameworkResourceURL="[cms.root]/libraries/civicrm/"
   fi
 fi
 echo "admin.sh initialization script complete."
