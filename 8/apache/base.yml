@@ -15,7 +15,7 @@ services:
       - MYSQL_DATABASE
    
   vhttp:
-    image: blackflysolutions/drupal:8-apache
+    image: blackflysolutions/drupal:8-apache-civicrm-5
     deploy:
       labels:
         simuliidae.domain: "{VSITE_DOMAIN}"
@@ -37,7 +37,7 @@ services:
 
   admin:
     # use an extended version of the above image for administrative tasks
-    image: blackflysolutions/simuliidae-admin:8-apache
+    image: blackflysolutions/simuliidae-admin:8-apache-civicrm-5
     # image: simuliidae-admin:8-apache
     #image: simuliidae_admin:latest
     volumes:
