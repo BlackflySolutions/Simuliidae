@@ -1,0 +1,62 @@
+version: '3'
+
+services:
+
+  vsql:
+    image: blackflysolutions/mariadb:10.1
+    expose:
+           - "3306"
+    volumes:
+      - vdb:/var/lib/mysql
+    environment:
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+   
+  vhttp:
+    image: blackflysolutions/drupal:8-apache-civicrm-5
+    deploy:
+      labels:
+        simuliidae.domain: "{VSITE_DOMAIN}"
+    ports:
+      - 80/tcp
+    volumes:
+      - vdrupal:/var/www/drupal
+    environment:
+      - VSITE
+      - VSITE_SITES
+      - VSITE_DOMAIN
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_DATABASE
+      - DRUPAL_DATABASE
+      - CIVICRM_DATABASE
+    depends_on:
+      - vsql
+
+  admin:
+    # use an extended version of the above image for administrative tasks
+    image: blackflysolutions/simuliidae-admin:8-apache-civicrm-5
+    # image: simuliidae-admin:8-apache
+    #image: simuliidae_admin:latest
+    volumes:
+      - vdrupal:/var/www/drupal
+    environment:
+      - VSITE
+      - VSITE_SITES
+      - VSITE_DOMAIN
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+      - DRUPAL_DATABASE
+      - CIVICRM_DATABASE
+
+    depends_on:
+      - vsql
+      - vhttp
+
+volumes:
+  vdrupal:
+  vdb:

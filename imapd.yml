@@ -1,0 +1,27 @@
+# add a container running dovecot to allow sites to pull their bounces from the host
+version: '3'
+
+services:
+
+# allow reading of vmailboxes
+  vimapd:
+    image: "blackflysolutions/dovecot"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname=={VSITE_NODE-$THIS_NODE}
+      resources:
+        limits:
+          cpus: "1"
+          memory: "50M"
+    networks:
+      default:
+        aliases:
+          - "{VSITE_CIVIMAIL_DOMAIN}"
+    environment:
+      - VSITE_CIVIMAIL_USER
+      - VSITE_CIVIMAIL_PASS
+      - VSITE_CIVIMAIL_DOMAIN
+    volumes:
+      - /var/www/vmailbox/{VSITE_CIVIMAIL_DOMAIN}/{VSITE_CIVIMAIL_USER}:/civimail

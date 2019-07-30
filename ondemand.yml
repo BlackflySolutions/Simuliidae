@@ -1,0 +1,19 @@
+# additions for a setup that auto-deploys new sites
+# pass in env variables for initial site generation
+# todo - get this information in a saner way? 
+# or - use a site-building container to do this that doesn't stick around?
+version: '3'
+
+services:
+
+   admin:
+     environment:
+      - VSITE_SITE_NAME
+      - VSITE_NAME
+      - VSITE_ADMIN
+      - VSITE_ADMIN_MAIL
+      - VSITE_USER_NAME
+      - VSITE_USER_MAIL
+      - VSITE_USER_ROLE
+      - VSITE_FEATURE
+      - VSITE_THEME

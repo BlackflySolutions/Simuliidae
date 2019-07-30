@@ -1,5 +1,5 @@
-# additions and changes to base.yml for sites migrated from Louise
-# 1. deploy for production settings
+# additions and changes to base.yml for deployment with swarm
+# 1. deploy for typical production settings
 # 2. provide host-mounted backup directories
 #    note: the deploy script will need to ensure the host directories exist/are created
 version: '3'
@@ -10,7 +10,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.hostname=={VSITE_NODE-ectemnia}
+          - node.hostname=={VSITE_NODE-$THIS_NODE}
       replicas: 1
       resources:
         limits:
@@ -25,8 +25,9 @@ services:
     deploy:
       placement:
         constraints:
-          - node.hostname=={VSITE_NODE-ectemnia}
+          - node.hostname=={VSITE_NODE-$THIS_NODE}
       labels:
+        simuliidae.environmnet: "{VSITE_ENVIRONMENT-Production}"
         simuliidae.domain: "{VSITE_DOMAIN}"
         simuliidae.domainaliases: "{VSITE_DOMAIN_ALIASES}"
       replicas: 1
@@ -41,14 +42,12 @@ services:
     volumes:
     - /var/backup/docker/{VSITE}/volume:/var/backup/volume
     - /var/backup/docker/{VSITE}/vsql:/var/backup/vsql
-    - /var/backup/{VSITE_ADMIN_RESTOREDB_DIR-null}:/var/restore/vdb
-    - /var/backup/{VSITE_ADMIN_RESTORESITE_DIR-null}:/var/restore/vsite
     environment:
       - VSITE_CIVIMAIL_SMTP_DEFAULT
     deploy:
       placement:
         constraints:
-          - node.hostname=={VSITE_NODE-ectemnia}
+          - node.hostname=={VSITE_NODE-$THIS_NODE}
       replicas: 1
       resources:
         limits:

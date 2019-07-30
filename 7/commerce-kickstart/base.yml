@@ -16,8 +16,6 @@ services:
     image: prosimulium:7-commerce-kickstart
     ports:
            - "80/tcp"
-    expose:
-           - "80"
     volumes:
       - vsite:/var/www/html/sites/default
     environment:
