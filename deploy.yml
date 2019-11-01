@@ -11,6 +11,9 @@ services:
       placement:
         constraints:
           - node.hostname=={VSITE_NODE-$THIS_NODE}
+      labels:
+        simuliidae.environment: "{VSITE_ENVIRONMENT-Production}"
+        simuliidae.domain: "{VSITE_DOMAIN}"
       replicas: 1
       resources:
         limits:
@@ -27,7 +30,7 @@ services:
         constraints:
           - node.hostname=={VSITE_NODE-$THIS_NODE}
       labels:
-        simuliidae.environmnet: "{VSITE_ENVIRONMENT-Production}"
+        simuliidae.environment: "{VSITE_ENVIRONMENT-Production}"
         simuliidae.domain: "{VSITE_DOMAIN}"
         simuliidae.domainaliases: "{VSITE_DOMAIN_ALIASES}"
       replicas: 1
@@ -48,6 +51,9 @@ services:
       placement:
         constraints:
           - node.hostname=={VSITE_NODE-$THIS_NODE}
+      labels:
+        simuliidae.environment: "{VSITE_ENVIRONMENT-Production}"
+        simuliidae.domain: "{VSITE_DOMAIN}"
       replicas: 1
       resources:
         limits:
