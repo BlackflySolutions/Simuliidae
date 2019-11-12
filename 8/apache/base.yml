@@ -3,12 +3,13 @@ version: '3'
 services:
 
   vsql:
-    image: blackflysolutions/mariadb:10.1
+    image: blackflysolutions/mariadb:10.2
     expose:
            - "3306"
     volumes:
       - vdb:/var/lib/mysql
     environment:
+      - VSITE_ENVIRONMENT
       - MYSQL_USER
       - MYSQL_PASSWORD
       - MYSQL_ROOT_PASSWORD
@@ -27,6 +28,7 @@ services:
       - VSITE
       - VSITE_SITES
       - VSITE_DOMAIN
+      - VSITE_ENVIRONMENT
       - MYSQL_USER
       - MYSQL_PASSWORD
       - MYSQL_DATABASE
@@ -46,6 +48,7 @@ services:
       - VSITE
       - VSITE_SITES
       - VSITE_DOMAIN
+      - VSITE_ENVIRONMENT
       - MYSQL_USER
       - MYSQL_PASSWORD
       - MYSQL_ROOT_PASSWORD
