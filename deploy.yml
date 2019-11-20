@@ -1,12 +1,16 @@
 # additions and changes to base.yml for deployment with swarm
 # 1. deploy for typical production settings
-# 2. provide host-mounted backup directories
+# 2. provide host-mounted backup and restore directories
+# 3. provide ssh keys for backup and drupal user to access shared private remote resources
 #    note: the deploy script will need to ensure the host directories exist/are created
 version: '3'
 
 services:
 
   vsql:
+    labels:
+      simuliidae.environment: "{VSITE_ENVIRONMENT-Production}"
+      simuliidae.domain: "{VSITE_DOMAIN}"
     deploy:
       placement:
         constraints:
@@ -25,6 +29,9 @@ services:
   vhttp:
     environment:
       - VSITE_CIVIMAIL_SMTP_DEFAULT
+    labels:
+      simuliidae.environment: "{VSITE_ENVIRONMENT-Production}"
+      simuliidae.domain: "{VSITE_DOMAIN}"
     deploy:
       placement:
         constraints:
@@ -43,10 +50,16 @@ services:
 
   admin:
     volumes:
-    - /var/backup/docker/{VSITE}/volume:/var/backup/volume
-    - /var/backup/docker/{VSITE}/vsql:/var/backup/vsql
+      - /var/backup/docker/{VSITE}/volume:/var/backup/volume
+      - /var/backup/docker/{VSITE}/vsql:/var/backup/vsql
+      - /{VSITE_ORIGIN_NODE}var/backup/docker/{VSITE}/:/var/restore/
+      - /home/drupal/.ssh:/home/drupal/.ssh:ro
+      - /home/backup/.ssh:/root/.backup-ssh:ro
     environment:
       - VSITE_CIVIMAIL_SMTP_DEFAULT
+    labels:
+      simuliidae.environment: "{VSITE_ENVIRONMENT-Production}"
+      simuliidae.domain: "{VSITE_DOMAIN}"
     deploy:
       placement:
         constraints:
