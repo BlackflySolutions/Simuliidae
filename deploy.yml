@@ -13,6 +13,7 @@ services:
     labels:
       simuliidae.environment: "{VSITE_ENVIRONMENT-Production}"
       simuliidae.domain: "{VSITE_DOMAIN}"
+      simuliidae.civicrm.version: "{VSITE_CIVICRM_VER}"
     deploy:
       placement:
         constraints:
@@ -20,6 +21,7 @@ services:
       labels:
         simuliidae.environment: "{VSITE_ENVIRONMENT-Production}"
         simuliidae.domain: "{VSITE_DOMAIN}"
+        simuliidae.civicrm.version: "{VSITE_CIVICRM_VER}"
       replicas: 1
       resources:
         limits:
@@ -35,6 +37,7 @@ services:
     labels:
       simuliidae.environment: "{VSITE_ENVIRONMENT-Production}"
       simuliidae.domain: "{VSITE_DOMAIN}"
+      simuliidae.civicrm.version: "{VSITE_CIVICRM_VER}"
     deploy:
       placement:
         constraints:
@@ -44,6 +47,7 @@ services:
         simuliidae.domain: "{VSITE_DOMAIN}"
         simuliidae.domainaliases: "{VSITE_DOMAIN_ALIASES}"
         simuliidae.domainalternatives: "{VSITE_DOMAIN_ALTERNATIVES}"
+        simuliidae.civicrm.version: "{VSITE_CIVICRM_VER}"
       replicas: 1
       resources:
         limits:
@@ -59,6 +63,7 @@ services:
     labels:
       simuliidae.environment: "{VSITE_ENVIRONMENT-Production}"
       simuliidae.domain: "{VSITE_DOMAIN}"
+      simuliidae.civicrm.version: "{VSITE_CIVICRM_VER}"
     volumes:
       - /var/backup/docker/{VSITE}/volume:/var/backup/volume
       - /var/backup/docker/{VSITE}/vsql:/var/backup/vsql
@@ -72,6 +77,7 @@ services:
       labels:
         simuliidae.environment: "{VSITE_ENVIRONMENT-Production}"
         simuliidae.domain: "{VSITE_DOMAIN}"
+        simuliidae.civicrm.version: "{VSITE_CIVICRM_VER}"
       replicas: 1
       resources:
         limits:
