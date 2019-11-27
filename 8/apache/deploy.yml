@@ -1,0 +1,92 @@
+services:
+  admin:
+    command: apache2-foreground
+    depends_on:
+    - vhttp
+    - vsql
+    deploy:
+      placement:
+        constraints:
+        - node.hostname==${VSITE_NODE-lyall}
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2000M
+      restart_policy:
+        condition: none
+    environment:
+      CIVICRM_DATABASE: null
+      DRUPAL_DATABASE: null
+      MYSQL_DATABASE: null
+      MYSQL_PASSWORD: null
+      MYSQL_ROOT_PASSWORD: null
+      MYSQL_USER: null
+      VSITE: null
+      VSITE_CIVIMAIL_SMTP_DEFAULT: null
+      VSITE_DOMAIN: null
+      VSITE_SITES: null
+    image: blackflysolutions/simuliidae-admin:8-apache-civicrm-5
+    volumes:
+    - /var/backup/docker/${VSITE}/volume:/var/backup/volume:rw
+    - /var/backup/docker/${VSITE}/vsql:/var/backup/vsql:rw
+    - vdrupal:/var/www/drupal:rw
+  vhttp:
+    depends_on:
+    - vsql
+    deploy:
+      labels:
+        simuliidae.domain: '${VSITE_DOMAIN}'
+        simuliidae.domainaliases: '${VSITE_DOMAIN_ALIASES}'
+      placement:
+        constraints:
+        - node.hostname==${VSITE_NODE-lyall}
+      replicas: 1
+      resources:
+        limits:
+          cpus: '2'
+          memory: '${VSITE_HTTP_MEMORY-500M}'
+      restart_policy:
+        max_attempts: 2
+    environment:
+      CIVICRM_DATABASE: null
+      DRUPAL_DATABASE: null
+      MYSQL_DATABASE: null
+      MYSQL_PASSWORD: null
+      MYSQL_USER: null
+      VSITE: null
+      VSITE_CIVIMAIL_SMTP_DEFAULT: null
+      VSITE_DOMAIN: null
+      VSITE_SITES: null
+    image: blackflysolutions/drupal:8-apache-civicrm-5
+    ports:
+    - 80/tcp
+    volumes:
+    - vdrupal:/var/www/drupal:rw
+  vsql:
+    deploy:
+      placement:
+        constraints:
+        - node.hostname==${VSITE_NODE-lyall}
+      replicas: 1
+      resources:
+        limits:
+          cpus: '2'
+          memory: '${VSITE_SQL_MEMORY-4000M}'
+      restart_policy:
+        max_attempts: 2
+    environment:
+      MYSQL_DATABASE: null
+      MYSQL_PASSWORD: null
+      MYSQL_ROOT_PASSWORD: null
+      MYSQL_USER: null
+    expose:
+    - '3306'
+    image: blackflysolutions/mariadb:10.2
+    volumes:
+    - vdb:/var/lib/mysql:rw
+version: '3.0'
+volumes:
+  vdb: {}
+  vdrupal: {}
+
