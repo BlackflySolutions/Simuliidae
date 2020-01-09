@@ -1,5 +1,5 @@
 # add a container running dovecot to allow sites to pull their bounces from the host
-version: '3'
+version: '3.4'
 
 services:
 
