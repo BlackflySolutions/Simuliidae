@@ -49,7 +49,7 @@ if [ -d "/var/www/drupal/vendor/civicrm" ]; then
 else
   # this should go away when we get to 5.13.x?
   # sudo -u drupal composer config repositories.zetacomponents-mail vcs https://github.com/civicrm/zetacomponents-mail.git
-  sudo -u drupal composer require civicrm/civicrm-core:~5 civicrm/civicrm-drupal-8 roundearth/civicrm-composer-plugin
+  sudo -u drupal composer require civicrm/civicrm-core:~5 civicrm/civicrm-drupal-8:~5  roundearth/civicrm-composer-plugin
   # and enable/auto-install
   if [ ! -f /var/www/drupal/web/sites/default/civicrm_settings.php ]; then
     chmod ug+w /var/www/drupal/web/sites/default
