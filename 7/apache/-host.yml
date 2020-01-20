@@ -1,7 +1,7 @@
 # additions and changes to base.yml to 
 # provide host-mounted shared code analogous to a distro
 # if the host-mounted directories don't exist, you'll get errors starting up containers
-version: '3'
+version: '3.4'
 
 services:
 

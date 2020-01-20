@@ -1,4 +1,4 @@
-version: '3'
+version: '3.4'
 
 services:
 
@@ -11,9 +11,11 @@ services:
       - MYSQL_PASSWORD
       - MYSQL_ROOT_PASSWORD
       - MYSQL_DATABASE
+      - VSITE_ENVIRONMENT
    
   vhttp:
     image: blackflysolutions/prosimulium:7-apache
+    #image: prosimulium:7-apache
     ports:
            - "80/tcp"
     volumes:
@@ -21,6 +23,7 @@ services:
     environment:
       - VSITE
       - VSITE_SITE
+      - VSITE_ENVIRONMENT
       - VSITE_DOMAIN
       - VSITE_DOMAIN_ALTERNATIVES
       - MYSQL_USER
@@ -34,7 +37,7 @@ services:
     # create a new, empty site at this location
     # build a temporary super-set of the vhttp container above, run some scripts, and then (maybe) exit.
     image: blackflysolutions/prosimulium:7-apache-admin
-    #image: simuliidae_admin:latest
+    #image: prosimulium:7-apache-admin
     #build:
     #  context: admin
     volumes:
@@ -42,6 +45,7 @@ services:
     environment:
       - VSITE
       - VSITE_SITES
+      - VSITE_ENVIRONMENT
       - VSITE_DOMAIN
       - VSITE_DOMAIN_ALTERNATIVES
       - MYSQL_USER
