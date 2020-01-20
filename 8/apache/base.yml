@@ -3,6 +3,7 @@ version: '3'
 services:
 
   vsql:
+    #image: mariadb:10.2
     image: blackflysolutions/mariadb:10.2
     expose:
            - "3306"
@@ -17,6 +18,8 @@ services:
    
   vhttp:
     image: blackflysolutions/drupal:8-apache-civicrm-5
+    #image: blackflysolutions/prosimulium:8-apache
+    #image: prosimulium:8-apache
     deploy:
       labels:
         simuliidae.domain: "{VSITE_DOMAIN}"
@@ -40,8 +43,8 @@ services:
   admin:
     # use an extended version of the above image for administrative tasks
     image: blackflysolutions/simuliidae-admin:8-apache-civicrm-5
-    # image: simuliidae-admin:8-apache
-    #image: simuliidae_admin:latest
+    #image: blackflysolutions/prosimulium:8-apache-admin
+    #image: prosimulium:8-apache-admin
     volumes:
       - vdrupal:/var/www/drupal
     environment:
@@ -49,6 +52,7 @@ services:
       - VSITE_SITES
       - VSITE_DOMAIN
       - VSITE_ENVIRONMENT
+      - VSITE_CIVICRM_VER
       - MYSQL_USER
       - MYSQL_PASSWORD
       - MYSQL_ROOT_PASSWORD
