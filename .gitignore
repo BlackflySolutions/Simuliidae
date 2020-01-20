@@ -1,1 +1,3 @@
 *.bak
+[6-9]/apache/*.yml
+![6-9]/apache/base.yml
