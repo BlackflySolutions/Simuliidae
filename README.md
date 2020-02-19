@@ -20,6 +20,7 @@ This project includes instructions, docker compose files and Docker files for an
 The Drupal/CiviCRM web server image definition is hosted here: https://github.com/BlackflySolutions/drupal
 The Mariadb database image definition is here: https://github.com/BlackflySolutions/mariadb
 
+/*
 ## Quick Start On Your Own System
 1. Install docker on your system.
 2. Either install docker-compose or configure your docker node as a (usually stand-alone) swarm.
@@ -28,3 +29,4 @@ The Mariadb database image definition is here: https://github.com/BlackflySoluti
 
 ## Quick Start on Blackfly's Test System
 1. Visit https://discover.civicrm.ca/ and follow the instructions. It uses this project with some additional automation.
+*/
