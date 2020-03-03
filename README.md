@@ -15,10 +15,12 @@ The structure of the project mirrors that of the official Drupal docker project.
 This is a work-in-progress.
 
 ## What It Is, What It Includes
-This project includes instructions, docker compose files and Docker files for an "admin" container. 
+This project includes instructions, docker compose files, files for building Docker images, and some bash scripts.
 
-The Drupal/CiviCRM web server image definition is hosted here: https://github.com/BlackflySolutions/drupal
-The Mariadb database image definition is here: https://github.com/BlackflySolutions/mariadb
+The Mariadb database image definition that is used is here: https://github.com/BlackflySolutions/mariadb
+
+## Evaluator Quick Start
+Instructions for this function are in progress here: [Evaluator Quick Start wiki page](https://github.com/BlackflySolutions/Simuliidae/wiki/Evaluator-Quick-Start).
 
 <!---
 ## Quick Start On Your Own System
