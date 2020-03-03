@@ -1,4 +1,4 @@
-version: '3.4'
+version: '3'
 
 services:
 
@@ -14,18 +14,15 @@ services:
       - VSITE_ENVIRONMENT
    
   vhttp:
-    image: blackflysolutions/prosimulium:7-apache
-    #image: prosimulium:7-apache
+    image: blackflysolutions/drupal:7-apache-civicrm-5
     ports:
            - "80/tcp"
     volumes:
       - vsite:/var/www/html/sites/default
     environment:
       - VSITE
-      - VSITE_SITE
       - VSITE_ENVIRONMENT
       - VSITE_DOMAIN
-      - VSITE_DOMAIN_ALTERNATIVES
       - MYSQL_USER
       - MYSQL_PASSWORD
       - DRUPAL_DATABASE
@@ -34,26 +31,23 @@ services:
       - vsql
 
   admin:
-    # create a new, empty site at this location
-    # build a temporary super-set of the vhttp container above, run some scripts, and then (maybe) exit.
-    image: blackflysolutions/prosimulium:7-apache-admin
-    #image: prosimulium:7-apache-admin
-    #build:
-    #  context: admin
+    image: blackflysolutions/simuliidae-admin:7-apache-civicrm-5
     volumes:
       - vsite:/var/www/html/sites/default
     environment:
       - VSITE
-      - VSITE_SITES
       - VSITE_ENVIRONMENT
       - VSITE_DOMAIN
-      - VSITE_DOMAIN_ALTERNATIVES
+      - VSITE_CIVICRM_VER
       - MYSQL_USER
       - MYSQL_PASSWORD
       - MYSQL_ROOT_PASSWORD
       - MYSQL_DATABASE
       - DRUPAL_DATABASE
       - CIVICRM_DATABASE
+      - VSITE_SITE_NAME
+      - VSITE_ADMIN_NAME
+      - VSITE_ADMIN_MAIL
       - VSITE_USER_NAME
       - VSITE_USER_MAIL
       - VSITE_USER_ROLE
