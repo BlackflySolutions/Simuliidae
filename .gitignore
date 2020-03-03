@@ -1,0 +1,6 @@
+*.bak
+[6-9]/*/*.yml
+![6-9]/*/base.yml
+![6-9]/*/-*.yml
+vsite/*.env
+vsite/!test.env
