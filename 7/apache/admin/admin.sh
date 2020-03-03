@@ -31,7 +31,8 @@ if [ ! -f /var/www/html/sites/default/settings.php ]; then
       sudo -E -u www-data drush -y cc drush
       chmod u+w /var/www/html/sites/default
       mysql -u root -p$MYSQL_PASSWORD -h vsql  -e "create database if not exists $CIVICRM_DATABASE; grant all on $CIVICRM_DATABASE.* to $MYSQL_USER@'%'; UPDATE $DRUPAL_DATABASE.system SET status = 1 where name = 'civicrm'"
-      sudo -E -u www-data drush -y civicrm-install --dbhost=vsql --dbname=$CIVICRM_DATABASE --dbpass=$MYSQL_PASSWORD --dbuser=$MYSQL_USER --site_url=$VSITE_DOMAIN --ssl=on --destination=sites/all/modules
+      # add --ssl=on in the next line if ssl is enabled
+      sudo -E -u www-data drush -y civicrm-install --dbhost=vsql --dbname=$CIVICRM_DATABASE --dbpass=$MYSQL_PASSWORD --dbuser=$MYSQL_USER --site_url=$VSITE_DOMAIN --destination=sites/all/modules
       chmod u-w /var/www/html/sites/default
       sudo -E -u www-data drush -y civicrm-ext-install ca.civicrm.logviewer 
     # sudo -E -u www-data drush -y civicrm-ext-install org.civicrm.shoreditch
