@@ -66,5 +66,7 @@ services:
       - vhttp
 
 volumes:
-  vdrupal:
   vdb:
+  vdrupal:
+    labels:
+      simuliidae.backup.exclude: "{VSITE_BACKUP_EXCLUDE}"

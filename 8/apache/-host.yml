@@ -1,7 +1,7 @@
 # additions and changes to base.yml to 
 # provide host-mounted shared code analogous to a distro
 # if the host-mounted directories don't exist, you'll get errors starting up containers
-version: '3'
+version: '3.4'
 
 services:
 
@@ -19,7 +19,7 @@ services:
     volumes:
     - /home/drupal/.ssh:/home/drupal/.ssh:ro
     - /home/backup/.ssh:/root/.backup-ssh:ro
-    - /var/backup/docker/${VSITE}:/var/backup:rw
+    - /var/backup/docker/{VSITE}:/var/backup:rw
     - /var/www/drupal/git_deploy_cache:/tmp/git_deploy:rw
     - /var/www/drupal/8-host:/var/www/drupal/web/sites/all/host:ro
     - /var/www/drupal/libraries:/var/www/drupal/web/sites/all/libraries:ro
