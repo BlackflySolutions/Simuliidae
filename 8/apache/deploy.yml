@@ -33,7 +33,9 @@ services:
       VSITE_DRUPAL_VER: null
       VSITE_ENVIRONMENT: null
       VSITE_SITES: null
-    image: prosimulium:8-apache-admin
+    image: blackflysolutions/simuliidae-admin:8-apache-civicrm-5
+    #image: simuliidae-admin:8-apache-civicrm-5
+    #image: prosimulium:8-apache-admin
     labels:
       simuliidae.civicrm.version: '${VSITE_CIVICRM_VER}'
       simuliidae.domain: '${VSITE_DOMAIN}'
@@ -74,7 +76,9 @@ services:
       VSITE_DOMAIN: null
       VSITE_ENVIRONMENT: null
       VSITE_SITES: null
-    image: prosimulium:8-apache
+    image: blackflysolutions/drupal:8-apache-civicrm-5
+    #image: prosimulium:8-apache
+    #image: drupal:8-apache-civicrm-5
     labels:
       simuliidae.civicrm.version: '${VSITE_CIVICRM_VER}'
       simuliidae.domain: '${VSITE_DOMAIN}'
@@ -119,4 +123,3 @@ version: '3.4'
 volumes:
   vdb: {}
   vdrupal: {}
-
