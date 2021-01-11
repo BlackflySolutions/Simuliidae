@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+
+  vhttp:
+    image: drupal:7-apache-civicrm-5
+    build:
+      context: drupal
+    ports:
+      - "1978:80"
+
+  admin:
+    image: simuliidae-admin:7-apache-civicrm-5
+    build:
+      context: admin
+      args:
+        - REPOSITORY_FROM=
