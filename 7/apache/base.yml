@@ -3,7 +3,7 @@ version: '3.4'
 services:
 
   vsql:
-    image: blackflysolutions/mariadb:10.1
+    image: blackflysolutions/mariadb:10.2
     volumes:
       - vdb:/var/lib/mysql
     environment:
