@@ -1,6 +1,7 @@
 #!/bin/bash
 # 1. project variant (directory)
 # 2. compose file additions
+export VSITE_SFTP_PORT=60666
 export THIS_NODE=`hostname`
 echo "Using $THIS_NODE"
 export VSITE_COMPOSE_PROJECT_VARIANT=$1
@@ -24,4 +25,4 @@ do
   fi
   shift
 done
-docker-compose -f ${VSITE_COMPOSE_PROJECT_VARIANT}/${BASE}.yml $CONFIGS config | sed 's/{VSITE/\${VSITE/g' | sed "s/ \([^[:space:]]*\): ''$/ - \1/" > ${VSITE_COMPOSE_PROJECT_VARIANT}/${GENNAME}.yml
+docker-compose -f ${VSITE_COMPOSE_PROJECT_VARIANT}/${BASE}.yml $CONFIGS config | sed 's/{VSITE/\${VSITE/g' | sed "s/ \([^[:space:]]*\): ''$/ - \1/" | sed 's/60666/\${VSITE_SFTP_PORT}/' > ${VSITE_COMPOSE_PROJECT_VARIANT}/${GENNAME}.yml
