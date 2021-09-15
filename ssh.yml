@@ -1,0 +1,17 @@
+# to use this, we need to define:
+#VSITE_SFTP_USER=
+#VSITE_SFTP_PASSWORD=b1795c88e4d445f1a33
+version: '3.4'
+services:
+  admin:
+    environment:
+      - VSITE_SSH_USER
+    ports:
+      - target: 22
+        published: "${VSITE_SSH_PORT}"
+        protocol: tcp
+        mode: ingress
+    volumes:
+      - /var/www/ssh-keys/host/ssh_host_ed25519_key:/etc/ssh/ssh_host_ed25519_key 
+      - /var/www/ssh-keys/host/ssh_host_rsa_key:/etc/ssh/ssh_host_rsa_key 
+      - /var/www/ssh-keys/{VSITE_SSH_USER}/id_rsa.pub:/home/{VSITE_SSH_USER}/.ssh/hosted_id_rsa.pub:ro
