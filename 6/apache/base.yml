@@ -1,4 +1,4 @@
-version: '3'
+version: '3.4'
 
 services:
 
@@ -18,11 +18,12 @@ services:
     ports:
            - "80/tcp"
     volumes:
-      - vsite:/var/www/html/sites/{VSITE_SITES}
+      - vsite:/var/www/html/sites/default
     environment:
       - VSITE
       - VSITE_SITES
       - VSITE_DOMAIN
+      - VSITE_DOMAIN_ALTERNATIVES
       - MYSQL_USER
       - MYSQL_PASSWORD
       - DRUPAL_DATABASE
@@ -39,17 +40,19 @@ services:
     #build:
     #  context: admin
     volumes:
-      - vsite:/var/www/html/sites/{VSITE_SITES}
+      - vsite:/var/www/html/sites/default
     environment:
       - VSITE
       - VSITE_SITES
       - VSITE_DOMAIN
+      - VSITE_DOMAIN_ALTERNATIVES
       - MYSQL_USER
       - MYSQL_PASSWORD
       - MYSQL_ROOT_PASSWORD
       - MYSQL_DATABASE
       - DRUPAL_DATABASE
       - CIVICRM_DATABASE
+
     depends_on:
       - vsql
       - vhttp
