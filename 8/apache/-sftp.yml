@@ -1,0 +1,37 @@
+# to use this, we need to define:
+#VSITE_SFTP_USER=
+#VSITE_SFTP_PASSWORD=b1795c88e4d445f1a33
+version: '3.4'
+services:
+  sftp:
+    # enable file management via sftp
+    image: "sftp:alpine-3.7"
+    volumes:
+      - vdrupal:/home/{VSITE_SFTP_USER}/{VSITE}
+      - /var/www/ssh-keys/host/ssh_host_ed25519_key:/etc/ssh/ssh_host_ed25519_key 
+      - /var/www/ssh-keys/host/ssh_host_rsa_key:/etc/ssh/ssh_host_rsa_key 
+      - /var/www/ssh-keys/{VSITE_SFTP_USER}/id_rsa.pub:/home/{VSITE_SFTP_USER}/.ssh/keys/id_rsa.pub:ro
+      - /var/www/drupal/8-host:/home/{VSITE_SFTP_USER}/sites/all/host:ro
+      - /var/www/drupal/libraries:/home/{VSITE_SFTP_USER}/sites/all/libraries:ro
+      - /var/www/drupal/8-modules:/home/{VSITE_SFTP_USER}/sites/all/modules/contrib:ro
+      - /var/www/drupal/8-features:/home/{VSITE_SFTP_USER}/sites/all/modules/features:ro
+      - /var/www/drupal/8-themes:/home/{VSITE_SFTP_USER}/sites/all/themes/contrib:ro
+
+    ports:
+      - target: 22
+        published: "${VSITE_SFTP_PORT}"
+        protocol: tcp
+        mode: ingress
+    command: "{VSITE_SFTP_USER}:{VSITE_SFTP_PASSWORD}:1978"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname=={VSITE_NODE-falcoe}
+      resources:
+        limits:
+          cpus: "1"
+          memory: "120M"
+
+volumes:
+    vdrupal:
