@@ -1,0 +1,15 @@
+# add in redis - this requires some supporting bits still
+version: '3.4'
+services:
+  vredis:
+    image: "redis:large"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname=={VSITE_NODE-$THIS_NODE}
+      resources:
+        limits:
+          cpus: "1"
+          memory: "2000M"
+
