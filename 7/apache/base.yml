@@ -3,7 +3,7 @@ version: '3.4'
 services:
 
   vsql:
-    image: blackflysolutions/mariadb:10.2
+    image: blackflysolutions/mariadb:10.1
     volumes:
       - vdb:/var/lib/mysql
     environment:
@@ -14,7 +14,7 @@ services:
       - VSITE_ENVIRONMENT
    
   vhttp:
-    image: blackflysolutions/drupal:7-apache-civicrm-5
+    image: blackflysolutions/prosimulium:7-apache
     ports:
            - "80/tcp"
     volumes:
@@ -31,7 +31,7 @@ services:
       - vsql
 
   admin:
-    image: blackflysolutions/simuliidae-admin:7-apache-civicrm-5
+    image: blackflysolutions/prosimulium:7-apache-admin
     volumes:
       - vsite:/var/www/html/sites/default
     environment:
