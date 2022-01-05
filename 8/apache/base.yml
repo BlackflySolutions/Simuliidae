@@ -16,8 +16,8 @@ services:
       - MYSQL_DATABASE
    
   vhttp:
-    image: blackflysolutions/drupal:8-apache-civicrm-5
-    #image: blackflysolutions/prosimulium:8-apache
+    #image: blackflysolutions/drupal:8-apache-civicrm-5
+    image: blackflysolutions/prosimulium:8-apache
     deploy:
       labels:
         simuliidae.domain: "{VSITE_DOMAIN}"
@@ -40,8 +40,8 @@ services:
 
   admin:
     # use an extended version of the above image for administrative tasks
-    image: blackflysolutions/simuliidae-admin:8-apache-civicrm-5
-    #image: blackflysolutions/prosimulium:8-apache-admin
+    #image: blackflysolutions/simuliidae-admin:8-apache-civicrm-5
+    image: blackflysolutions/prosimulium:8-apache-admin
     volumes:
       - vdrupal:/var/www/drupal
     environment:
