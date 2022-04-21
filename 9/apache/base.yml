@@ -17,8 +17,7 @@ services:
    
   vhttp:
     #image: blackflysolutions/drupal:9-apache-civicrm-5
-    #image: blackflysolutions/prosimulium:9-apache
-    image: prosimulium:9-apache
+    image: blackflysolutions/prosimulium:9-apache
     deploy:
       labels:
         simuliidae.domain: "{VSITE_DOMAIN}"
@@ -42,8 +41,7 @@ services:
   admin:
     # use an extended version of the above image for administrative tasks
     #image: blackflysolutions/simuliidae-admin:9-apache-civicrm-5
-    #image: blackflysolutions/prosimulium:9-apache-admin
-    image: prosimulium:9-apache-admin
+    image: blackflysolutions/prosimulium:9-apache-admin
     volumes:
       - vdrupal:/var/www/drupal
     environment:
