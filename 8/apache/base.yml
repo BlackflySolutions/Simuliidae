@@ -3,7 +3,7 @@ version: '3.4'
 services:
 
   vsql:
-    image: blackflysolutions/mariadb:10.3
+    image: blackflysolutions/mariadb:{VSITE_MARIADB_VER-10.3}
     expose:
            - "3306"
     volumes:
