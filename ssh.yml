@@ -1,6 +1,5 @@
 # to use this, we need to define:
 #VSITE_SFTP_USER=
-#VSITE_SFTP_PASSWORD=b1795c88e4d445f1a33
 version: '3.4'
 services:
   admin:
