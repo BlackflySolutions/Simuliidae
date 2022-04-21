@@ -13,8 +13,8 @@ services:
       - MYSQL_DATABASE
    
   vhttp:
-    # image: blackflysolutions/prosimulium:6-apache
-    image: prosimulium:6-apache
+    image: blackflysolutions/prosimulium:6-apache
+    # image: prosimulium:6-apache
     ports:
            - "80/tcp"
     volumes:
@@ -34,8 +34,8 @@ services:
   admin:
     # create a new, empty site at this location
     # build a temporary super-set of the vhttp container above, run some scripts, and then (maybe) exit.
-    # image: blackflysolutions/prosimulium:6-apache-admin
-    image: prosimulium:6-apache-admin
+    image: blackflysolutions/prosimulium:6-apache-admin
+    # image: prosimulium:6-apache-admin
     #image: simuliidae_admin:latest
     #build:
     #  context: admin
