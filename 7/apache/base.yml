@@ -3,7 +3,7 @@ version: '3.4'
 services:
 
   vsql:
-    image: blackflysolutions/mariadb:10.1
+    image: blackflysolutions/mariadb:{VSITE_MARIADB_VER-10.1}
     volumes:
       - vdb:/var/lib/mysql
     environment:
@@ -23,6 +23,7 @@ services:
       - VSITE
       - VSITE_ENVIRONMENT
       - VSITE_DOMAIN
+      - VSITE_DOMAIN_ALTERNATIVES
       - MYSQL_USER
       - MYSQL_PASSWORD
       - DRUPAL_DATABASE
@@ -38,6 +39,7 @@ services:
       - VSITE
       - VSITE_ENVIRONMENT
       - VSITE_DOMAIN
+      - VSITE_DOMAIN_ALTERNATIVES
       - VSITE_CIVICRM_VER
       - MYSQL_USER
       - MYSQL_PASSWORD
