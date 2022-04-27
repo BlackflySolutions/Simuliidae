@@ -10,16 +10,23 @@
 # 6. an ssh client and git, to support some automation
 # by default, local building
 ARG REPOSITORY_FROM=
-ARG IMAGE_FROM=drupal-civicrm-base:7-php7.4-apache-buster
+ARG IMAGE_FROM=drupal-civicrm-base:9.3-php7.4-apache-buster
 # first build the web service
 FROM ${REPOSITORY_FROM}${IMAGE_FROM} as vhttp
+# change the document root as per https://hub.docker.com/_/php/
+# because I want to build my code with composer
+RUN mkdir -p /var/www/drupal
+ENV APACHE_DOCUMENT_ROOT /var/www/drupal/web
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+WORKDIR /var/www/drupal
 # Add a way to send mail out, assuming the host can do mail at port 25. The initialize.sh script sets up an entry in /etc/hosts to make it "easy".
 # Use iproute2 to figure my ip route out to the host.
 # Install openssh-client for outgoing https requests!
 RUN apt-get update && apt-get install -y msmtp openssh-client iproute2 git libmcrypt-dev && \
   pecl install -o redis && docker-php-ext-enable redis && \
-  pecl install -o mcrypt-1.0.4 && docker-php-ext-enable mcrypt && \
   pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick && \
+  pecl install -o apcu && docker-php-ext-enable apcu  && \
   docker-php-ext-install exif && \
   apt-get clean && \
   echo 'sendmail_path = "/usr/bin/msmtp -C /etc/msmtprc -t"' > /usr/local/etc/php/conf.d/mail.ini
@@ -40,13 +47,19 @@ FROM vhttp as admin
 RUN apt-get update \
   && apt-get install -y mariadb-client sudo vim zip unzip netcat ssh rsync \
   && apt-get purge -y
-# we only still need to do this for Drupal 7
-COPY drush.phar /usr/local/bin/drush
+# drush launcher: drush is/was installed by composer
+RUN curl -L -o /usr/local/bin/drush https://github.com/drush-ops/drush-launcher/releases/download/0.6.0/drush.phar
+RUN chmod ugo+x /usr/local/bin/drush
 COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
+# add composer, using (default) version 2 as of Jan 18
+RUN curl --silent --show-error https://getcomposer.org/installer | php -- --filename=composer --install-dir=/usr/local/bin
+# add additional dependencies for installing civicrm with D9 + composer
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
+RUN apt-get install -y nodejs
+RUN npm install -g bower
 # We create a drupal user to own all the code, using Dries birth year as the uid
 RUN useradd -u 1978 -g www-data -ms /bin/bash drupal
-# A customized/simplified version of the settings.php file
-COPY default.settings.php settings.php /usr/local/src/
+RUN chown drupal:www-data /var/www/drupal
 # A bunch of convenience scripts
 COPY admin.sh admindb.sh restoredb.sh setup.sh wait-for-it.sh backupdb.sh backupsite.sh /usr/local/bin/
 # A copy of the cv civicrm command line utility
@@ -55,8 +68,6 @@ RUN chmod ugo+x /usr/local/bin/drush && chmod ugo+x /usr/local/bin/cv && chmod u
 # The apache for the container shouldn't actually be functional, it doesn't get invoked, so minimize it's resource use.
 COPY admin.conf /etc/apache2/conf-available
 RUN a2enconf admin
-# get a copy of the registry_rebuild drush command because it's so useful
-RUN mkdir /var/www/.drush && chown www-data:www-data /var/www/.drush && sudo -E -u www-data drush -y @none dl --destination=/var/www/.drush registry_rebuild-7.x
 # CMD["apache2-foreground"]
 # Run the same initialization script that the web (drupal) does.
 CMD /usr/local/bin/initialize.sh && apache2-foreground
