@@ -1,0 +1,12 @@
+# Notes
+
+Notes about how the docker-library/drupal project works.
+
+update.sh - the master script that runs versions.sh and then apply-templates.sh
+
+
+versions.sh - a script that looks at various public sources to generate a versions.json file of drupal version -> php/os options that is going to be used to generate all the different Dockerfiles per drupal/php/os versions.
+
+apply-templates.sh - here's where most of the work is, to generate Dockerfiles from the Dockerfile.template for each of the versions in versions.json
+
+generate-stackbrew-library.sh - generating the contents of the library/xxx manifest file
