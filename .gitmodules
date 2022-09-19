@@ -1,0 +1,6 @@
+[submodule "reference/drupal"]
+	path = reference/drupal
+	url = git@github.com:BlackflySolutions/drupal.git
+[submodule "reference/wordpress"]
+	path = reference/wordpress
+	url = git@github.com:BlackflySolutions/wordpress.git
