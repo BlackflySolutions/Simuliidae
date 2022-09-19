@@ -20,6 +20,8 @@ Before you do any building, you may need to do this: apt-get install -y jq
   b. merge in the remote upstream - i.e. the docker-library master branches - either via the command line, or in the github interface, followed by pulling in the updated branch here.
   c. run apply-template.sh
 
-2. Check for new variants. New minor versions are handled automatically, but new major versions require a new directory and updates to the build scripts.
+2. Check for new CMS versions, and variants. With Drupal, new patch versions should be handled automatically, but new major and minor versions require a new directory and sometimes updates to the build scripts when the underlying OS version changes, for example. With Wordpress, there's generally only one "latest" version, but it may incorporate breaking changes over time.
 
-3. Run the build.sh and other scripts to generate the simuliidae images.
+3. Run the build-drupal.sh to generate the new drupal images. Each variant will require two lines in that script, one for the 'base' image and one for the extended one that includes the drupal code.
+4. Run the build-drupal-simuliidae.sh to generate the new simuliidae images, for as many different images that you want to support!
+5. TODO: scripts to do the equivalent for wordpress.

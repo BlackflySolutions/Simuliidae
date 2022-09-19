@@ -8,3 +8,5 @@ DOCKER_BUILDKIT=1 docker build --target=drupal-base -t drupal-civicrm-base:7-php
 DOCKER_BUILDKIT=1 docker build --target= -t drupal-civicrm:7-php7.4-apache-buster ../reference/drupal/7/php7.4/apache-buster/
 DOCKER_BUILDKIT=1 docker build --target=drupal-base -t drupal-civicrm-base:9.3-php7.4-apache-buster ../reference/drupal/9.3/php7.4/apache-buster/
 DOCKER_BUILDKIT=1 docker build --target= -t drupal-civicrm:9.3-php7.4-apache-buster ../reference/drupal/9.3/php7.4/apache-buster/
+DOCKER_BUILDKIT=1 docker build --target=drupal-base -t drupal-civicrm-base:9.4-php8.0-apache-buster ../reference/drupal/9.4/php8.0/apache-buster/
+DOCKER_BUILDKIT=1 docker build --target= -t drupal-civicrm:9.4-php8.0-apache-buster ../reference/drupal/9.4/php8.0/apache-buster/
