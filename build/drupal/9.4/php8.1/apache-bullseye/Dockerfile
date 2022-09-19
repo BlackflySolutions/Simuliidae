@@ -1,0 +1,74 @@
+# This is used to build extended versions of the drupal-civicrm image, with production goodies that
+# are not needed for testing or local/dev.
+# Note: requires the IMAGE_FROM argument, which may be either the base or non-base version
+# Goodies include:
+# 1. the php pecl redis extension, to support the use of redis
+# 2. imagemagick, because it's great
+# 3. msmtprc: a way to send mail via the host's mail system
+# 4. handling of varnish+hitch proxying by apache
+# 5. the mcrypt pecl extension to support old civi upgrades
+# 6. an ssh client and git, to support some automation
+#
+# by default, do local building
+ARG REPOSITORY_FROM=
+ARG IMAGE_FROM=drupal-civicrm-base:9.4-php8.1-apache-bullseye
+# first build the web service
+FROM ${REPOSITORY_FROM}${IMAGE_FROM} as vhttp
+# change the document root as per https://hub.docker.com/_/php/
+# because I want to build my code with composer
+RUN mkdir -p /var/www/drupal
+ENV APACHE_DOCUMENT_ROOT /var/www/drupal/web
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+WORKDIR /var/www/drupal
+# Add a way to send mail out, assuming the host can do mail at port 25. The initialize.sh script sets up an entry in /etc/hosts to make it "easy".
+# Use iproute2 to figure my ip route out to the host.
+# Install openssh-client for outgoing https requests!
+RUN apt-get update && apt-get install -y msmtp openssh-client iproute2 git libmcrypt-dev && \
+  pecl install -o redis && docker-php-ext-enable redis && \
+  pecl install -o imagick && docker-php-ext-enable imagick && \
+  pecl install -o apcu && docker-php-ext-enable apcu  && \
+  docker-php-ext-install exif && \
+  apt-get clean && \
+  echo 'sendmail_path = "/usr/bin/msmtp -C /etc/msmtprc -t"' > /usr/local/etc/php/conf.d/mail.ini
+COPY msmtprc /etc/msmtprc
+# tell apache how to handle the varnish+hitch proxying
+RUN echo 'SetEnvIf X-Forwarded-Proto https HTTPS=on' >> /var/www/html/.htaccess
+# increase php timeout and other customizations
+COPY vhttp.ini /usr/local/etc/php/conf.d/
+COPY vhttp.conf /etc/apache2/conf-available/
+RUN a2enconf vhttp && a2enmod expires
+# initialize needs to run after the container has been created. 
+COPY initialize.sh /usr/local/bin/initialize.sh
+RUN chmod u+x /usr/local/bin/initialize.sh 
+# CMD["apache2-foreground"]
+CMD /usr/local/bin/initialize.sh && apache2-foreground
+FROM vhttp as admin
+# an extended version of the webserver image, adding extra packages and scripts
+RUN apt-get update \
+  && apt-get install -y mariadb-client sudo vim zip unzip netcat ssh rsync \
+  && apt-get purge -y
+# drush launcher: drush is/was installed by composer
+RUN curl -L -o /usr/local/bin/drush https://github.com/drush-ops/drush-launcher/releases/latest/download/drush.phar
+RUN chmod ugo+x /usr/local/bin/drush
+COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
+# add composer, using (default) version 2 as of Jan 18
+RUN curl --silent --show-error https://getcomposer.org/installer | php -- --filename=composer --install-dir=/usr/local/bin
+# add additional dependencies for installing civicrm with D9 + composer
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
+RUN apt-get install -y nodejs
+RUN npm install -g bower
+# We create a drupal user to own all the code, using Dries birth year as the uid
+RUN useradd -u 1978 -g www-data -ms /bin/bash drupal
+RUN chown drupal:www-data /var/www/drupal
+# A bunch of convenience scripts
+COPY admin.sh admindb.sh restoredb.sh setup.sh wait-for-it.sh backupdb.sh backupsite.sh /usr/local/bin/
+# A copy of the cv civicrm command line utility
+RUN curl -LsS https://download.civicrm.org/cv/cv.phar -o /usr/local/bin/cv
+RUN chmod ugo+x /usr/local/bin/drush && chmod ugo+x /usr/local/bin/cv && chmod ugo+x /usr/local/bin/*.sh 
+# The apache for the container shouldn't actually be functional, it doesn't get invoked, so minimize it's resource use.
+COPY admin.conf /etc/apache2/conf-available
+RUN a2enconf admin
+# CMD["apache2-foreground"]
+# Run the same initialization script that the web (drupal) does.
+CMD /usr/local/bin/initialize.sh && apache2-foreground
