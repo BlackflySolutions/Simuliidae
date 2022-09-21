@@ -11,7 +11,7 @@
 # by default, local building
 ARG REPOSITORY_FROM=
 # default to starting from the base image, without Drupal
-ARG IMAGE_FROM=drupal:base-7-php7.4-apache-buster
+ARG IMAGE_FROM=
 # first build the web service
 FROM ${REPOSITORY_FROM}${IMAGE_FROM} as vhttp
 # Add a way to send mail out, assuming the host can do mail at port 25. The initialize.sh script sets up an entry in /etc/hosts to make it "easy".
