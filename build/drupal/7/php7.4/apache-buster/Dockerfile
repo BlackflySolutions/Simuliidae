@@ -1,62 +1,95 @@
-# This is used to build extended versions of the drupal-civicrm image, with production goodies that
-# are not needed for testing or local/dev.
-# Note: requires the IMAGE_FROM argument, which may be either the base or non-base version
-# Goodies include:
-# 1. the php pecl redis extension, to support the use of redis
-# 2. imagemagick, because it's great
-# 3. msmtprc: a way to send mail via the host's mail system
-# 4. handling of varnish+hitch proxying by apache
-# 5. the mcrypt pecl extension to support old civi upgrades
-# 6. an ssh client and git, to support some automation
-# by default, local building
-ARG REPOSITORY_FROM=
-ARG IMAGE_FROM=drupal-civicrm-base:7-php7.4-apache-buster
-# first build the web service
-FROM ${REPOSITORY_FROM}${IMAGE_FROM} as vhttp
-# Add a way to send mail out, assuming the host can do mail at port 25. The initialize.sh script sets up an entry in /etc/hosts to make it "easy".
-# Use iproute2 to figure my ip route out to the host.
-# Install openssh-client for outgoing https requests!
-RUN apt-get update && apt-get install -y msmtp openssh-client iproute2 git libmcrypt-dev && \
-  pecl install -o redis && docker-php-ext-enable redis && \
-  pecl install -o mcrypt-1.0.4 && docker-php-ext-enable mcrypt && \
-  pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick && \
-  docker-php-ext-install exif && \
-  apt-get clean && \
-  echo 'sendmail_path = "/usr/bin/msmtp -C /etc/msmtprc -t"' > /usr/local/etc/php/conf.d/mail.ini
-COPY msmtprc /etc/msmtprc
-# tell apache how to handle the varnish+hitch proxying
-RUN echo 'SetEnvIf X-Forwarded-Proto https HTTPS=on' >> /var/www/html/.htaccess
-# increase php timeout and other customizations
-COPY vhttp.ini /usr/local/etc/php/conf.d/
-COPY vhttp.conf /etc/apache2/conf-available/
-RUN a2enconf vhttp && a2enmod expires
-# initialize needs to run after the container has been created. 
-COPY initialize.sh /usr/local/bin/initialize.sh
-RUN chmod u+x /usr/local/bin/initialize.sh 
-# CMD["apache2-foreground"]
-CMD /usr/local/bin/initialize.sh && apache2-foreground
-FROM vhttp as admin
-# an extended version of the webserver image, adding extra packages and scripts
-RUN apt-get update \
-  && apt-get install -y mariadb-client sudo vim zip unzip netcat ssh rsync \
-  && apt-get purge -y
-# we only still need to do this for Drupal 7
-COPY drush.phar /usr/local/bin/drush
-COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
-# We create a drupal user to own all the code, using Dries birth year as the uid
-RUN useradd -u 1978 -g www-data -ms /bin/bash drupal
-# A customized/simplified version of the settings.php file
-COPY default.settings.php settings.php /usr/local/src/
-# A bunch of convenience scripts
-COPY admin.sh admindb.sh restoredb.sh setup.sh wait-for-it.sh backupdb.sh backupsite.sh /usr/local/bin/
-# A copy of the cv civicrm command line utility
-RUN curl -LsS https://download.civicrm.org/cv/cv.phar -o /usr/local/bin/cv
-RUN chmod ugo+x /usr/local/bin/drush && chmod ugo+x /usr/local/bin/cv && chmod ugo+x /usr/local/bin/*.sh 
-# The apache for the container shouldn't actually be functional, it doesn't get invoked, so minimize it's resource use.
-COPY admin.conf /etc/apache2/conf-available
-RUN a2enconf admin
-# get a copy of the registry_rebuild drush command because it's so useful
-RUN mkdir /var/www/.drush && chown www-data:www-data /var/www/.drush && sudo -E -u www-data drush -y @none dl --destination=/var/www/.drush registry_rebuild-7.x
-# CMD["apache2-foreground"]
-# Run the same initialization script that the web (drupal) does.
-CMD /usr/local/bin/initialize.sh && apache2-foreground
+#
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
+#
+# PLEASE DO NOT EDIT IT DIRECTLY.
+#
+
+# from https://www.drupal.org/docs/system-requirements/php-requirements
+# create as a "base" that doesn't include the drupal code
+FROM php:7.4-apache-buster AS drupal-base
+
+# install the PHP extensions we need
+RUN set -eux; \
+	\
+	if command -v a2enmod; then \
+		a2enmod rewrite; \
+	fi; \
+	\
+	savedAptMark="$(apt-mark showmanual)"; \
+	\
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
+		libfreetype6-dev \
+		libjpeg-dev \
+		libpng-dev \
+		libpq-dev \
+		libwebp-dev \
+		libzip-dev \
+		libxml2-dev \
+		libmagickwand-dev \
+		libicu-dev \
+		libc-client-dev \
+		libkrb5-dev \
+	; \
+	\
+	docker-php-ext-configure gd \
+		--with-freetype \
+		--with-jpeg=/usr \
+		--with-webp \
+	; \
+	\
+	docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
+	docker-php-ext-install -j "$(nproc)" \
+		gd \
+		opcache \
+		pdo_mysql \
+		pdo_pgsql \
+		zip \
+		mysqli \
+		dom \
+		soap \
+		sockets \
+		intl \
+		bcmath \
+		gettext \
+		imap \
+	; \
+	\
+RUN pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick \
+# reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
+	apt-mark auto '.*' > /dev/null; \
+	apt-mark manual $savedAptMark; \
+	ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
+		| awk '/=>/ { print $3 }' \
+		| sort -u \
+		| xargs -r dpkg-query -S \
+		| cut -d: -f1 \
+		| sort -u \
+		| xargs -rt apt-mark manual; \
+	\
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+	rm -rf /var/lib/apt/lists/*
+
+# set recommended PHP.ini settings
+# see https://secure.php.net/manual/en/opcache.installation.php
+RUN { \
+		echo 'opcache.memory_consumption=128'; \
+		echo 'opcache.interned_strings_buffer=8'; \
+		echo 'opcache.max_accelerated_files=4000'; \
+		echo 'opcache.revalidate_freq=60'; \
+		echo 'opcache.fast_shutdown=1'; \
+	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
+
+FROM drupal-base
+# https://www.drupal.org/node/3060/release
+ENV DRUPAL_VERSION 7.92
+ENV DRUPAL_MD5 7f95bd4a6693ed5215aba4038c23c933
+
+RUN set -eux; \
+	curl -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_VERSION}.tar.gz" -o drupal.tar.gz; \
+	echo "${DRUPAL_MD5} *drupal.tar.gz" | md5sum -c -; \
+	tar -xz --strip-components=1 -f drupal.tar.gz; \
+	rm drupal.tar.gz; \
+	chown -R www-data:www-data sites modules themes
+
+# vim:set ft=dockerfile:
