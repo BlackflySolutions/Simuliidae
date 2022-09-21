@@ -1,6 +1,6 @@
-# This is used to build extended versions of the drupal-civicrm image, with production goodies that
+# This is used to build extended versions of the drupal image, with production goodies that
 # are not needed for testing or local/dev.
-# Note: requires the IMAGE_FROM argument, which may be either the base or non-base version
+# Note: requires the IMAGE_FROM argument, which may be either the base or non-base (cms code) version
 # Goodies include:
 # 1. the php pecl redis extension, to support the use of redis
 # 2. imagemagick, because it's great
@@ -10,7 +10,7 @@
 # 6. an ssh client and git, to support some automation
 # by default, local building
 ARG REPOSITORY_FROM=
-ARG IMAGE_FROM=drupal:base-9.3-php7.4-apache-buster
+ARG IMAGE_FROM=
 # first build the web service
 FROM ${REPOSITORY_FROM}${IMAGE_FROM} as vhttp
 # change the document root as per https://hub.docker.com/_/php/
@@ -54,7 +54,7 @@ COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
 # add composer, using (default) version 2 as of Jan 18
 RUN curl --silent --show-error https://getcomposer.org/installer | php -- --filename=composer --install-dir=/usr/local/bin
 # add additional dependencies for installing civicrm with D9 + composer
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
 RUN apt-get install -y nodejs
 RUN npm install -g bower
 # We create a drupal user to own all the code, using Dries birth year as the uid
