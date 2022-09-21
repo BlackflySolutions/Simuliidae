@@ -1,0 +1,3 @@
+latest/php7.4/apache
+latest/php8.1/apache
+latest/php8.0/apache
