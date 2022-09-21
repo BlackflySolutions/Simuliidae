@@ -1,0 +1,1 @@
+What about versioning? A good idea to insert the wp version in the tag?
