@@ -1,0 +1,5 @@
+*.bak
+*/*/*/*.yml
+!*/*/*/base.yml
+!*/*/*/drupal.yml
+!*/*/*/-*.yml
