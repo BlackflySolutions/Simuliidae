@@ -1,3 +1,4 @@
+#!/bin/bash
 # restores backups 
 MYSQLIMPORT_CMD=/usr/bin/mysqlimport
 MYSQL_CMD=/usr/bin/mysql

@@ -1,3 +1,4 @@
+#!/bin/bash
 # restore sites/default from it's origin backup
 RESTORE_DIR="/var/restore/volume/${VSITE}_vsite/"
 rsync -az $RESTORE_DIR /var/www/html/sites/default
