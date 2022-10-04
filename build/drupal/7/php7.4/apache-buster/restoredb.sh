@@ -7,34 +7,22 @@ DB_PASSWORD="$MYSQL_ROOT_PASSWORD"
 DB_NAMES="$MYSQL_DATABASE $CIVICRM_DATABASE"
 DB_HOST="vsql"
 #
-RESTORE_DIR=/var/restore/vdb
+RESTORE_DIR=/var/restore/vsql
 #
 # set $(date)
 #
-# restore a database from it's separate table files
+# restore a database from it's origin backup
 # echo "$MYSQLIMPORT_CMD --local -u $DB_USER --delete $DB_NAME $RESTORE_DIR/*txt"
 for DB_NAME in $DB_NAMES
 do
   if [ $DB_NAME != "Database" -a $DB_NAME != "test" -a $DB_NAME != "mysql" ] 
   then 
-    if [ -d $RESTORE_DIR/$DB_NAME ]
+    if [ -f $RESTORE_DIR/${DB_NAME}.sql ]
     then
       echo $RESTORE_DIR/$DB_NAME
       start=`date +%s`
-      cd $RESTORE_DIR/$DB_NAME
-      TABLESQLS=`ls *sql`
-      for TABLESQL in $TABLESQLS
-      do
-        TABLE=${TABLESQL%.sql}
-        $MYSQL_CMD -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME -e"SET SQL_MODE='NO_AUTO_VALUE_ON_ZERO';SET sql_log_bin=0; SET FOREIGN_KEY_CHECKS=0; USE $DB_NAME; DROP TABLE IF EXISTS $TABLE; SOURCE $RESTORE_DIR/$DB_NAME/$TABLE.sql;";
-      done
-      TABLETXTS=`ls *txt`
-      for TABLETXT in $TABLETXTS 
-      do
-        TABLE=${TABLETXT%.txt}
-        $MYSQL_CMD -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME -e"SET SQL_MODE='NO_AUTO_VALUE_ON_ZERO';SET sql_log_bin=0; SET FOREIGN_KEY_CHECKS=0; SET autocommit=0; SET unique_checks=0; USE $DB_NAME; 
-LOAD DATA LOCAL INFILE \"$RESTORE_DIR/$DB_NAME/$TABLETXT\" INTO TABLE $TABLE; COMMIT;";
-      done
+      $MYSQL_CMD -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME -e"DROP DATABASE IF EXISTS $DB_NAME; CREATE DATABASE $DB_NAME; GRANT ALL ON $DB_NAME.* to $MYSQL_USER@'%'; ";
+      $MYSQL_CMD -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME < $RESTORE_DIR/${DB_NAME}.sql
       end=`date +%s`
       runtime=$((end-start))
       echo "runtime: $runtime"
