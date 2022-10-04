@@ -21,7 +21,7 @@ do
     then
       echo $RESTORE_DIR/$DB_NAME
       start=`date +%s`
-      $MYSQL_CMD -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME -e"DROP DATABASE IF EXISTS $DB_NAME; CREATE DATABASE $DB_NAME; GRANT ALL ON $DB_NAME.* to $MYSQL_USER@'%'; ";
+      $MYSQL_CMD -h $DB_HOST -u $DB_USER -p$DB_PASSWORD -e"DROP DATABASE IF EXISTS $DB_NAME; CREATE DATABASE $DB_NAME; GRANT ALL ON $DB_NAME.* to $MYSQL_USER@'%'; ";
       $MYSQL_CMD -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME < $RESTORE_DIR/${DB_NAME}.sql
       end=`date +%s`
       runtime=$((end-start))
