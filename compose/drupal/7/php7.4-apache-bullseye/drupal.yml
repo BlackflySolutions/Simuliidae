@@ -14,7 +14,7 @@ services:
       - MYSQL_DATABASE
    
   vhttp:
-    image: blackflysolutions/simuliidae:vhttp-base-7-php7.4-apache-buster
+    image: blackflysolutions/simuliidae-drupal:vhttp-drupal-7-php7.4-apache-buster
     ports:
            - "80/tcp"
     expose:
@@ -36,7 +36,7 @@ services:
       - vsql
 
   admin:
-    image: blackflysolutions/simuliidae:admin-base-7-php7.4-apache-buster
+    image: blackflysolutions/simuliidae-drupal:admin-drupal-7-php7.4-apache-buster
     volumes:
       - vsite:/var/www/html/sites/default
     environment:
