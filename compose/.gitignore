@@ -2,4 +2,5 @@
 */*/*/*.yml
 !*/*/*/base.yml
 !*/*/*/drupal.yml
+!*/*/*/sites.yml
 !*/*/*/-*.yml
