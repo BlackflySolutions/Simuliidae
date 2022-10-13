@@ -26,7 +26,7 @@ services:
       resources:
         limits:
           cpus: "2"
-          memory: "4000M"
+          memory: "{VSITE_SQL_MEMORY-4000M}"
       restart_policy:
         max_attempts: 2
     
@@ -52,7 +52,7 @@ services:
       resources:
         limits:
           cpus: "2"
-          memory: "500M"
+          memory: "{VSITE_HTTP_MEMORY-500M}"
       restart_policy:
         max_attempts: 2
 
