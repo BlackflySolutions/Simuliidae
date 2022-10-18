@@ -61,7 +61,7 @@ RUN npm install -g bower
 RUN useradd -u 1978 -g www-data -ms /bin/bash drupal
 RUN chown drupal:www-data /var/www/drupal
 # A bunch of convenience scripts
-COPY admin.sh admindb.sh restoredb.sh setup.sh wait-for-it.sh backupdb.sh backupsite.sh /usr/local/bin/
+COPY admin.sh admindb.sh restoredb.sh restoredrupal.sh  restorefiles.sh  restorevsite.sh setup.sh wait-for-it.sh backupdb.sh backupsite.sh /usr/local/bin/
 # A copy of the cv civicrm command line utility
 RUN curl -LsS https://download.civicrm.org/cv/cv.phar -o /usr/local/bin/cv
 RUN chmod ugo+x /usr/local/bin/drush && chmod ugo+x /usr/local/bin/cv && chmod ugo+x /usr/local/bin/*.sh 
