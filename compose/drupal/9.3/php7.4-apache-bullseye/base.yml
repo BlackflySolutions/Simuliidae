@@ -1,0 +1,68 @@
+version: '3.4'
+
+services:
+
+  vsql:
+    image: blackflysolutions/mariadb:10.3
+    expose:
+           - "3306"
+    volumes:
+      - vdb:/var/lib/mysql
+    environment:
+      - VSITE_ENVIRONMENT
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+   
+  vhttp:
+    image: blackflysolutions/simuliidae-drupal:vhttp-base-9.3-php7.4-apache-buster
+    deploy:
+      labels:
+        simuliidae.domain: "{VSITE_DOMAIN}"
+    ports:
+      - 80/tcp
+    volumes:
+      - vdrupal:/var/www/drupal
+    environment:
+      - VSITE
+      - VSITE_SITES
+      - VSITE_DOMAIN
+      - VSITE_ENVIRONMENT
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_DATABASE
+      - DRUPAL_DATABASE
+      - CIVICRM_DATABASE
+    depends_on:
+      - vsql
+
+  admin:
+    # use an extended version of the above image for administrative tasks
+    image: blackflysolutions/simuliidae-drupal:admin-base-9.3-php7.4-apache-buster
+    volumes:
+      - vdrupal:/var/www/drupal
+    environment:
+      - VSITE
+      - VSITE_SITES
+      - VSITE_DOMAIN
+      - DRUSH_OPTIONS_URI={VSITE_DOMAIN}
+      - VSITE_ENVIRONMENT
+      - VSITE_CIVICRM_VER
+      - VSITE_DRUPAL_VER
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+      - DRUPAL_DATABASE
+      - CIVICRM_DATABASE
+
+    depends_on:
+      - vsql
+      - vhttp
+
+volumes:
+  vdb:
+  vdrupal:
+    labels:
+      simuliidae.backup.exclude: "{VSITE_BACKUP_EXCLUDE}"
