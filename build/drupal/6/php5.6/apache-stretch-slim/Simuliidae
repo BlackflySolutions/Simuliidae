@@ -1,0 +1,60 @@
+# This is used to build extended versions of the drupal-civicrm image, with production goodies that
+# are not needed for testing or local/dev.
+# Note: requires the IMAGE_FROM argument, which may be either the base or non-base version
+# Goodies include:
+# 1. the php pecl redis extension, to support the use of redis
+# 2. imagemagick, because it's great
+# 3. msmtprc: a way to send mail via the host's mail system
+# 4. handling of varnish+hitch proxying by apache
+# 5. the mcrypt pecl extension to support old civi upgrades
+# 6. an ssh client and git, to support some automation
+# by default, local building
+ARG REPOSITORY_FROM=
+# default to starting from the base image, without Drupal
+ARG IMAGE_FROM=
+# first build the web service
+FROM ${REPOSITORY_FROM}${IMAGE_FROM} as vhttp
+RUN a2enmod rewrite
+RUN a2enmod expires
+RUN pecl install -o redis-2.2.8 \
+  && docker-php-ext-enable redis
+# Add a way to send mail out, assume the host can do mail. 
+# Use iproute2 to figure my ip route out to the host.
+# Install openssh-client for outgoing https requests!
+RUN apt-get update && apt-get install -y ssmtp imagemagick openssh-client iproute2 && \
+  apt-get clean && \
+  echo "FromLineOverride=YES" >> /etc/ssmtp/ssmtp.conf && \
+  echo 'sendmail_path = "/usr/sbin/ssmtp -t"' > /usr/local/etc/php/conf.d/mail.ini
+# handle the varnish+hitch proxying
+RUN echo 'SetEnvIf X-Forwarded-Proto https HTTPS=on' >> /var/www/html/.htaccess
+# add the exif extension
+RUN docker-php-ext-install exif
+# and the mysqli extension!
+RUN docker-php-ext-install mysql
+# increase php timeout and other customizations
+COPY vhttp.ini /usr/local/etc/php/conf.d/
+COPY vhttp.conf /etc/apache2/conf-available/
+RUN a2enconf vhttp
+# initialize needs to run after the container has been created. 
+COPY initialize.sh /usr/local/bin/initialize.sh
+RUN chmod u+x /usr/local/bin/initialize.sh 
+# CMD["apache2-foreground"]
+CMD /usr/local/bin/initialize.sh && apache2-foreground
+FROM vhttp as admin
+
+RUN apt-get update \
+  && apt-get install -y mariadb-client sudo vim git zip unzip netcat \
+  && apt-get purge -y
+COPY drush.phar /usr/local/bin/drush
+COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
+RUN useradd -u 1978 -g www-data -ms /bin/bash drupal
+COPY default.settings.php settings.php /usr/local/src/
+COPY admin.sh admindb.sh restoredb.sh restorefiles.sh restorevsite.sh setup.sh wait-for-it.sh /usr/local/bin/
+RUN curl -LsS https://download.civicrm.org/cv/cv.phar -o /usr/local/bin/cv
+RUN chmod ugo+x /usr/local/bin/drush && chmod ugo+x /usr/local/bin/cv && chmod ugo+x /usr/local/bin/*.sh 
+COPY admin.conf /etc/apache2/conf-available
+RUN a2enconf admin
+# RUN mkdir /var/www/.drush && chown www-data:www-data /var/www/.drush && sudo -E -u www-data drush -y @none dl --destination=/var/www/.drush registry_rebuild-7.x
+# CMD["apache2-foreground"]
+# Run the same initialization script that the web (drupal) does.
+CMD /usr/local/bin/initialize.sh && apache2-foreground

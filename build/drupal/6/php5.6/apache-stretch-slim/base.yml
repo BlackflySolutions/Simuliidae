@@ -1,0 +1,62 @@
+version: '3.4'
+
+services:
+
+  vsql:
+    image: blackflysolutions/mariadb:10.1
+    volumes:
+      - vdb:/var/lib/mysql
+    environment:
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+   
+  vhttp:
+    image: blackflysolutions/prosimulium:6-apache
+    # image: prosimulium:6-apache
+    ports:
+           - "80/tcp"
+    volumes:
+      - vsite:/var/www/html/sites/default
+    environment:
+      - VSITE
+      - VSITE_SITES
+      - VSITE_DOMAIN
+      - VSITE_DOMAIN_ALTERNATIVES
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - DRUPAL_DATABASE
+      - CIVICRM_DATABASE
+    depends_on:
+      - vsql
+
+  admin:
+    # create a new, empty site at this location
+    # build a temporary super-set of the vhttp container above, run some scripts, and then (maybe) exit.
+    image: blackflysolutions/prosimulium:6-apache-admin
+    # image: prosimulium:6-apache-admin
+    #image: simuliidae_admin:latest
+    #build:
+    #  context: admin
+    volumes:
+      - vsite:/var/www/html/sites/default
+    environment:
+      - VSITE
+      - VSITE_SITES
+      - VSITE_DOMAIN
+      - VSITE_DOMAIN_ALTERNATIVES
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+      - DRUPAL_DATABASE
+      - CIVICRM_DATABASE
+
+    depends_on:
+      - vsql
+      - vhttp
+
+volumes:
+    vsite:
+    vdb:
