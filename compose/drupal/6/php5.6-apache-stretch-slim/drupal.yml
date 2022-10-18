@@ -1,0 +1,59 @@
+version: '3.4'
+
+services:
+
+  vsql:
+    image: blackflysolutions/mariadb:{VSITE_MARIADB_VER-10.3}
+    volumes:
+      - vdb:/var/lib/mysql
+    environment:
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+   
+  vhttp:
+    image: blackflysolutions/simuliidae-drupal:vhttp-drupal-6-php5.6-apache-stretch-slim
+    ports:
+           - "80/tcp"
+    volumes:
+      - vsite:/var/www/html/sites/default
+    environment:
+      - VSITE_ENVIRONMENT
+      - VSITE
+      - VSITE_SITE
+      - VSITE_SITES
+      - VSITE_DOMAIN
+      - VSITE_DOMAIN_ALTERNATIVES
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - DRUPAL_DATABASE
+      - CIVICRM_DATABASE
+    depends_on:
+      - vsql
+
+  admin:
+    image: blackflysolutions/simuliidae-drupal:admin-drupal-6-php5.6-apache-stretch-slim
+    volumes:
+      - vsite:/var/www/html/sites/default
+    environment:
+      - VSITE_ENVIRONMENT
+      - VSITE
+      - VSITE_SITE
+      - VSITE_SITES
+      - VSITE_DOMAIN
+      - VSITE_DOMAIN_ALTERNATIVES
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+      - DRUPAL_DATABASE
+      - CIVICRM_DATABASE
+
+    depends_on:
+      - vsql
+      - vhttp
+
+volumes:
+    vsite:
+    vdb:

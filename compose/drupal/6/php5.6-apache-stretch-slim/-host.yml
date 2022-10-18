@@ -1,0 +1,28 @@
+# additions and changes to base.yml to 
+# provide host-mounted shared code analogous to a distro
+# if the host-mounted directories don't exist, you'll get errors starting up containers
+version: '3.4'
+
+services:
+
+  vhttp:
+    volumes:
+    - /var/www/drupal/git_deploy_cache:/tmp/git_deploy:rw
+    - /var/www/drupal/6-host:/var/www/html/sites/all/host:ro
+    - /var/www/drupal/libraries:/var/www/html/sites/all/libraries:ro
+    - /var/www/civicrm/{VSITE_CIVICRM_VER-none}:/var/www/html/sites/all/modules/civicrm:ro
+    - /var/www/drupal/6-modules/cache_backport:/var/www/html/sites/all/modules/cache_backport:ro
+    - /var/www/drupal/6-modules:/var/www/html/sites/all/modules/contrib:ro
+    - /var/www/drupal/6-themes:/var/www/html/sites/all/themes/contrib:ro
+    - /var/www/civicrm/vendor:/var/www/html/vendor:ro
+
+  admin:
+    volumes:
+    - /var/www/drupal/git_deploy_cache:/tmp/git_deploy:rw
+    - /var/www/drupal/6-host:/var/www/html/sites/all/host:ro
+    - /var/www/drupal/libraries:/var/www/html/sites/all/libraries:ro
+    - /var/www/civicrm/{VSITE_CIVICRM_VER-none}:/var/www/html/sites/all/modules/civicrm:ro
+    - /var/www/drupal/6-modules/cache_backport:/var/www/html/sites/all/modules/cache_backport:ro
+    - /var/www/drupal/6-modules:/var/www/html/sites/all/modules/contrib:ro
+    - /var/www/drupal/6-themes:/var/www/html/sites/all/themes/contrib:ro
+    - /var/www/civicrm/vendor:/var/www/html/vendor:ro
