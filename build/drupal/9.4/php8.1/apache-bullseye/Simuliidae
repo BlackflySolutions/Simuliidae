@@ -51,7 +51,6 @@ RUN apt-get update \
 # drush launcher: drush is/was installed by composer
 RUN curl -L -o /usr/local/bin/drush https://github.com/drush-ops/drush-launcher/releases/latest/download/drush.phar
 RUN chmod ugo+x /usr/local/bin/drush
-COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
 # add composer, using (default) version 2 as of Jan 18
 RUN curl --silent --show-error https://getcomposer.org/installer | php -- --filename=composer --install-dir=/usr/local/bin
 # add additional dependencies for installing civicrm with D9 + composer
@@ -62,7 +61,7 @@ RUN npm install -g bower
 RUN useradd -u 1978 -g www-data -ms /bin/bash drupal
 RUN chown drupal:www-data /var/www/drupal
 # A bunch of convenience scripts
-COPY admin.sh admindb.sh restoredb.sh setup.sh wait-for-it.sh backupdb.sh backupsite.sh /usr/local/bin/
+COPY admin/*sh /usr/local/bin/
 # A copy of the cv civicrm command line utility
 RUN curl -LsS https://download.civicrm.org/cv/cv.phar -o /usr/local/bin/cv
 RUN chmod ugo+x /usr/local/bin/drush && chmod ugo+x /usr/local/bin/cv && chmod ugo+x /usr/local/bin/*.sh 
