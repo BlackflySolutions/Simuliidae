@@ -1,5 +1,4 @@
-# restores backups from /var/www/restore/vbd
-# This is a legacy script
+# restores backups 
 MYSQLIMPORT_CMD=/usr/bin/mysqlimport
 MYSQL_CMD=/usr/bin/mysql
 #
