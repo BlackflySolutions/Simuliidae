@@ -6,7 +6,7 @@
 
 # from https://www.drupal.org/docs/system-requirements/php-requirements
 # create as a "base" that doesn't include the drupal code
-FROM php:8.1-apache-bullseye AS drupal-base
+FROM php:7.4-apache-bullseye AS drupal-base
 
 # install the PHP extensions we need
 RUN set -eux; \

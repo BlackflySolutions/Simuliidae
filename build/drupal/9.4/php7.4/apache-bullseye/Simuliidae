@@ -1,6 +1,6 @@
-# This is used to build extended versions of the drupal image, with production goodies that
+# This is used to build extended versions of the drupal-civicrm image, with production goodies that
 # are not needed for testing or local/dev.
-# Note: requires the IMAGE_FROM argument, which may be either the base or non-base (cms code) version
+# Note: requires the IMAGE_FROM argument, which may be either the base or non-base version
 # Goodies include:
 # 1. the php pecl redis extension, to support the use of redis
 # 2. imagemagick, because it's great
@@ -8,9 +8,10 @@
 # 4. handling of varnish+hitch proxying by apache
 # 5. the mcrypt pecl extension to support old civi upgrades
 # 6. an ssh client and git, to support some automation
-# by default, local building
-ARG REPOSITORY_FROM=
-ARG IMAGE_FROM=
+#
+# by default, do local building
+ARG REPOSITORY_FROM
+ARG IMAGE_FROM
 # first build the web service
 FROM ${REPOSITORY_FROM}${IMAGE_FROM} as vhttp
 # change the document root as per https://hub.docker.com/_/php/
@@ -25,7 +26,7 @@ WORKDIR /var/www/drupal
 # Install openssh-client for outgoing https requests!
 RUN apt-get update && apt-get install -y msmtp openssh-client iproute2 git libmcrypt-dev && \
   pecl install -o redis && docker-php-ext-enable redis && \
-  pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick && \
+  pecl install -o imagick && docker-php-ext-enable imagick && \
   pecl install -o apcu && docker-php-ext-enable apcu  && \
   docker-php-ext-install exif && \
   apt-get clean && \
@@ -48,20 +49,19 @@ RUN apt-get update \
   && apt-get install -y mariadb-client sudo vim zip unzip netcat ssh rsync \
   && apt-get purge -y
 # drush launcher: drush is/was installed by composer
-RUN curl -L -o /usr/local/bin/drush https://github.com/drush-ops/drush-launcher/releases/download/0.6.0/drush.phar
+RUN curl -L -o /usr/local/bin/drush https://github.com/drush-ops/drush-launcher/releases/latest/download/drush.phar
 RUN chmod ugo+x /usr/local/bin/drush
-COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
 # add composer, using (default) version 2 as of Jan 18
 RUN curl --silent --show-error https://getcomposer.org/installer | php -- --filename=composer --install-dir=/usr/local/bin
 # add additional dependencies for installing civicrm with D9 + composer
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
 RUN apt-get install -y nodejs
 RUN npm install -g bower
 # We create a drupal user to own all the code, using Dries birth year as the uid
 RUN useradd -u 1978 -g www-data -ms /bin/bash drupal
 RUN chown drupal:www-data /var/www/drupal
 # A bunch of convenience scripts
-COPY admin.sh admindb.sh restoredb.sh restoredrupal.sh  restorefiles.sh  restorevsite.sh setup.sh wait-for-it.sh backupdb.sh backupsite.sh root-ssh.sh /usr/local/bin/
+COPY admin/*sh /usr/local/bin/
 # A copy of the cv civicrm command line utility
 RUN curl -LsS https://download.civicrm.org/cv/cv.phar -o /usr/local/bin/cv
 RUN chmod ugo+x /usr/local/bin/drush && chmod ugo+x /usr/local/bin/cv && chmod ugo+x /usr/local/bin/*.sh 
