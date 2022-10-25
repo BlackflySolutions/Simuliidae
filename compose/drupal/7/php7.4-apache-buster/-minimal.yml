@@ -1,0 +1,15 @@
+# additions and changes to base
+# provide host-mounted shared code 
+version: '3.4'
+
+services:
+
+  vhttp:
+    volumes:
+    - /var/www/drupal/7-host:/var/www/html/sites/all/host:ro
+    - /var/www/drupal/7-minimal:/var/www/html/sites/all/modules/minimal:ro
+
+  admin:
+    volumes:
+    - /var/www/drupal/7-host:/var/www/html/sites/all/host:ro
+    - /var/www/drupal/7-minimal:/var/www/html/sites/all/modules/minimal:ro
