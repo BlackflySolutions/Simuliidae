@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+
+  vsql:
+    image: mariadb:10.3
+    volumes:
+      - /usr/local/mysql:/etc/mysql/conf.d 
+    sysctls:
+      fs.aio-max-nr: 500000 
