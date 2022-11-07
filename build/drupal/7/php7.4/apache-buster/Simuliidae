@@ -17,7 +17,7 @@ FROM ${REPOSITORY_FROM}${IMAGE_FROM} as vhttp
 # Add a way to send mail out, assuming the host can do mail at port 25. The initialize.sh script sets up an entry in /etc/hosts to make it "easy".
 # Use iproute2 to figure my ip route out to the host.
 # Install openssh-client for outgoing https requests!
-RUN apt-get update && apt-get install -y msmtp openssh-client iproute2 git libmcrypt-dev && \
+RUN apt-get update && apt-get install -y msmtp imagemagick openssh-client iproute2 git libmcrypt-dev && \
   pecl install -o redis && docker-php-ext-enable redis && \
   pecl install -o mcrypt-1.0.4 && docker-php-ext-enable mcrypt && \
   pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick && \
