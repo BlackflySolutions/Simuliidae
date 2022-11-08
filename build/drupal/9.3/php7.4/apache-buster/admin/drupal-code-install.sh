@@ -10,7 +10,9 @@ else
   sudo -u drupal composer create-project drupal/recommended-project:${VSITE_DRUPAL_VER} . --no-interaction  --no-install
   sudo -u drupal composer require --no-update drush/drush zaporylie/composer-drupal-optimizations:^1.1 --dev
   sudo -u drupal composer config --no-plugins allow-plugins.zaporylie/composer-drupal-optimizations true
-  sudo -u drupal composer require drupal/core-recommended:${VSITE_DRUPAL_VER} --update-with-all-dependencies
+  sudo -u drupal composer require --no-update drupal/core-recommended:${VSITE_DRUPAL_VER}
+  sudo -u drupal composer require --no-update drupal/core-composer-scaffold:${VSITE_DRUPAL_VER}
+  sudo -u drupal composer require --no-update drupal/core-project-message:${VSITE_DRUPAL_VER} 
   sudo -u drupal composer update
   cd /var/www/
   chown drupal drupal
