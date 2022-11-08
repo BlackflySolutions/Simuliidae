@@ -20,10 +20,23 @@ else
    --account-mail=${VSITE_ADMIN_MAIL:-$VSITE_DEFAULT_MAIL} \
    --db-su=root \
    --db-su-pw=$MYSQL_ROOT_PASSWORD 
+  # now some cleanups/customizations that I can't do with drush - redo the settings file!
+  if [ -f /var/www/drupal/web/sites/default/default.settings.php ]; then
+    cp /var/www/drupal/web/sites/default/default.settings.php /var/www/drupal/web/sites/default/settings.php
+    HASH_SALT_SETTING='$settings["hash_salt"] = '
+    HASH_SALT_SETTING+="'"
+    HASH_SALT_SETTING+=`drush eval 'echo Drupal\Component\Utility\Crypt::randomBytesBase64(55)'`
+    HASH_SALT_SETTING+="';"
+    echo $HASH_SALT_SETTING >> /var/www/drupal/web/sites/default/settings.php
+    echo 'include("sites/all/host/settings.local.php");' >> /var/www/drupal/web/sites/default/settings.php
+    echo '# include("sites/all/host/z.redis.inc");' >> /var/www/drupal/web/sites/default/settings.php
+    echo '$settings["config_sync_directory"] = "../config/sync";' >> /var/www/drupal/web/sites/default/settings.php
+  fi
   sudo -E -u www-data drush -y pm:enable toolbar
-  sudo -E -u www-data drush -y theme:enable seven
-  sudo -E -u www-data drush -y config-set system.theme admin seven
-  sudo -E -u www-data drush -y config-set system.theme default ${VSITE_THEME:-seven}
+  # sudo -E -u www-data drush -y pm:enable redis
+  sudo -E -u www-data drush -y theme:enable claro
+  sudo -E -u www-data drush -y config-set system.theme admin claro
+  sudo -E -u www-data drush -y config-set system.theme default ${VSITE_THEME:-claro}
   echo "Site Installation Completed"
   echo "Login using the following url"
   sudo -E -u www-data drush --uri="https://${VSITE_DOMAIN}" uli
