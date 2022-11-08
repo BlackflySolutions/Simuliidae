@@ -4,7 +4,8 @@ echo "Installing a new CiviCRM instance."
 if [ ! -f /var/www/drupal/web/sites/default/civicrm_settings.php ]; then
   chmod ug+w /var/www/drupal/web/sites/default
   mysql -u root -p$MYSQL_PASSWORD -h vsql  -e "create database if not exists $CIVICRM_DATABASE; grant all on $CIVICRM_DATABASE.* to $MYSQL_USER@'%';"
-  sudo -E -u www-data drush -y pm:enable civicrm
+#  sudo -E -u www-data drush -y pm:enable civicrm
+  cv core:install --cms-base-url=https://$VSITE_DOMAIN --db="mysql://$MYSQL_USER:$MYSQL_PASSWORD@vsql/$CIVICRM_DATABASE"
   chmod ug-w /var/www/drupal/web/sites/default
   curl -LsS https://download.civicrm.org/cv/cv.phar -o /usr/local/bin/cv
   chmod +x /usr/local/bin/cv
