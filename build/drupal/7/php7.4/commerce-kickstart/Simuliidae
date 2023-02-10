@@ -1,8 +1,8 @@
 ARG REPOSITORY_FROM=
 # default to starting from the base image, without Drupal
-ARG IMAGE_FROM=
+ARG VARIANT_TAG=
 # first build the web service
-FROM ${REPOSITORY_FROM}${IMAGE_FROM} as vhttp
+FROM ${REPOSITORY_FROM}drupal:base-${VARIANT_TAG} as vhttp-drupal
 
 ENV CK_VERSION 7.x-2.75
 RUN set -eux; \
@@ -30,10 +30,15 @@ RUN a2enconf vhttp && a2enmod expires
 # initialize needs to run after the container has been created. 
 COPY initialize.sh /usr/local/bin/initialize.sh
 RUN chmod u+x /usr/local/bin/initialize.sh 
-# CMD["apache2-foreground"]
-CMD /usr/local/bin/initialize.sh && apache2-foreground
+# default entrypoint runs initialize and then default/inherited CMD to start apache
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod 775 /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+# inherited default CMD["apache2-foreground"]
+CMD ["apache2-foreground"]
+#
 # done with vhttp, now add the admin bits
-FROM vhttp as admin
+FROM vhttp-drupal as admin-drupal
 # an extended version of the webserver image, adding extra packages and scripts
 RUN apt-get update \
   && apt-get install -y mariadb-client sudo vim zip unzip netcat ssh rsync \
@@ -53,6 +58,5 @@ COPY admin.conf /etc/apache2/conf-available
 RUN a2enconf admin
 # get a copy of the registry_rebuild drush command because it's so useful
 RUN mkdir /var/www/.drush && chown www-data:www-data /var/www/.drush && sudo -E -u www-data drush -y @none dl --destination=/var/www/.drush registry_rebuild-7.x
+# Inherit the initialization script and entrypoint from vhttp-base
 # CMD["apache2-foreground"]
-# Run the same initialization script that the web (drupal) does.
-CMD /usr/local/bin/initialize.sh && apache2-foreground

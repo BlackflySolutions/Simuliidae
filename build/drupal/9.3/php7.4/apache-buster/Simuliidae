@@ -10,9 +10,9 @@
 # 6. an ssh client and git, to support some automation
 # by default, local building
 ARG REPOSITORY_FROM=
-ARG IMAGE_FROM=
+ARG VARIANT_TAG=
 # first build the web service
-FROM ${REPOSITORY_FROM}${IMAGE_FROM} as vhttp
+FROM ${REPOSITORY_FROM}drupal:base-${VARIANT_TAG} as vhttp-base
 # change the document root as per https://hub.docker.com/_/php/
 # because I want to build my code with composer
 RUN mkdir -p /var/www/drupal
@@ -31,8 +31,6 @@ RUN apt-get update && apt-get install -y msmtp openssh-client iproute2 git libmc
   apt-get clean && \
   echo 'sendmail_path = "/usr/bin/msmtp -C /etc/msmtprc -t"' > /usr/local/etc/php/conf.d/mail.ini
 COPY msmtprc /etc/msmtprc
-# tell apache how to handle the varnish+hitch proxying
-RUN echo 'SetEnvIf X-Forwarded-Proto https HTTPS=on' >> /var/www/html/.htaccess
 # increase php timeout and other customizations
 COPY vhttp.ini /usr/local/etc/php/conf.d/
 COPY vhttp.conf /etc/apache2/conf-available/
@@ -40,9 +38,14 @@ RUN a2enconf vhttp && a2enmod expires
 # initialize needs to run after the container has been created. 
 COPY initialize.sh /usr/local/bin/initialize.sh
 RUN chmod u+x /usr/local/bin/initialize.sh 
-# CMD["apache2-foreground"]
-CMD /usr/local/bin/initialize.sh && apache2-foreground
-FROM vhttp as admin
+# default entrypoint runs initialize and then default/inherited CMD to start apache
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod 775 /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+# inherited default CMD["apache2-foreground"]
+CMD ["apache2-foreground"]
+#
+FROM vhttp-base as admin-base
 # an extended version of the webserver image, adding extra packages and scripts
 RUN apt-get update \
   && apt-get install -y mariadb-client sudo vim zip unzip netcat ssh rsync \
@@ -68,6 +71,5 @@ RUN chmod ugo+x /usr/local/bin/drush && chmod ugo+x /usr/local/bin/cv && chmod u
 # The apache for the container shouldn't actually be functional, it doesn't get invoked, so minimize it's resource use.
 COPY admin.conf /etc/apache2/conf-available
 RUN a2enconf admin
+# Inherits the initialization script and entrypoint from vhttp-base
 # CMD["apache2-foreground"]
-# Run the same initialization script that the web (drupal) does.
-CMD /usr/local/bin/initialize.sh && apache2-foreground
