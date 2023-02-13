@@ -9,7 +9,7 @@ fi
 echo "Preparing Drupal core codebase update to $VSITE_DRUPAL_VER using composer."
 cd /var/www/drupal
 sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer require --no-update drupal/core-recommended:${VSITE_DRUPAL_VER} --update-with-all-dependencies
-sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer require --no-update drupal/core-compose-scaffold:${VSITE_DRUPAL_VER} --update-with-all-dependencies
+sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer require --no-update drupal/core-composer-scaffold:${VSITE_DRUPAL_VER} --update-with-all-dependencies
 sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer require --no-update drupal/core-project-message:${VSITE_DRUPAL_VER} --update-with-all-dependencies
 # sudo -u drupal composer update drupal/core drupal/core-* --with-all-dependencies
 # sudo -u drupal composer update drupal/core-recommended --with-dependencies
