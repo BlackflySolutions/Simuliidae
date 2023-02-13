@@ -37,6 +37,9 @@ else
   sudo -E -u www-data drush -y theme:enable claro
   sudo -E -u www-data drush -y config-set system.theme admin claro
   sudo -E -u www-data drush -y config-set system.theme default ${VSITE_THEME:-claro}
+  # secure some filesystem permissions/ownership
+  chmod g-w /var/www/drupal/web/sites/default
+  chmod u+w /var/www/drupal/web/sites/default/settings.php
   echo "Site Installation Completed"
   echo "Login using the following url"
   sudo -E -u www-data drush --uri="https://${VSITE_DOMAIN}" uli
