@@ -10,7 +10,8 @@
     "variants": [
       "apache-bullseye"
     ],
-    "version": "10.0.4"
+    "civicrmVersion": "5.59.3",
+    "version": "10.0.5"
   },
   "7": {
     "md5": "dae634ea0da005c5c435cfa9a9c5c322",
@@ -22,7 +23,8 @@
       "apache-bullseye",
       "apache-buster"
     ],
-    "version": "7.94"
+    "civicrmVersion": "5.59.3",
+    "version": "7.95"
   },
   "9.3": {
     "composer": {
@@ -34,6 +36,7 @@
     "variants": [
       "apache-buster"
     ],
+    "civicrmVersion": "5.59.3",
     "version": "9.3.22"
   },
   "9.4": {
@@ -47,7 +50,8 @@
     "variants": [
       "apache-bullseye"
     ],
-    "version": "9.4.11"
+    "civicrmVersion": "5.59.3",
+    "version": "9.4.12"
   },
   "9.5": {
     "composer": {
@@ -59,6 +63,7 @@
     "variants": [
       "apache-bullseye"
     ],
-    "version": "9.5.4"
+    "civicrmVersion": "5.59.3",
+    "version": "9.5.5"
   }
 }
