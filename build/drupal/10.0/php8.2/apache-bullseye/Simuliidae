@@ -17,6 +17,14 @@ ARG VARIANT_TAG=
 FROM ${REPOSITORY_FROM}drupal:base-${VARIANT_TAG} as vhttp-base
 # We create a drupal user to own all the code, using Dries birth year as the uid
 RUN useradd -u 1978 -g www-data -ms /bin/bash drupal
+# change the document root as per https://hub.docker.com/_/php/
+# because I want to build my code with composer and this is how I've been doing it ...
+RUN mkdir -p /var/www/drupal
+ENV APACHE_DOCUMENT_ROOT /var/www/drupal/web
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+WORKDIR /var/www/drupal
+RUN chown drupal:www-data /var/www/drupal
 # Add a way to send mail out, assuming the host can do mail at port 25. 
 # The initialize.sh script sets up an entry in /etc/hosts to make it "easy".
 # Use iproute2 to figure my ip route out to the host.
@@ -42,12 +50,14 @@ ENTRYPOINT ["/entrypoint.sh"]
 CMD ["apache2-foreground"]
 # Step 2: build a basic admin service, adding some bits to the vhttp-base
 # Admin runs sshd as it's CMD by default, but can be used to, e.g. do automated setup.
-FROM vhttp-base as admin-base
+# We'll first build admin-minimal that we'll use later as a base for admin-build
+FROM vhttp-base as admin-minimal
 RUN apt-get update \
   && apt-get install -y mariadb-client sudo vim zip unzip netcat ssh rsync openssh-server \
   && apt-get purge -y
-# hard-coded drush version, may need updating sometimes
-RUN curl -L -o /usr/local/bin/drush https://github.com/drush-ops/drush/releases/download/8.4.11/drush.phar
+# drush launcher, drush will be installed by composer
+RUN curl -L -o /usr/local/bin/drush https://github.com/drush-ops/drush-launcher/releases/latest/download/drush.phar
+RUN chmod u+x /usr/local/bin/drush
 # Add this version's collection of admin convenience scripts [these are version specific and evolve!]
 COPY admin/*sh /usr/local/bin/
 # Include copy of the cv civicrm command line utility
@@ -58,15 +68,50 @@ RUN chmod ugo+x /usr/local/bin/drush && chmod ugo+x /usr/local/bin/cv && chmod u
 # in case it's actually started.
 COPY admin.conf /etc/apache2/conf-available
 RUN a2enconf admin
-COPY entrypoint-sshd.sh /entrypoint-sshd.sh
-RUN chmod 775 /entrypoint-sshd.sh
-# need a few extra calisthenics to get sshd working 
-RUN mkdir -p /var/run/sshd 
-# && sed -i "s/UsePrivilegeSeparation.*/UsePrivilegeSeparation no/g" /etc/ssh/sshd_config \
-#  && sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
-#  && touch /root/.Xauthority \
-#  && true
-# Inherits the initialization script and entrypoint from vhttp-base
+# We inherit the initialization script and entrypoint from vhttp-base
 # But we'll use a new entrypoint and cmd to run sshd
+COPY entrypoint-sshd.sh /entrypoint-sshd.sh
+RUN chmod 775 /entrypoint-sshd.sh && mkdir -p /var/run/sshd 
 ENTRYPOINT ["/entrypoint-sshd.sh"]
 CMD ["/entrypoint-sshd.sh"]
+FROM admin-minimal as admin-base
+# add composer, uses (default) version 2
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
+# add additional dependencies for installing civicrm with D9 + composer
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
+RUN apt-get install -y nodejs
+RUN npm install -g bower
+# Step 3: from the admin-base, add the CMS code, and then copy it over to the vhttp-base as the vhttp-cms
+FROM admin-base as admin-build-cms
+# https://www.drupal.org/node/3060/release
+ENV DRUPAL_VERSION 10.0.4
+USER drupal:www-data
+RUN set -eux; \
+	composer create-project --no-interaction --no-install "drupal/recommended-project:$DRUPAL_VERSION" ./;
+#RUN composer config extra.enable-patching true
+#RUN composer config --no-plugins allow-plugins.cweagans/composer-patches true
+RUN composer require --no-update drush/drush --dev
+RUN echo "Building with Drupal version $DRUPAL_VERSION"
+RUN composer require --no-update drupal/core:${DRUPAL_VERSION} --update-with-all-dependencies
+RUN composer update 
+#	chown -R drupal:www-data web/sites web/modules web/themes; 
+FROM admin-build-cms as admin-build-crm
+ENV CIVICRM_VERSION 5.59.1
+RUN set -eux; \
+  composer config extra.enable-patching true; \
+  composer config minimum-stability dev; \
+  composer config extra.compile-mode all;  
+RUN \ 
+  composer require --no-update -W "civicrm/civicrm-asset-plugin:'~1.1'"; \
+  composer require --no-update -W "civicrm/civicrm-core:$CIVICRM_VERSION"; \
+  composer require --no-update -W "civicrm/civicrm-packages:$CIVICRM_VERSION"; \
+  composer require --no-update -W "civicrm/civicrm-drupal-8:$CIVICRM_VERSION"; 
+RUN composer update
+FROM vhttp-base as vhttp-cms
+COPY --from=admin-build-cms /var/www/drupal .
+FROM vhttp-base as vhttp-crm
+COPY --from=admin-build-crm /var/www/drupal .
+FROM admin-minimal as admin-cms
+COPY --from=admin-build-cms /var/www/drupal .
+FROM admin-minimal as admin-crm
+COPY --from=admin-build-crm /var/www/drupal .

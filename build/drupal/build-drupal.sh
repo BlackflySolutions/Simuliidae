@@ -8,5 +8,5 @@ while read VARIANT_DIR; do
   echo "$VARIANT_DIR"
   VARIANT_TAG=$(echo $VARIANT_DIR | sed -e 's/\//-/g')
   DOCKER_BUILDKIT=1 docker build --target=drupal-base -t drupal:base-$VARIANT_TAG $VARIANT_DIR
-  DOCKER_BUILDKIT=1 docker build --target= -t drupal:drupal-$VARIANT_TAG $VARIANT_DIR
+  # DOCKER_BUILDKIT=1 docker build --target= -t drupal:drupal-$VARIANT_TAG $VARIANT_DIR
 done <variants.txt

@@ -1,1 +1,7 @@
+7/php7.4/apache-buster
+7/php8.0/apache-buster
 9.3/php7.4/apache-buster
+9.4/php7.4/apache-bullseye
+9.4/php8.1/apache-bullseye
+9.5/php8.1/apache-bullseye
+10.0/php8.2/apache-bullseye
