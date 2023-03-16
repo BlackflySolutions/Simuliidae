@@ -11,7 +11,10 @@ ARG VARIANT_TAG=
 FROM ${REPOSITORY_FROM}drupal:base-${VARIANT_TAG} as vhttp-base
 # We create a drupal user to own all the code, using Dries birth year as the uid
 RUN useradd -u 1978 -g www-data -ms /bin/bash drupal
-{{ if env.version | startswith("7") then "" else ( -}}
+{{ if env.version | startswith("7") then ( -}}
+# use the default document root inherited from php/apache
+WORKDIR /var/www/html
+{{ ) else ( -}}
 # change the document root as per https://hub.docker.com/_/php/
 # because I want to build my code with composer and this is how I've been doing it ...
 RUN mkdir -p /var/www/drupal
@@ -46,7 +49,8 @@ ENTRYPOINT ["/entrypoint.sh"]
 CMD ["apache2-foreground"]
 # Step 2: build a basic admin service, adding some bits to the vhttp-base
 # Admin runs sshd as it's CMD by default, but can be used to, e.g. do automated setup.
-FROM vhttp-base as admin-base
+# We'll first build admin-minimal that we'll use later as a base for admin-build
+FROM vhttp-base as admin-minimal
 RUN apt-get update \
   && apt-get install -y mariadb-client sudo vim zip unzip netcat ssh rsync openssh-server \
   && apt-get purge -y
@@ -57,14 +61,7 @@ RUN curl -L -o /usr/local/bin/drush https://github.com/drush-ops/drush/releases/
 # drush launcher, drush will be installed by composer
 RUN curl -L -o /usr/local/bin/drush https://github.com/drush-ops/drush-launcher/releases/latest/download/drush.phar
 {{ ) end -}}
-{{ if env.version | startswith("7") then "" else ( -}}
-# add composer, uses (default) version 2 
-RUN curl --silent --show-error https://getcomposer.org/installer | php -- --filename=composer --install-dir=/usr/local/bin
-# add additional dependencies for installing civicrm with D9 + composer
-RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
-RUN apt-get install -y nodejs
-RUN npm install -g bower
-{{ ) end -}}
+RUN chmod u+x /usr/local/bin/drush
 # Add this version's collection of admin convenience scripts [these are version specific and evolve!]
 COPY admin/*sh /usr/local/bin/
 # Include copy of the cv civicrm command line utility
@@ -75,15 +72,85 @@ RUN chmod ugo+x /usr/local/bin/drush && chmod ugo+x /usr/local/bin/cv && chmod u
 # in case it's actually started.
 COPY admin.conf /etc/apache2/conf-available
 RUN a2enconf admin
-COPY entrypoint-sshd.sh /entrypoint-sshd.sh
-RUN chmod 775 /entrypoint-sshd.sh
-# need a few extra calisthenics to get sshd working 
-RUN mkdir -p /var/run/sshd 
-# && sed -i "s/UsePrivilegeSeparation.*/UsePrivilegeSeparation no/g" /etc/ssh/sshd_config \
-#  && sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
-#  && touch /root/.Xauthority \
-#  && true
-# Inherits the initialization script and entrypoint from vhttp-base
+# We inherit the initialization script and entrypoint from vhttp-base
 # But we'll use a new entrypoint and cmd to run sshd
+COPY entrypoint-sshd.sh /entrypoint-sshd.sh
+RUN chmod 775 /entrypoint-sshd.sh && mkdir -p /var/run/sshd 
 ENTRYPOINT ["/entrypoint-sshd.sh"]
 CMD ["/entrypoint-sshd.sh"]
+FROM admin-minimal as admin-base
+{{ if env.version | startswith("7") then "" else ( -}}
+# add composer, uses (default) version 2
+COPY --from=composer:{{ .composer.version }} /usr/bin/composer /usr/local/bin/
+# add additional dependencies for installing civicrm with D9 + composer
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
+RUN apt-get install -y nodejs
+RUN npm install -g bower
+{{ ) end -}}
+# Step 3: from the admin-base, add the CMS code, and then copy it over to the vhttp-base as the vhttp-cms
+FROM admin-base as admin-build-cms
+# https://www.drupal.org/node/3060/release
+ENV DRUPAL_VERSION {{ .version }}
+{{ if env.version | startswith("7") then ( -}}
+ENV DRUPAL_MD5 {{ .md5 }}
+RUN set -eux; \
+	curl -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_VERSION}.tar.gz" -o drupal.tar.gz; \
+	echo "${DRUPAL_MD5} *drupal.tar.gz" | md5sum -c -; \
+	tar -xz --strip-components=1 -f drupal.tar.gz; \
+	rm drupal.tar.gz; \
+	chown -R drupal:www-data sites modules themes;
+{{ ) else ( -}}
+USER drupal:www-data
+RUN set -eux; \
+	composer create-project --no-interaction --no-install "drupal/recommended-project:$DRUPAL_VERSION" ./;
+#RUN composer config extra.enable-patching true
+#RUN composer config --no-plugins allow-plugins.cweagans/composer-patches true
+RUN composer require --no-update drush/drush --dev
+RUN echo "Building with Drupal version $DRUPAL_VERSION"
+RUN composer require --no-update drupal/core:${DRUPAL_VERSION} --update-with-all-dependencies
+RUN composer update 
+#	chown -R drupal:www-data web/sites web/modules web/themes; 
+{{ ) end -}}
+FROM admin-build-cms as admin-build-crm
+ENV CIVICRM_VERSION {{ .civicrmVersion }}
+{{ if env.version | startswith("7") then ( -}}
+RUN set -eux; \
+        cd sites/all/modules; \
+        curl -L "https://download.civicrm.org/civicrm-${CIVICRM_VERSION}-drupal.tar.gz" | tar xvz; \
+	chown -R drupal:www-data civicrm;
+{{ ) else ( -}}
+RUN set -eux; \
+  composer config extra.enable-patching true; \
+  composer config minimum-stability dev; \
+  composer config extra.compile-mode all;  
+RUN \ 
+  composer require --no-update -W "civicrm/civicrm-asset-plugin:'~1.1'"; \
+  composer require --no-update -W "civicrm/civicrm-core:$CIVICRM_VERSION"; \
+  composer require --no-update -W "civicrm/civicrm-packages:$CIVICRM_VERSION"; \
+  composer require --no-update -W "civicrm/civicrm-drupal-8:$CIVICRM_VERSION"; 
+RUN composer update
+{{ ) end -}}
+FROM vhttp-base as vhttp-cms
+{{ if env.version | startswith("7") then ( -}}
+COPY --from=admin-build-cms /var/www/html .
+{{ ) else ( -}}
+COPY --from=admin-build-cms /var/www/drupal .
+{{ ) end -}}
+FROM vhttp-base as vhttp-crm
+{{ if env.version | startswith("7") then ( -}}
+COPY --from=admin-build-crm /var/www/html .
+{{ ) else ( -}}
+COPY --from=admin-build-crm /var/www/drupal .
+{{ ) end -}}
+FROM admin-minimal as admin-cms
+{{ if env.version | startswith("7") then ( -}}
+COPY --from=admin-build-cms /var/www/html .
+{{ ) else ( -}}
+COPY --from=admin-build-cms /var/www/drupal .
+{{ ) end -}}
+FROM admin-minimal as admin-crm
+{{ if env.version | startswith("7") then ( -}}
+COPY --from=admin-build-crm /var/www/html .
+{{ ) else ( -}}
+COPY --from=admin-build-crm /var/www/drupal .
+{{ ) end -}}
