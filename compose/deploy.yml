@@ -34,6 +34,8 @@ services:
     environment:
       - VSITE_ENVIRONMENT
       - VSITE_CIVIMAIL_SMTP_DEFAULT
+      - VSITE_CRED_KEY
+      - VSITE_SIGN_KEY
     labels:
       simuliidae.environment: "{VSITE_ENVIRONMENT-Production}"
       simuliidae.domain: "{VSITE_DOMAIN}"
@@ -60,6 +62,8 @@ services:
     environment:
       - VSITE_ENVIRONMENT
       - VSITE_CIVIMAIL_SMTP_DEFAULT
+      - VSITE_CRED_KEY
+      - VSITE_SIGN_KEY
     labels:
       simuliidae.environment: "{VSITE_ENVIRONMENT-Production}"
       simuliidae.domain: "{VSITE_DOMAIN}"
