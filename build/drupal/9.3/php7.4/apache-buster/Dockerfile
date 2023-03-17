@@ -58,10 +58,10 @@ RUN set -eux; \
 		imap \
 	; \
 	\
-RUN pecl install -o imagick && docker-php-ext-enable imagick \
- && pecl install -o redis && docker-php-ext-enable redis \
- && pecl install -o apcu && docker-php-ext-enable apcu \
- && docker-php-ext-install exif \
+        pecl install -o imagick && docker-php-ext-enable imagick; \
+        pecl install -o redis && docker-php-ext-enable redis; \
+        pecl install -o apcu && docker-php-ext-enable apcu; \
+        docker-php-ext-install exif; \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
