@@ -52,7 +52,7 @@ CMD ["apache2-foreground"]
 # We'll first build admin-minimal that we'll use later as a base for admin-build
 FROM vhttp-base as admin-minimal
 RUN apt-get update \
-  && apt-get install -y mariadb-client sudo vim zip unzip netcat ssh rsync openssh-server \
+  && apt-get install -y mariadb-client sudo vim less zip unzip netcat ssh rsync openssh-server \
   && apt-get purge -y
 {{ if env.version | startswith("7") then ( -}}
 # hard-coded drush version, may need updating sometimes
