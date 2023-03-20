@@ -3,7 +3,7 @@ version: '3.4'
 services:
 
   vsql:
-    image: blackflysolutions/mariadb:10.4
+    image: blackflysolutions/mariadb:{VSITE_MARIADB_VER-10.3}
     expose:
            - "3306"
     volumes:
@@ -16,7 +16,7 @@ services:
       - MYSQL_DATABASE
    
   vhttp:
-    image: blackflysolutions/simuliidae-drupal:vhttp-drupal-9.4-php7.4-apache-bullseye
+    image: blackflysolutions/simuliidae-drupal:vhttp-cms-9.4-php7.4-apache-bullseye
     deploy:
       labels:
         simuliidae.domain: "{VSITE_DOMAIN}"
@@ -39,7 +39,7 @@ services:
 
   admin:
     # use an extended version of the above image for administrative tasks
-    image: blackflysolutions/simuliidae-drupal:admin-drupal-9.4-php7.4-apache-bullseye
+    image: blackflysolutions/simuliidae-drupal:admin-cms-9.4-php7.4-apache-bullseye
     volumes:
       - vdrupal:/var/www/drupal
     environment:
