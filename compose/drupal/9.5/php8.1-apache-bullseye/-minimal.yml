@@ -7,13 +7,13 @@ services:
 
   vhttp:
     volumes:
-    - /var/www/drupal/9.5-host:/var/www/drupal/web/sites/all/host:ro
-    - /var/www/drupal/9.5-features/blackfly_purger:/var/www/drupal/web/sites/all/modules/features/blackfly_purger:ro
-    - /var/www/drupal/9.5-minimal:/var/www/drupal/web/sites/all/modules/minimal:ro
+    - /var/www/drupal/9.5/host:/var/www/drupal/web/sites/all/host:ro
+    - /var/www/drupal/9.5/features/blackfly_purger:/var/www/drupal/web/sites/all/modules/features/blackfly_purger:ro
+    - /var/www/drupal/9.5/minimal:/var/www/drupal/web/sites/all/modules/minimal:ro
 
   admin:
     volumes:
     - /var/backup/docker/{VSITE}:/var/backup:rw
-    - /var/www/drupal/9.5-host:/var/www/drupal/web/sites/all/host:ro
-    - /var/www/drupal/9.5-features/blackfly_purger:/var/www/drupal/web/sites/all/modules/features/blackfly_purger:ro
-    - /var/www/drupal/9.5-minimal:/var/www/drupal/web/sites/all/modules/minimal:ro
+    - /var/www/drupal/9.5/host:/var/www/drupal/web/sites/all/host:ro
+    - /var/www/drupal/9.5/features/blackfly_purger:/var/www/drupal/web/sites/all/modules/features/blackfly_purger:ro
+    - /var/www/drupal/9.5/minimal:/var/www/drupal/web/sites/all/modules/minimal:ro

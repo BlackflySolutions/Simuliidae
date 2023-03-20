@@ -16,14 +16,14 @@ services:
       - MYSQL_DATABASE
    
   vhttp:
-    image: blackflysolutions/simuliidae-drupal:vhttp-drupal-9.5-php8.1-apache-bullseye
+    image: blackflysolutions/simuliidae-drupal:vhttp-cms-9.5-php8.1-apache-bullseye
     deploy:
       labels:
         simuliidae.domain: "{VSITE_DOMAIN}"
     ports:
       - 80/tcp
     volumes:
-      - vdrupal:/var/www/drupal
+      - vsite:/var/www/drupal/web/sites/default
     environment:
       - VSITE
       - VSITE_SITES
@@ -39,9 +39,9 @@ services:
 
   admin:
     # use an extended version of the above image for administrative tasks
-    image: blackflysolutions/simuliidae-drupal:admin-drupal-9.5-php8.1-apache-bullseye
+    image: blackflysolutions/simuliidae-drupal:admin-cms-9.5-php8.1-apache-bullseye
     volumes:
-      - vdrupal:/var/www/drupal
+      - vsite:/var/www/drupal/web/sites/default
     environment:
       - VSITE
       - VSITE_SITES
@@ -63,6 +63,6 @@ services:
 
 volumes:
   vdb:
-  vdrupal:
+  vsite:
     labels:
       simuliidae.backup.exclude: "{VSITE_BACKUP_EXCLUDE}"
