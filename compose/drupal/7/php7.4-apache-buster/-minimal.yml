@@ -6,10 +6,10 @@ services:
 
   vhttp:
     volumes:
-    - /var/www/drupal/7-host:/var/www/html/sites/all/host:ro
-    - /var/www/drupal/7-minimal:/var/www/html/sites/all/modules/minimal:ro
+    - /var/www/drupal/7/host:/var/www/html/sites/all/host:ro
+    - /var/www/drupal/7/minimal:/var/www/html/sites/all/modules/minimal:ro
 
   admin:
     volumes:
-    - /var/www/drupal/7-host:/var/www/html/sites/all/host:ro
-    - /var/www/drupal/7-minimal:/var/www/html/sites/all/modules/minimal:ro
+    - /var/www/drupal/7/host:/var/www/html/sites/all/host:ro
+    - /var/www/drupal/7/minimal:/var/www/html/sites/all/modules/minimal:ro
