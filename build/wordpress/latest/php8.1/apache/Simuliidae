@@ -65,7 +65,7 @@ RUN curl -LsS https://download.civicrm.org/cv/cv.phar -o /usr/local/bin/cv
 RUN chmod ugo+x /usr/local/bin/wp && chmod ugo+x /usr/local/bin/cv && chmod ugo+x /usr/local/bin/*.sh 
 # The apache for the container shouldn't actually be functional, it doesn't get invoked, so minimize it's resource use
 # in case it's actually started.
-COPY admin.conf /etc/apache2/conf-available
+COPY admin/admin.conf /etc/apache2/conf-available
 RUN a2enconf admin
 # We inherit the initialization script and entrypoint from vhttp-base
 # But we'll use a new entrypoint and cmd to run sshd
