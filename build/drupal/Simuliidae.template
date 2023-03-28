@@ -27,7 +27,9 @@ RUN chown drupal:www-data /var/www/drupal
 # Add a way to send mail out, assuming the host can do mail at port 25. 
 # The initialize.sh script sets up an entry in /etc/hosts to make it "easy".
 # Use iproute2 to figure my ip route out to the host.
-RUN apt-get update && apt-get install -y msmtp iproute2 && \
+# Also include an ssh client and git as useful binaries for the vhttp image
+# e.g. for git checkouts of modules.
+RUN apt-get update && apt-get install -y msmtp iproute2 openssh-client git && \
   apt-get clean && \
   echo 'sendmail_path = "/usr/bin/msmtp -C /etc/msmtprc -t"' > /usr/local/etc/php/conf.d/mail.ini
 COPY msmtprc /etc/msmtprc
@@ -103,8 +105,8 @@ RUN set -eux; \
 USER drupal:www-data
 RUN set -eux; \
 	composer create-project --no-interaction --no-install "drupal/recommended-project:$DRUPAL_VERSION" ./;
-#RUN composer config extra.enable-patching true
-#RUN composer config --no-plugins allow-plugins.cweagans/composer-patches true
+RUN composer config extra.enable-patching true
+RUN composer config --no-plugins allow-plugins.cweagans/composer-patches true
 RUN composer require --no-update drush/drush --dev
 RUN echo "Building with Drupal version $DRUPAL_VERSION"
 RUN composer require --no-update drupal/core:${DRUPAL_VERSION} --update-with-all-dependencies
@@ -124,11 +126,13 @@ RUN set -eux; \
   composer config minimum-stability dev; \
   composer config extra.compile-mode all;  
 RUN \ 
-  composer require --no-update -W "civicrm/civicrm-asset-plugin:'~1.1'"; \
   composer require --no-update -W "civicrm/civicrm-core:$CIVICRM_VERSION"; \
   composer require --no-update -W "civicrm/civicrm-packages:$CIVICRM_VERSION"; \
-  composer require --no-update -W "civicrm/civicrm-drupal-8:$CIVICRM_VERSION"; 
-RUN composer update
+  composer require --no-update -W "civicrm/civicrm-drupal-8:$CIVICRM_VERSION"; \
+  composer config --no-plugins allow-plugins.civicrm/civicrm-asset-plugin true; \
+  composer config --no-plugins allow-plugins.civicrm/composer-downloads-plugin true; \
+  composer config --no-plugins allow-plugins.civicrm/composer-compile-plugin true; \
+  composer update;
 {{ ) end -}}
 FROM vhttp-base as vhttp-cms
 {{ if env.version | startswith("7") then ( -}}

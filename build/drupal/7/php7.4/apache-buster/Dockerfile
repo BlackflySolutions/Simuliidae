@@ -31,8 +31,6 @@ RUN set -eux; \
 		libc-client-dev \
 		libkrb5-dev \
 		libmcrypt-dev \
-		openssh-client \
-		git \
 	; \
 	\
 	docker-php-ext-configure gd \

@@ -10,11 +10,11 @@
     "variants": [
       "apache-bullseye"
     ],
-    "civicrmVersion": "5.59.3",
+    "civicrmVersion": "dev-master",
     "version": "10.0.5"
   },
   "7": {
-    "md5": "dae634ea0da005c5c435cfa9a9c5c322",
+    "md5": "ebd3b1ef8605585d703c13552f841731",
     "phpVersions": [
       "7.4",
       "8.0"

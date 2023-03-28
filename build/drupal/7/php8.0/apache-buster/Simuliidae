@@ -22,7 +22,9 @@ WORKDIR /var/www/html
 # Add a way to send mail out, assuming the host can do mail at port 25. 
 # The initialize.sh script sets up an entry in /etc/hosts to make it "easy".
 # Use iproute2 to figure my ip route out to the host.
-RUN apt-get update && apt-get install -y msmtp iproute2 && \
+# Also include an ssh client and git as useful binaries for the vhttp image
+# e.g. for git checkouts of modules.
+RUN apt-get update && apt-get install -y msmtp iproute2 openssh-client git && \
   apt-get clean && \
   echo 'sendmail_path = "/usr/bin/msmtp -C /etc/msmtprc -t"' > /usr/local/etc/php/conf.d/mail.ini
 COPY msmtprc /etc/msmtprc
@@ -47,7 +49,7 @@ CMD ["apache2-foreground"]
 # We'll first build admin-minimal that we'll use later as a base for admin-build
 FROM vhttp-base as admin-minimal
 RUN apt-get update \
-  && apt-get install -y mariadb-client sudo vim zip unzip netcat ssh rsync openssh-server \
+  && apt-get install -y mariadb-client sudo vim less zip unzip netcat ssh rsync openssh-server \
   && apt-get purge -y
 # hard-coded drush version, may need updating sometimes
 RUN curl -L -o /usr/local/bin/drush https://github.com/drush-ops/drush/releases/download/8.4.11/drush.phar
@@ -73,7 +75,7 @@ FROM admin-minimal as admin-base
 FROM admin-base as admin-build-cms
 # https://www.drupal.org/node/3060/release
 ENV DRUPAL_VERSION 7.95
-ENV DRUPAL_MD5 dae634ea0da005c5c435cfa9a9c5c322
+ENV DRUPAL_MD5 ebd3b1ef8605585d703c13552f841731
 RUN set -eux; \
 	curl -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_VERSION}.tar.gz" -o drupal.tar.gz; \
 	echo "${DRUPAL_MD5} *drupal.tar.gz" | md5sum -c -; \
