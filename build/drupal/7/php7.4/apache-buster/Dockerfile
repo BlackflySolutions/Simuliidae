@@ -59,6 +59,7 @@ RUN set -eux; \
         pecl install -o imagick && docker-php-ext-enable imagick; \
         pecl install -o redis && docker-php-ext-enable redis; \
         pecl install -o apcu && docker-php-ext-enable apcu; \
+        pecl install -o mcrypt-1.0.5 && docker-php-ext-enable mcrypt; \
         docker-php-ext-install exif; \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
