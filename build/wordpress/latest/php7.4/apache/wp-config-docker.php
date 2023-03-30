@@ -117,6 +117,9 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strpos($_SERVER['HTTP_X_FORWARD
 	$_SERVER['HTTPS'] = 'on';
 }
 // (we include this by default because reverse proxying is extremely common in container environments)
+// Simuliidae addition - get the WP_SITEURL and WP_HOME from the env
+define( 'WP_SITE_URL', getenv_docker('WP_SITE_URL', '') );
+define( 'WP_HOME', getenv_docker('WP_HOME', '') );
 
 if ($configExtra = getenv_docker('WORDPRESS_CONFIG_EXTRA', '')) {
 	eval($configExtra);
