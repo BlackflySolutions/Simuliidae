@@ -3,8 +3,8 @@ version: '3.4'
 services:
 
   vhttp:
-    image: simuliidae-wordpress:vhttp-base-latest-php8.2-apache
-      #image: blackflysolutions/simuliidae-wordpress:vhttp-base-latest-php8.2-apache
+    #image: simuliidae-wordpress:vhttp-base-latest-php8.2-apache
+    image: blackflysolutions/simuliidae-wordpress:vhttp-base-latest-php8.2-apache
     ports:
       - "80/tcp"
     expose:
@@ -18,6 +18,9 @@ services:
       - VSITE
       - VSITE_DOMAIN
       - VSITE_DOMAIN_ALTERNATIVES
+      - WP_HOME=https://{VSITE_DOMAIN}
+      - WP_SITE_URL=https://{VSITE_DOMAIN}
+
     volumes:
       - vwp:/var/www/html
 
@@ -32,8 +35,8 @@ services:
       - vdb:/var/lib/mysql
 
   admin:
-    image: simuliidae-wordpress:admin-base-latest-php8.2-apache
-    #    image: blackflysolutions/simuliidae-wordpress:admin-base-latest-php8.2-apache
+    #image: simuliidae-wordpress:admin-base-latest-php8.2-apache
+    image: blackflysolutions/simuliidae-wordpress:admin-base-latest-php8.2-apache
     volumes:
       - vwp:/var/www/html
     environment:
@@ -50,6 +53,8 @@ services:
       - VSITE_DOMAIN_ALTERNATIVES
       - VSITE_CIVICRM_VER
       - VSITE_WORDPRESS_VER
+      - WP_HOME=https://{VSITE_DOMAIN}
+      - WP_SITE_URL=https://{VSITE_DOMAIN}
 
     depends_on:
       - vsql
