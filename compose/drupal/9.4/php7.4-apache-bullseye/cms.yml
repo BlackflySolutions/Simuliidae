@@ -23,7 +23,7 @@ services:
     ports:
       - 80/tcp
     volumes:
-      - vdrupal:/var/www/drupal
+      - vsite:/var/www/drupal/web/sites/default
     environment:
       - VSITE
       - VSITE_SITES
@@ -41,7 +41,7 @@ services:
     # use an extended version of the above image for administrative tasks
     image: blackflysolutions/simuliidae-drupal:admin-cms-9.4-php7.4-apache-bullseye
     volumes:
-      - vdrupal:/var/www/drupal
+      - vsite:/var/www/drupal/web/sites/default
     environment:
       - VSITE
       - VSITE_SITES
@@ -63,6 +63,4 @@ services:
 
 volumes:
   vdb:
-  vdrupal:
-    labels:
-      simuliidae.backup.exclude: "{VSITE_BACKUP_EXCLUDE}"
+  vsite:
