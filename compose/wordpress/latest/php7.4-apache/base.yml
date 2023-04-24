@@ -18,6 +18,10 @@ services:
       - VSITE
       - VSITE_DOMAIN
       - VSITE_DOMAIN_ALTERNATIVES
+      - WP_HOME=https://{VSITE_DOMAIN}
+      - WP_SITE_URL=https://{VSITE_DOMAIN}
+      - WP_MEMORY_LIMIT={VSITE_WP_MEMORY_LIMIT}
+
     volumes:
       - vwp:/var/www/html
 
@@ -50,6 +54,9 @@ services:
       - VSITE_DOMAIN_ALTERNATIVES
       - VSITE_CIVICRM_VER
       - VSITE_WORDPRESS_VER
+      - WP_HOME=https://{VSITE_DOMAIN}
+      - WP_SITE_URL=https://{VSITE_DOMAIN}
+      - WP_MEMORY_LIMIT={VSITE_WP_MEMORY_LIMIT}
 
     depends_on:
       - vsql
