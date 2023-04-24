@@ -120,6 +120,7 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strpos($_SERVER['HTTP_X_FORWARD
 // Simuliidae addition - get the WP_SITEURL and WP_HOME from the env
 define( 'WP_SITE_URL', getenv_docker('WP_SITE_URL', '') );
 define( 'WP_HOME', getenv_docker('WP_HOME', '') );
+define( 'WP_MEMORY_LIMIT', getenv_docker('WP_MEMORY_LIMIT', '') );
 
 if ($configExtra = getenv_docker('WORDPRESS_CONFIG_EXTRA', '')) {
 	eval($configExtra);
