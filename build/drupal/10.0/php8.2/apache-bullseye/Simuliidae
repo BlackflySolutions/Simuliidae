@@ -86,7 +86,7 @@ RUN npm install -g bower
 # Step 3: from the admin-base, add the CMS code, and then copy it over to the vhttp-base as the vhttp-cms
 FROM admin-base as admin-build-cms
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 10.0.5
+ENV DRUPAL_VERSION 10.0.8
 USER drupal:www-data
 RUN set -eux; \
 	composer create-project --no-interaction --no-install "drupal/recommended-project:$DRUPAL_VERSION" ./;

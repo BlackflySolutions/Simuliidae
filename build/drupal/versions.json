@@ -11,10 +11,10 @@
       "apache-bullseye"
     ],
     "civicrmVersion": "dev-master",
-    "version": "10.0.5"
+    "version": "10.0.8"
   },
   "7": {
-    "md5": "ebd3b1ef8605585d703c13552f841731",
+    "md5": "4aa685e8eca141505867f8cbab48b72b",
     "phpVersions": [
       "7.4",
       "8.0"
@@ -23,8 +23,8 @@
       "apache-bullseye",
       "apache-buster"
     ],
-    "civicrmVersion": "5.59.3",
-    "version": "7.95"
+    "civicrmVersion": "5.60.0",
+    "version": "7.96"
   },
   "9.3": {
     "composer": {
@@ -36,7 +36,7 @@
     "variants": [
       "apache-buster"
     ],
-    "civicrmVersion": "5.59.3",
+    "civicrmVersion": "5.60.0",
     "version": "9.3.22"
   },
   "9.4": {
@@ -50,8 +50,8 @@
     "variants": [
       "apache-bullseye"
     ],
-    "civicrmVersion": "5.59.3",
-    "version": "9.4.12"
+    "civicrmVersion": "5.60.0",
+    "version": "9.4.14"
   },
   "9.5": {
     "composer": {
@@ -63,7 +63,7 @@
     "variants": [
       "apache-bullseye"
     ],
-    "civicrmVersion": "5.59.3",
-    "version": "9.5.5"
+    "civicrmVersion": "5.60.0",
+    "version": "9.5.8"
   }
 }
