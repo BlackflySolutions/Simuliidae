@@ -26,6 +26,7 @@ services:
       - VSITE
       - VSITE_SITE
       - VSITE_DOMAIN
+      - VSITE_DOMAIN_ALTERNATIVES
       - MYSQL_USER
       - MYSQL_PASSWORD
       - MYSQL_ROOT_PASSWORD
@@ -44,6 +45,7 @@ services:
       - VSITE_SITE
       - VSITE_SITE_NAME
       - VSITE_DOMAIN
+      - VSITE_DOMAIN_ALTERNATIVES
       - MYSQL_USER
       - MYSQL_PASSWORD
       - MYSQL_ROOT_PASSWORD
