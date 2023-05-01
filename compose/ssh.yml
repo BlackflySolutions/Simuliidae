@@ -13,4 +13,4 @@ services:
     volumes:
       - /var/www/ssh-keys/host/ssh_host_ed25519_key:/etc/ssh/ssh_host_ed25519_key 
       - /var/www/ssh-keys/host/ssh_host_rsa_key:/etc/ssh/ssh_host_rsa_key 
-      - /var/www/ssh-keys/{VSITE_SSH_USER}/id_rsa.pub:/home/{VSITE_SSH_USER}/.ssh/hosted_id_rsa.pub:ro
+      - /var/www/ssh-keys/${VSITE_SSH_USER}/id_rsa.pub:/home/${VSITE_SSH_USER}/.ssh/hosted_id_rsa.pub:ro

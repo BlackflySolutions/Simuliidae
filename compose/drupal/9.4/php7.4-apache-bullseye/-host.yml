@@ -17,7 +17,7 @@ services:
 
   admin:
     volumes:
-    - /var/backup/docker/{VSITE}:/var/backup:rw
+    - /var/backup/docker/${VSITE}:/var/backup:rw
     - /var/www/drupal/git_deploy_cache:/tmp/git_deploy:rw
     - /var/www/drupal/9.4/host:/var/www/drupal/web/sites/all/host:ro
     - /var/www/drupal/libraries:/var/www/drupal/web/sites/all/libraries:ro

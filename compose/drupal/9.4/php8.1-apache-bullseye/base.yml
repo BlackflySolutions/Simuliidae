@@ -19,7 +19,7 @@ services:
     image: blackflysolutions/simuliidae-drupal:vhttp-base-9.4-php8.1-apache-bullseye
     deploy:
       labels:
-        simuliidae.domain: "{VSITE_DOMAIN}"
+        simuliidae.domain: "${VSITE_DOMAIN}"
     ports:
       - 80/tcp
     volumes:
@@ -48,7 +48,7 @@ services:
       - VSITE_SITES
       - VSITE_DOMAIN
       - VSITE_DOMAIN_ALTERNATIVES
-      - DRUSH_OPTIONS_URI={VSITE_DOMAIN}
+      - DRUSH_OPTIONS_URI=${VSITE_DOMAIN}
       - VSITE_ENVIRONMENT
       - VSITE_CIVICRM_VER
       - VSITE_DRUPAL_VER
@@ -67,4 +67,4 @@ volumes:
   vdb:
   vdrupal:
     labels:
-      simuliidae.backup.exclude: "{VSITE_BACKUP_EXCLUDE}"
+      simuliidae.backup.exclude: "${VSITE_BACKUP_EXCLUDE}"

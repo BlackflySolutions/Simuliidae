@@ -11,22 +11,22 @@ services:
     environment:
       - VSITE_ENVIRONMENT
     labels:
-      simuliidae.environment: "{VSITE_ENVIRONMENT-Production}"
-      simuliidae.domain: "{VSITE_DOMAIN}"
-      simuliidae.civicrm.version: "{VSITE_CIVICRM_VER}"
+      simuliidae.environment: "${VSITE_ENVIRONMENT-Production}"
+      simuliidae.domain: "${VSITE_DOMAIN}"
+      simuliidae.civicrm.version: "${VSITE_CIVICRM_VER}"
     deploy:
       placement:
         constraints:
-          - node.hostname=={VSITE_NODE-$THIS_NODE}
+          - node.hostname==${VSITE_NODE-$THIS_NODE}
       labels:
-        simuliidae.environment: "{VSITE_ENVIRONMENT-Production}"
-        simuliidae.domain: "{VSITE_DOMAIN}"
-        simuliidae.civicrm.version: "{VSITE_CIVICRM_VER}"
+        simuliidae.environment: "${VSITE_ENVIRONMENT-Production}"
+        simuliidae.domain: "${VSITE_DOMAIN}"
+        simuliidae.civicrm.version: "${VSITE_CIVICRM_VER}"
       replicas: 1
       resources:
         limits:
           cpus: "2"
-          memory: "{VSITE_SQL_MEMORY-4000M}"
+          memory: "${VSITE_SQL_MEMORY-4000M}"
       restart_policy:
         max_attempts: 2
     
@@ -37,24 +37,24 @@ services:
       - VSITE_CRED_KEY
       - VSITE_SIGN_KEY
     labels:
-      simuliidae.environment: "{VSITE_ENVIRONMENT-Production}"
-      simuliidae.domain: "{VSITE_DOMAIN}"
-      simuliidae.civicrm.version: "{VSITE_CIVICRM_VER}"
+      simuliidae.environment: "${VSITE_ENVIRONMENT-Production}"
+      simuliidae.domain: "${VSITE_DOMAIN}"
+      simuliidae.civicrm.version: "${VSITE_CIVICRM_VER}"
     deploy:
       placement:
         constraints:
-          - node.hostname=={VSITE_NODE-$THIS_NODE}
+          - node.hostname==${VSITE_NODE-$THIS_NODE}
       labels:
-        simuliidae.environment: "{VSITE_ENVIRONMENT-Production}"
-        simuliidae.domain: "{VSITE_DOMAIN}"
-        simuliidae.domainaliases: "{VSITE_DOMAIN_ALIASES}"
-        simuliidae.domainalternatives: "{VSITE_DOMAIN_ALTERNATIVES}"
-        simuliidae.civicrm.version: "{VSITE_CIVICRM_VER}"
+        simuliidae.environment: "${VSITE_ENVIRONMENT-Production}"
+        simuliidae.domain: "${VSITE_DOMAIN}"
+        simuliidae.domainaliases: "${VSITE_DOMAIN_ALIASES}"
+        simuliidae.domainalternatives: "${VSITE_DOMAIN_ALTERNATIVES}"
+        simuliidae.civicrm.version: "${VSITE_CIVICRM_VER}"
       replicas: 1
       resources:
         limits:
           cpus: "2"
-          memory: "{VSITE_HTTP_MEMORY-500M}"
+          memory: "${VSITE_HTTP_MEMORY-500M}"
       restart_policy:
         max_attempts: 2
 
@@ -65,21 +65,21 @@ services:
       - VSITE_CRED_KEY
       - VSITE_SIGN_KEY
     labels:
-      simuliidae.environment: "{VSITE_ENVIRONMENT-Production}"
-      simuliidae.domain: "{VSITE_DOMAIN}"
-      simuliidae.civicrm.version: "{VSITE_CIVICRM_VER}"
+      simuliidae.environment: "${VSITE_ENVIRONMENT-Production}"
+      simuliidae.domain: "${VSITE_DOMAIN}"
+      simuliidae.civicrm.version: "${VSITE_CIVICRM_VER}"
     volumes:
-      - /var/backup/{VSITE_ORIGIN_NODE-docker}/{VSITE}/:/var/restore/
+      - /var/backup/${VSITE_ORIGIN_NODE-docker}/${VSITE}/:/var/restore/
       - /home/drupal/.ssh:/home/drupal/.ssh:ro
       - /home/backup/.ssh:/root/.backup-ssh:ro
     deploy:
       placement:
         constraints:
-          - node.hostname=={VSITE_NODE-$THIS_NODE}
+          - node.hostname==${VSITE_NODE-$THIS_NODE}
       labels:
-        simuliidae.environment: "{VSITE_ENVIRONMENT-Production}"
-        simuliidae.domain: "{VSITE_DOMAIN}"
-        simuliidae.civicrm.version: "{VSITE_CIVICRM_VER}"
+        simuliidae.environment: "${VSITE_ENVIRONMENT-Production}"
+        simuliidae.domain: "${VSITE_DOMAIN}"
+        simuliidae.civicrm.version: "${VSITE_CIVICRM_VER}"
       replicas: 1
       resources:
         limits:

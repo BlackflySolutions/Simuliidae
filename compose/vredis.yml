@@ -2,15 +2,15 @@
 version: '3.4'
 services:
   vredis:
-    image: "blackflysolutions/redis:{VSITE_REDIS_VER-3-alpine}"
+    image: 'blackflysolutions/redis:${VSITE_REDIS_VER-3-alpine}'
     environment:
       - VSITE_REDIS_MAXMEMORY
     deploy:
       replicas: 1
       placement:
         constraints:
-          - node.hostname=={VSITE_NODE-$THIS_NODE}
+          - node.hostname==${VSITE_NODE-$THIS_NODE}
       resources:
         limits:
           cpus: "1"
-          memory: "{VSITE_REDIS_MEMORY-400M}"
+          memory: '${VSITE_REDIS_MEMORY-400M}'
