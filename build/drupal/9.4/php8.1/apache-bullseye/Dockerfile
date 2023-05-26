@@ -86,7 +86,7 @@ RUN { \
 FROM drupal-base
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 9.4.14
+ENV DRUPAL_VERSION 9.4.15
 
 WORKDIR /opt/drupal
 RUN set -eux; \
