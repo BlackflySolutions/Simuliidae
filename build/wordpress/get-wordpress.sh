@@ -10,3 +10,5 @@ while read VARIANT_DIR; do
     echo "Missing $REFERENCE_DOCKERFILE"
   fi
 done <variants.txt
+REFERENCE_DIR="../../reference/wordpress/"
+cp $REFERENCE_DIR/versions.json ./
