@@ -6,7 +6,7 @@
 
 # from https://www.drupal.org/docs/system-requirements/php-requirements
 # create as a "base" that doesn't include the drupal code
-FROM php:7.4-apache-buster AS drupal-base
+FROM php:7.4-apache-bullseye AS drupal-base
 
 # install the PHP extensions we need
 RUN set -eux; \
@@ -65,7 +65,7 @@ RUN set -eux; \
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
 	ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
-		| awk '/=>/ { print $3 }' \
+		| awk '/=>/ { so = $(NF-1); if (index(so, "/usr/local/") == 1) { next }; gsub("^/(usr/)?", "", so); print so }' \
 		| sort -u \
 		| xargs -r dpkg-query -S \
 		| cut -d: -f1 \
@@ -86,8 +86,8 @@ RUN { \
 
 FROM drupal-base
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 7.97
-ENV DRUPAL_MD5 37b63299e115a9e8863f564780a026e9
+ENV DRUPAL_VERSION 7.98
+ENV DRUPAL_MD5 4139f0feecb44a53645242194809b73a
 
 RUN set -eux; \
 	curl -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_VERSION}.tar.gz" -o drupal.tar.gz; \
