@@ -85,8 +85,12 @@ FROM admin-minimal as admin-base
 # add composer, uses (default) version 2
 COPY --from=composer:{{ .composer.version }} /usr/bin/composer /usr/local/bin/
 # add additional dependencies for installing civicrm with D9 + composer
-RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
-RUN apt-get install -y nodejs
+RUN apt-get update && apt-get install -y ca-certificates curl gnupg && \
+  mkdir -p /etc/apt/keyrings && \
+  curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+  NODE_MAJOR=16 && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list && \
+  apt-get update && apt-get install -y nodejs && \
+  apt-get purge -y && apt-get clean
 RUN npm install -g bower
 {{ ) end -}}
 # Step 3: from the admin-base, add the CMS code, and then copy it over to the vhttp-base as the vhttp-cms
@@ -106,8 +110,12 @@ USER drupal:www-data
 RUN set -eux; \
 	composer create-project --no-interaction --no-install "drupal/recommended-project:$DRUPAL_VERSION" ./;
 RUN composer config extra.enable-patching true
-# RUN composer config --no-plugins allow-plugins.cweagans/composer-patches true
+RUN composer config --no-plugins allow-plugins.cweagans/composer-patches true
+{{ if env.version | startswith("9") then ( -}}
+RUN composer require --no-update drush/drush:11.x --dev
+{{ ) else ( -}}
 RUN composer require --no-update drush/drush --dev
+{{ ) end -}}
 RUN echo "Building with Drupal version $DRUPAL_VERSION"
 RUN composer require --no-update drupal/core:${DRUPAL_VERSION} --update-with-all-dependencies
 RUN composer update 
