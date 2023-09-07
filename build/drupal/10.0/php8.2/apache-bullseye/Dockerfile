@@ -64,7 +64,7 @@ RUN set -eux; \
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
 	ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
-		| awk '/=>/ { print $3 }' \
+		| awk '/=>/ { so = $(NF-1); if (index(so, "/usr/local/") == 1) { next }; gsub("^/(usr/)?", "", so); print so }' \
 		| sort -u \
 		| xargs -r dpkg-query -S \
 		| cut -d: -f1 \
@@ -86,7 +86,7 @@ RUN { \
 FROM drupal-base
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 10.0.9
+ENV DRUPAL_VERSION 10.0.10
 
 WORKDIR /opt/drupal
 RUN set -eux; \
