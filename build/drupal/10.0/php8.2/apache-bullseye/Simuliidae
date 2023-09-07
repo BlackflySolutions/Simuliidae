@@ -56,7 +56,7 @@ CMD ["apache2-foreground"]
 FROM vhttp-base as admin-minimal
 RUN apt-get update \
   && apt-get install -y mariadb-client sudo vim less zip unzip netcat ssh rsync openssh-server \
-  && apt-get purge -y 
+  && apt-get purge -y
 # drush launcher, drush will be installed by composer
 RUN curl -L -o /usr/local/bin/drush https://github.com/drush-ops/drush-launcher/releases/latest/download/drush.phar
 RUN chmod u+x /usr/local/bin/drush
@@ -102,7 +102,7 @@ RUN composer require --no-update drupal/core:${DRUPAL_VERSION} --update-with-all
 RUN composer update 
 #	chown -R drupal:www-data web/sites web/modules web/themes; 
 FROM admin-build-cms as admin-build-crm
-ENV CIVICRM_VERSION 5.64.3
+ENV CIVICRM_VERSION 5.65.0
 RUN set -eux; \
   composer config extra.enable-patching true; \
   composer config minimum-stability dev; \
