@@ -6,12 +6,12 @@
       "8.1",
       "8.2"
     ],
-    "sha1": "a355d1b975405a391c4a78f988d656b375683fb2",
-    "upstream": "6.2.2",
+    "sha1": "052777aef40e7f627c63c8a26eefe37b843a44df",
+    "upstream": "6.3.1",
     "variants": [
       "apache"
     ],
-    "version": "6.2.2",
-    "civicrmVersion": "5.61.4"
+    "civicrmVersion": "5.65.0",
+    "version": "6.3.1"
   }
 }

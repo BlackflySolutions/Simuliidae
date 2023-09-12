@@ -74,9 +74,9 @@ RUN set -ex; \
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
 	ldd "$extDir"/*.so \
-		| awk '/=>/ { print $3 }' \
+		| awk '/=>/ { so = $(NF-1); if (index(so, "/usr/local/") == 1) { next }; gsub("^/(usr/)?", "", so); print so }' \
 		| sort -u \
-		| xargs -r dpkg-query -S \
+		| xargs -r dpkg-query --search \
 		| cut -d: -f1 \
 		| sort -u \
 		| xargs -rt apt-mark manual; \
@@ -122,11 +122,11 @@ RUN set -eux; \
 	{ \
 		echo 'RemoteIPHeader X-Forwarded-For'; \
 # these IP ranges are reserved for "private" use and should thus *usually* be safe inside Docker
-		echo 'RemoteIPTrustedProxy 10.0.0.0/8'; \
-		echo 'RemoteIPTrustedProxy 172.16.0.0/12'; \
-		echo 'RemoteIPTrustedProxy 192.168.0.0/16'; \
-		echo 'RemoteIPTrustedProxy 169.254.0.0/16'; \
-		echo 'RemoteIPTrustedProxy 127.0.0.0/8'; \
+		echo 'RemoteIPInternalProxy 10.0.0.0/8'; \
+		echo 'RemoteIPInternalProxy 172.16.0.0/12'; \
+		echo 'RemoteIPInternalProxy 192.168.0.0/16'; \
+		echo 'RemoteIPInternalProxy 169.254.0.0/16'; \
+		echo 'RemoteIPInternalProxy 127.0.0.0/8'; \
 	} > /etc/apache2/conf-available/remoteip.conf; \
 	a2enconf remoteip; \
 # https://github.com/docker-library/wordpress/issues/383#issuecomment-507886512
@@ -134,8 +134,8 @@ RUN set -eux; \
 	find /etc/apache2 -type f -name '*.conf' -exec sed -ri 's/([[:space:]]*LogFormat[[:space:]]+"[^"]*)%h([^"]*")/\1%a\2/g' '{}' +
 FROM wordpress-base
 RUN set -eux; \
-	version='6.2.2'; \
-	sha1='a355d1b975405a391c4a78f988d656b375683fb2'; \
+	version='6.3.1'; \
+	sha1='052777aef40e7f627c63c8a26eefe37b843a44df'; \
 	\
 	curl -o wordpress.tar.gz -fL "https://wordpress.org/wordpress-$version.tar.gz"; \
 	echo "$sha1 *wordpress.tar.gz" | sha1sum -c -; \
