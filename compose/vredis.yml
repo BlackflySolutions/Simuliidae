@@ -13,4 +13,4 @@ services:
       resources:
         limits:
           cpus: "1"
-          memory: "{VSITE_REDIS_MEMORY-400M}"
+          memory: "{VSITE_REDIS_MEMORY-800M}"
