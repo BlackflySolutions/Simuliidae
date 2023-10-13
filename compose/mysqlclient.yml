@@ -1,0 +1,10 @@
+# to use this, we need to define:
+#VSITE_MYSQL_PORT
+version: '3.4'
+services:
+  vsql:
+    ports:
+      - target: 3306
+        published: "${VSITE_MYSQL_PORT}"
+        protocol: tcp
+        mode: ingress

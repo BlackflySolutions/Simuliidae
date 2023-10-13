@@ -1,0 +1,25 @@
+# add a phpmyadmin container, will need additional work to expose it
+version: '3.4'
+services:
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    environment:
+      - VSITE_DOMAIN
+      - PMA_ABSOLUTE_URI=https://{VSITE_DOMAIN}/phpmyadmin/
+      - PMA_HOST=vsql
+    ports:
+      - "80/tcp"
+    deploy:
+      labels:
+        phpmyadmin.domain: "{VSITE_DOMAIN}"
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname=={VSITE_NODE-$THIS_NODE}
+      resources:
+        limits:
+          cpus: "1"
+          memory: "{VSITE_PHPMYADMIN_MEMORY-1000M}"
+    depends_on:
+      - vsql
