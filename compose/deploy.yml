@@ -54,7 +54,7 @@ services:
       resources:
         limits:
           cpus: "2"
-          memory: "{VSITE_HTTP_MEMORY-500M}"
+          memory: "{VSITE_HTTP_MEMORY-800M}"
       restart_policy:
         max_attempts: 2
 
