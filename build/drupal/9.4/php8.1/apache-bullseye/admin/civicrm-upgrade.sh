@@ -26,7 +26,6 @@ if  [[ '-y' != $ARG1 ]]; then
   done
 fi
 sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer update
+sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer civicrm:publish
 cv upgrade:db
-chown -R www-data:www-data web/sites/default/files/civicrm
-# support external scripts, reluctantly
-echo 'RewriteEngine Off' > /var/www/drupal/web/libraries/civicrm/extern/.htaccess
+chown -R www-data:www-data /var/www/drupal/web/sites/default/files/civicrm

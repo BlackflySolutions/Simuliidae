@@ -20,12 +20,13 @@ services:
     expose:
            - "80"
     volumes:
-      - vsite:/var/www/html/sites/default
+      - vdrupal:/var/www/html
     environment:
       - VSITE_ENVIRONMENT
       - VSITE
       - VSITE_SITE
       - VSITE_DOMAIN
+      - VSITE_DOMAIN_ALTERNATIVES
       - MYSQL_USER
       - MYSQL_PASSWORD
       - MYSQL_ROOT_PASSWORD
@@ -38,13 +39,14 @@ services:
   admin:
     image: blackflysolutions/simuliidae-drupal:admin-base-7-php7.4-apache-buster
     volumes:
-      - vsite:/var/www/html/sites/default
+      - vdrupal:/var/www/html
     environment:
       - VSITE_ENVIRONMENT
       - VSITE
       - VSITE_SITE
       - VSITE_SITE_NAME
       - VSITE_DOMAIN
+      - VSITE_DOMAIN_ALTERNATIVES
       - VSITE_CIVICRM_VER
       - MYSQL_USER
       - MYSQL_PASSWORD
@@ -66,5 +68,5 @@ services:
       - vhttp
 
 volumes:
-    vsite:
+    vdrupal:
     vdb:

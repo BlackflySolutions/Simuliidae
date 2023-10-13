@@ -5,6 +5,8 @@ while read VARIANT_DIR; do
   VARIANT_TAG=$(echo $VARIANT_DIR | sed -e 's/\//-/g')
   docker push blackflysolutions/simuliidae-drupal:vhttp-base-$VARIANT_TAG
   docker push blackflysolutions/simuliidae-drupal:admin-base-$VARIANT_TAG
-  docker push blackflysolutions/simuliidae-drupal:vhttp-drupal-$VARIANT_TAG
-  docker push blackflysolutions/simuliidae-drupal:admin-drupal-$VARIANT_TAG
+  docker push blackflysolutions/simuliidae-drupal:vhttp-cms-$VARIANT_TAG
+  docker push blackflysolutions/simuliidae-drupal:admin-cms-$VARIANT_TAG
+  docker push blackflysolutions/simuliidae-drupal:vhttp-crm-$VARIANT_TAG
+  docker push blackflysolutions/simuliidae-drupal:admin-crm-$VARIANT_TAG
 done <variants.txt

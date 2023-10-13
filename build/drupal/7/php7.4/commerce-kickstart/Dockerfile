@@ -82,8 +82,8 @@ RUN { \
 
 FROM drupal-base
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 7.92
-ENV DRUPAL_MD5 7f95bd4a6693ed5215aba4038c23c933
+ENV DRUPAL_VERSION 7.94
+ENV DRUPAL_MD5 dae634ea0da005c5c435cfa9a9c5c322
 
 RUN set -eux; \
 	curl -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_VERSION}.tar.gz" -o drupal.tar.gz; \

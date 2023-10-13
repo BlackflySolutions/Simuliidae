@@ -30,6 +30,7 @@ RUN set -eux; \
 		libicu-dev \
 		libc-client-dev \
 		libkrb5-dev \
+		libmcrypt-dev \
 	; \
 	\
 	docker-php-ext-configure gd \
@@ -55,12 +56,15 @@ RUN set -eux; \
 		imap \
 	; \
 	\
-RUN pecl install -o imagick-3.4.3 && docker-php-ext-enable imagick \
+        pecl install -o imagick && docker-php-ext-enable imagick; \
+        pecl install -o redis && docker-php-ext-enable redis; \
+        pecl install -o apcu && docker-php-ext-enable apcu; \
+        docker-php-ext-install exif; \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
 	ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
-		| awk '/=>/ { print $3 }' \
+		| awk '/=>/ { so = $(NF-1); if (index(so, "/usr/local/") == 1) { next }; gsub("^/(usr/)?", "", so); print so }' \
 		| sort -u \
 		| xargs -r dpkg-query -S \
 		| cut -d: -f1 \
@@ -77,14 +81,12 @@ RUN { \
 		echo 'opcache.interned_strings_buffer=8'; \
 		echo 'opcache.max_accelerated_files=4000'; \
 		echo 'opcache.revalidate_freq=60'; \
-		echo 'opcache.fast_shutdown=1'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
 FROM drupal-base
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
-
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 9.4.8
+ENV DRUPAL_VERSION 9.4.15
 
 WORKDIR /opt/drupal
 RUN set -eux; \

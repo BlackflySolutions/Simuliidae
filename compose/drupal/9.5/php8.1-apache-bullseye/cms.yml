@@ -1,0 +1,70 @@
+version: '3.4'
+
+services:
+
+  vsql:
+    image: blackflysolutions/mariadb:10.4
+    expose:
+           - "3306"
+    volumes:
+      - vdb:/var/lib/mysql
+    environment:
+      - VSITE_ENVIRONMENT
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+   
+  vhttp:
+    image: blackflysolutions/simuliidae-drupal:vhttp-cms-9.5-php8.1-apache-bullseye
+    deploy:
+      labels:
+        simuliidae.domain: "{VSITE_DOMAIN}"
+    ports:
+      - 80/tcp
+    volumes:
+      - vsite:/var/www/drupal/web/sites/default
+    environment:
+      - VSITE
+      - VSITE_SITES
+      - VSITE_DOMAIN
+      - VSITE_DOMAIN_ALTERNATIVES
+      - VSITE_ENVIRONMENT
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_DATABASE
+      - DRUPAL_DATABASE
+      - CIVICRM_DATABASE
+    depends_on:
+      - vsql
+
+  admin:
+    # use an extended version of the above image for administrative tasks
+    image: blackflysolutions/simuliidae-drupal:admin-cms-9.5-php8.1-apache-bullseye
+    volumes:
+      - vsite:/var/www/drupal/web/sites/default
+    environment:
+      - VSITE
+      - VSITE_SITES
+      - VSITE_DOMAIN
+      - VSITE_DOMAIN_ALTERNATIVES
+      - DRUSH_OPTIONS_URI={VSITE_DOMAIN}
+      - VSITE_ENVIRONMENT
+      - VSITE_CIVICRM_VER
+      - VSITE_DRUPAL_VER
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+      - DRUPAL_DATABASE
+      - CIVICRM_DATABASE
+
+    depends_on:
+      - vsql
+      - vhttp
+
+volumes:
+  vdb:
+  vsite:
+    labels:
+      simuliidae.backup.exclude: "{VSITE_BACKUP_EXCLUDE}"

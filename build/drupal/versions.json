@@ -1,0 +1,70 @@
+{
+  "10.0": {
+    "composer": {
+      "version": "2"
+    },
+    "phpVersions": [
+      "8.2",
+      "8.1"
+    ],
+    "variants": [
+      "apache-bullseye"
+    ],
+    "civicrmVersion": "5.65.2",
+    "version": "10.0.11"
+  },
+  "10.1": {
+    "composer": {
+      "version": "2"
+    },
+    "phpVersions": [
+      "8.2",
+      "8.1"
+    ],
+    "variants": [
+      "apache-bullseye"
+    ],
+    "civicrmVersion": "5.65.2",
+    "version": "10.1.4"
+  },
+  "7": {
+    "md5": "4139f0feecb44a53645242194809b73a",
+    "phpVersions": [
+      "8.2",
+      "8.1",
+      "7.4"
+    ],
+    "variants": [
+      "apache-bullseye"
+    ],
+    "civicrmVersion": "5.64.3",
+    "version": "7.98"
+  },
+  "9.4": {
+    "composer": {
+      "version": "2"
+    },
+    "phpVersions": [
+      "7.4",
+      "8.1"
+    ],
+    "variants": [
+      "apache-bullseye"
+    ],
+    "civicrmVersion": "5.64.3",
+    "version": "9.4.15"
+  },
+  "9.5": {
+    "composer": {
+      "version": "2"
+    },
+    "phpVersions": [
+      "8.1"
+    ],
+    "variants": [
+      "apache-bullseye"
+    ],
+    "civicrmVersion": "5.65.2",
+    "version": "9.5.11"
+  }
+}

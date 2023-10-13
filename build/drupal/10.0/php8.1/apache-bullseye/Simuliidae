@@ -1,0 +1,125 @@
+#
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
+#
+# PLEASE DO NOT EDIT IT DIRECTLY.
+#
+
+# This is used to build extended versions of the drupal image, with support for CiviCRM
+# as well as production goodies that are not needed for testing or local/dev.
+# Goodies include:
+# 1. msmtprc: a way to send mail via the host's mail system
+# 2. handling of varnish+hitch proxying by apache
+# by default, do local building, but we could build from the blackfly repository when using automated build processes.
+ARG REPOSITORY_FROM=
+# Requires the VARIANT_TAG argument, which may be either the base or non-base version [??]
+ARG VARIANT_TAG=
+# Step 1. build the basic web service, a slightly extended version of the corresonding drupal modified base image.
+FROM ${REPOSITORY_FROM}drupal:base-${VARIANT_TAG} as vhttp-base
+# We create a drupal user to own all the code, using Dries birth year as the uid
+RUN useradd -u 1978 -g www-data -ms /bin/bash drupal
+# change the document root as per https://hub.docker.com/_/php/
+# because I want to build my code with composer and this is how I've been doing it ...
+RUN mkdir -p /var/www/drupal
+ENV APACHE_DOCUMENT_ROOT /var/www/drupal/web
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+WORKDIR /var/www/drupal
+RUN chown drupal:www-data /var/www/drupal
+# Add a way to send mail out, assuming the host can do mail at port 25. 
+# The initialize.sh script sets up an entry in /etc/hosts to make it "easy".
+# Use iproute2 to figure my ip route out to the host.
+# Also include an ssh client and git as useful binaries for the vhttp image
+# e.g. for git checkouts of modules.
+RUN apt-get update && apt-get install -y msmtp iproute2 openssh-client git && \
+  apt-get clean && \
+  echo 'sendmail_path = "/usr/bin/msmtp -C /etc/msmtprc -t"' > /usr/local/etc/php/conf.d/mail.ini
+COPY msmtprc /etc/msmtprc
+# increase default php limits and other customizations
+COPY vhttp.ini /usr/local/etc/php/conf.d/
+# provide some handy apache configuration
+COPY vhttp.conf /etc/apache2/conf-available/
+RUN a2enconf vhttp && a2enmod expires
+# the initialize script needs to run after the container has been created. 
+# as well as setting up "mail" in /etc/hosts, it looks for some site-specific
+# apache and robots customization
+COPY initialize.sh /usr/local/bin/initialize.sh
+RUN chmod u+x /usr/local/bin/initialize.sh 
+# default entrypoint runs initialize and then default/inherited CMD to start apache
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod 775 /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+# inherited default CMD["apache2-foreground"], repeated here for good measure.
+CMD ["apache2-foreground"]
+# Step 2: build a basic admin service, adding some bits to the vhttp-base
+# Admin runs sshd as it's CMD by default, but can be used to, e.g. do automated setup.
+# We'll first build admin-minimal that we'll use later as a base for admin-build
+FROM vhttp-base as admin-minimal
+RUN apt-get update \
+  && apt-get install -y mariadb-client sudo vim less zip unzip netcat ssh rsync openssh-server \
+  && apt-get purge -y
+# drush launcher, drush will be installed by composer
+RUN curl -L -o /usr/local/bin/drush https://github.com/drush-ops/drush-launcher/releases/latest/download/drush.phar
+RUN chmod u+x /usr/local/bin/drush
+# Add this version's collection of admin convenience scripts [these are version specific and evolve!]
+COPY admin/*sh /usr/local/bin/
+# Include copy of the cv civicrm command line utility
+RUN curl -LsS https://download.civicrm.org/cv/cv.phar -o /usr/local/bin/cv
+# make sure all my scripts are executable
+RUN chmod ugo+x /usr/local/bin/drush && chmod ugo+x /usr/local/bin/cv && chmod ugo+x /usr/local/bin/*.sh 
+# The apache for the container shouldn't actually be functional, it doesn't get invoked, so minimize it's resource use
+# in case it's actually started.
+COPY admin.conf /etc/apache2/conf-available
+RUN a2enconf admin
+# We inherit the initialization script and entrypoint from vhttp-base
+# But we'll use a new entrypoint and cmd to run sshd
+COPY entrypoint-sshd.sh /entrypoint-sshd.sh
+RUN chmod 775 /entrypoint-sshd.sh && mkdir -p /var/run/sshd 
+ENTRYPOINT ["/entrypoint-sshd.sh"]
+CMD ["/entrypoint-sshd.sh"]
+FROM admin-minimal as admin-base
+# add composer, uses (default) version 2
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
+# add additional dependencies for installing civicrm with D9 + composer
+RUN apt-get update && apt-get install -y ca-certificates curl gnupg && \
+  mkdir -p /etc/apt/keyrings && \
+  curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+  NODE_MAJOR=16 && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list && \
+  apt-get update && apt-get install -y nodejs && \
+  apt-get purge -y && apt-get clean
+RUN npm install -g bower
+# Step 3: from the admin-base, add the CMS code, and then copy it over to the vhttp-base as the vhttp-cms
+FROM admin-base as admin-build-cms
+# https://www.drupal.org/node/3060/release
+ENV DRUPAL_VERSION 10.0.11
+USER drupal:www-data
+RUN set -eux; \
+	composer create-project --no-interaction --no-install "drupal/recommended-project:$DRUPAL_VERSION" ./;
+RUN composer config extra.enable-patching true
+RUN composer config --no-plugins allow-plugins.cweagans/composer-patches true
+RUN composer require --no-update drush/drush --dev
+RUN echo "Building with Drupal version $DRUPAL_VERSION"
+RUN composer require --no-update drupal/core:${DRUPAL_VERSION} --update-with-all-dependencies
+RUN composer update 
+#	chown -R drupal:www-data web/sites web/modules web/themes; 
+FROM admin-build-cms as admin-build-crm
+ENV CIVICRM_VERSION 5.65.2
+RUN set -eux; \
+  composer config extra.enable-patching true; \
+  composer config minimum-stability dev; \
+  composer config extra.compile-mode all;  
+RUN \ 
+  composer require --no-update -W "civicrm/civicrm-core:$CIVICRM_VERSION"; \
+  composer require --no-update -W "civicrm/civicrm-packages:$CIVICRM_VERSION"; \
+  composer require --no-update -W "civicrm/civicrm-drupal-8:$CIVICRM_VERSION"; \
+  composer config --no-plugins allow-plugins.civicrm/civicrm-asset-plugin true; \
+  composer config --no-plugins allow-plugins.civicrm/composer-downloads-plugin true; \
+  composer config --no-plugins allow-plugins.civicrm/composer-compile-plugin true; \
+  composer update;
+FROM vhttp-base as vhttp-cms
+COPY --from=admin-build-cms /var/www/drupal .
+FROM vhttp-base as vhttp-crm
+COPY --from=admin-build-crm /var/www/drupal .
+FROM admin-minimal as admin-cms
+COPY --from=admin-build-cms /var/www/drupal .
+FROM admin-minimal as admin-crm
+COPY --from=admin-build-crm /var/www/drupal .

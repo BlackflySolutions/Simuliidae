@@ -3,7 +3,7 @@ version: '3.4'
 services:
 
   vsql:
-    image: blackflysolutions/mariadb:10.4
+    image: blackflysolutions/mariadb:{VSITE_MARIADB_VER-10.3}
     expose:
            - "3306"
     volumes:
@@ -28,6 +28,7 @@ services:
       - VSITE
       - VSITE_SITES
       - VSITE_DOMAIN
+      - VSITE_DOMAIN_ALTERNATIVES
       - VSITE_ENVIRONMENT
       - MYSQL_USER
       - MYSQL_PASSWORD
@@ -46,6 +47,7 @@ services:
       - VSITE
       - VSITE_SITES
       - VSITE_DOMAIN
+      - VSITE_DOMAIN_ALTERNATIVES
       - DRUSH_OPTIONS_URI={VSITE_DOMAIN}
       - VSITE_ENVIRONMENT
       - VSITE_CIVICRM_VER

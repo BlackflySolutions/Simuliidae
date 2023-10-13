@@ -1,6 +1,7 @@
 *.bak
 */*/*/*.yml
 !*/*/*/base.yml
-!*/*/*/drupal.yml
+!*/*/*/cms.yml
+!*/*/*/crm.yml
 !*/*/*/sites.yml
 !*/*/*/-*.yml
