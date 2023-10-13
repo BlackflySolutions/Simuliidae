@@ -2,7 +2,7 @@
 version: '3.4'
 services:
   vredis:
-    image: "blackflysolutions/redis:{VSITE_REDIS_VER-3-alpine}"
+    image: "blackflysolutions/redis:{VSITE_REDIS_VER-6-alpine}"
     environment:
       - VSITE_REDIS_MAXMEMORY
     deploy:
