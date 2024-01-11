@@ -7,6 +7,7 @@ if [ ! -f /var/www/drupal/web/sites/default/civicrm_settings.php ]; then
 #  sudo -E -u www-data drush -y pm:enable civicrm
   cv core:install --cms-base-url=https://$VSITE_DOMAIN --db="mysql://$MYSQL_USER:$MYSQL_PASSWORD@vsql/$CIVICRM_DATABASE"
   chmod ug-w /var/www/drupal/web/sites/default
+  chown -R www-data:www-data /var/www/drupal/web/sites/default/files/civicrm
   curl -LsS https://download.civicrm.org/cv/cv.phar -o /usr/local/bin/cv
   chmod +x /usr/local/bin/cv
   sudo -E -u www-data drush -y pm:enable civicrmtheme
