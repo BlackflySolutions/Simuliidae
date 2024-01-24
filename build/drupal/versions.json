@@ -1,22 +1,29 @@
 {
-  "10.0": {
-    "composer": {
-      "version": "2"
-    },
+  "10.2": {
+    "version": "10.2.1",
+    "civicrmVersion": "5.69.2",
+    "url": "https://ftp.drupal.org/files/projects/drupal-10.2.1.tar.gz",
+    "md5": "df4b717aa27d328a557b7f13547012b0",
+    "date": 1704448164,
+    "notes": "https://www.drupal.org/project/drupal/releases/10.2.1",
     "phpVersions": [
-      "8.2",
-      "8.1"
+      "8.3",
+      "8.2"
     ],
     "variants": [
       "apache-bullseye"
     ],
-    "civicrmVersion": "5.65.2",
-    "version": "10.0.11"
+    "composer": {
+      "version": "2"
+    }
   },
   "10.1": {
-    "composer": {
-      "version": "2"
-    },
+    "version": "10.1.7",
+    "civicrmVersion": "5.69.2",
+    "url": "https://ftp.drupal.org/files/projects/drupal-10.1.7.tar.gz",
+    "md5": "c89d2e56737da5542a811913bd28de43",
+    "date": 1701857745,
+    "notes": "https://www.drupal.org/project/drupal/releases/10.1.7",
     "phpVersions": [
       "8.2",
       "8.1"
@@ -24,47 +31,23 @@
     "variants": [
       "apache-bullseye"
     ],
-    "civicrmVersion": "5.65.2",
-    "version": "10.1.4"
-  },
-  "7": {
-    "md5": "4139f0feecb44a53645242194809b73a",
-    "phpVersions": [
-      "8.2",
-      "8.1",
-      "7.4"
-    ],
-    "variants": [
-      "apache-bullseye"
-    ],
-    "civicrmVersion": "5.64.3",
-    "version": "7.98"
-  },
-  "9.4": {
     "composer": {
       "version": "2"
-    },
+    }
+  },
+  "7": {
+    "version": "7.99",
+    "civicrmVersion": "5.69.2",
+    "url": "https://ftp.drupal.org/files/projects/drupal-7.99.tar.gz",
+    "md5": "0fbcb06e354309356e6b4e33d2cd242d",
+    "date": 1701873806,
+    "notes": "https://www.drupal.org/project/drupal/releases/7.99",
     "phpVersions": [
       "7.4",
       "8.1"
     ],
     "variants": [
       "apache-bullseye"
-    ],
-    "civicrmVersion": "5.64.3",
-    "version": "9.4.15"
-  },
-  "9.5": {
-    "composer": {
-      "version": "2"
-    },
-    "phpVersions": [
-      "8.1"
-    ],
-    "variants": [
-      "apache-bullseye"
-    ],
-    "civicrmVersion": "5.65.2",
-    "version": "9.5.11"
+    ]
   }
 }
