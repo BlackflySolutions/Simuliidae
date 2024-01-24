@@ -37,7 +37,7 @@ COPY msmtprc /etc/msmtprc
 COPY vhttp.ini /usr/local/etc/php/conf.d/
 # provide some handy apache configuration
 COPY vhttp.conf /etc/apache2/conf-available/
-RUN a2enconf vhttp && a2enmod expires
+RUN a2enconf vhttp
 # the initialize script needs to run after the container has been created. 
 # as well as setting up "mail" in /etc/hosts, it looks for some site-specific
 # apache and robots customization
@@ -111,7 +111,7 @@ RUN set -eux; \
 	composer create-project --no-interaction --no-install "drupal/recommended-project:$DRUPAL_VERSION" ./;
 RUN composer config extra.enable-patching true
 RUN composer config --no-plugins allow-plugins.cweagans/composer-patches true
-{{ if env.version | startswith("10") then ( -}}
+{{ if env.version | startswith("10.1") then ( -}}
 RUN composer require --no-update drush/drush:11.x --dev
 {{ ) else ( -}}
 {{ if env.version | startswith("9") then ( -}}
