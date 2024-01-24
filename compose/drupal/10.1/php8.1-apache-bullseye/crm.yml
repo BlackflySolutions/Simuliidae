@@ -16,7 +16,7 @@ services:
       - MYSQL_DATABASE
    
   vhttp:
-    image: simuliidae-drupal:vhttp-crm-10.1-php8.1-apache-bullseye
+    image: blackflysolutions/simuliidae-drupal:vhttp-crm-10.1-php8.1-apache-bullseye
     deploy:
       labels:
         simuliidae.domain: "{VSITE_DOMAIN}"
@@ -40,7 +40,7 @@ services:
 
   admin:
     # use an extended version of the above image for administrative tasks
-    image: simuliidae-drupal:admin-crm-10.1-php8.1-apache-bullseye
+    image: blackflysolutions/simuliidae-drupal:admin-crm-10.1-php8.1-apache-bullseye
     volumes:
       - vsite:/var/www/drupal/web/sites/default
     environment:
