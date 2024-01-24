@@ -6,7 +6,7 @@
 
 # https://www.drupal.org/docs/system-requirements/php-requirements
 # create as a "base" that doesn't include the drupal code
-FROM php:8.2-apache-bullseye AS drupal-base
+FROM php:8.1-apache-bullseye AS drupal-base
 
 # install the PHP extensions we need
 RUN set -eux; \
@@ -60,6 +60,7 @@ RUN set -eux; \
         pecl install -o imagick && docker-php-ext-enable imagick; \
         pecl install -o redis && docker-php-ext-enable redis; \
         pecl install -o apcu && docker-php-ext-enable apcu; \
+        pecl install -o mcrypt-1.0.5 && docker-php-ext-enable mcrypt; \
         docker-php-ext-install exif; \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
@@ -85,21 +86,16 @@ RUN { \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
 FROM drupal-base
-COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
+# 2023-12-06: https://www.drupal.org/project/drupal/releases/7.99
+ENV DRUPAL_VERSION 7.99
+ENV DRUPAL_URL https://ftp.drupal.org/files/projects/drupal-7.99.tar.gz
+ENV DRUPAL_MD5 0fbcb06e354309356e6b4e33d2cd242d
 
-# 2023-12-06: https://www.drupal.org/project/drupal/releases/10.1.7
-ENV DRUPAL_VERSION 10.1.7
-
-WORKDIR /opt/drupal
 RUN set -eux; \
-	export COMPOSER_HOME="$(mktemp -d)"; \
-	composer create-project --no-interaction "drupal/recommended-project:$DRUPAL_VERSION" ./; \
-	chown -R www-data:www-data web/sites web/modules web/themes; \
-	rmdir /var/www/html; \
-	ln -sf /opt/drupal/web /var/www/html; \
-	# delete composer cache
-	rm -rf "$COMPOSER_HOME"
-
-ENV PATH=${PATH}:/opt/drupal/vendor/bin
+	curl -fSL "$DRUPAL_URL" -o drupal.tar.gz; \
+	echo "${DRUPAL_MD5} *drupal.tar.gz" | md5sum -c -; \
+	tar -xz --strip-components=1 -f drupal.tar.gz; \
+	rm drupal.tar.gz; \
+	chown -R www-data:www-data sites modules themes
 
 # vim:set ft=dockerfile:

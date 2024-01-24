@@ -4,15 +4,16 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-# from https://www.drupal.org/docs/system-requirements/php-requirements
+# https://www.drupal.org/docs/system-requirements/php-requirements
 # create as a "base" that doesn't include the drupal code
-FROM php:8.0-apache-buster AS drupal-base
+FROM php:8.3-apache-bullseye AS drupal-base
 
 # install the PHP extensions we need
 RUN set -eux; \
 	\
 	if command -v a2enmod; then \
-		a2enmod rewrite; \
+# https://github.com/drupal/drupal/blob/d91d8d0a6d3ffe5f0b6dde8c2fbe81404843edc5/.htaccess (references both mod_expires and mod_rewrite explicitly)
+		a2enmod expires rewrite; \
 	fi; \
 	\
 	savedAptMark="$(apt-mark showmanual)"; \
@@ -59,13 +60,12 @@ RUN set -eux; \
         pecl install -o imagick && docker-php-ext-enable imagick; \
         pecl install -o redis && docker-php-ext-enable redis; \
         pecl install -o apcu && docker-php-ext-enable apcu; \
-        pecl install -o mcrypt-1.0.5 && docker-php-ext-enable mcrypt; \
         docker-php-ext-install exif; \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
 	ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
-		| awk '/=>/ { print $3 }' \
+		| awk '/=>/ { so = $(NF-1); if (index(so, "/usr/local/") == 1) { next }; gsub("^/(usr/)?", "", so); print so }' \
 		| sort -u \
 		| xargs -r dpkg-query -S \
 		| cut -d: -f1 \
@@ -85,15 +85,21 @@ RUN { \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
 FROM drupal-base
-# https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 7.97
-ENV DRUPAL_MD5 37b63299e115a9e8863f564780a026e9
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
 
+# 2024-01-05: https://www.drupal.org/project/drupal/releases/10.2.1
+ENV DRUPAL_VERSION 10.2.1
+
+WORKDIR /opt/drupal
 RUN set -eux; \
-	curl -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_VERSION}.tar.gz" -o drupal.tar.gz; \
-	echo "${DRUPAL_MD5} *drupal.tar.gz" | md5sum -c -; \
-	tar -xz --strip-components=1 -f drupal.tar.gz; \
-	rm drupal.tar.gz; \
-	chown -R www-data:www-data sites modules themes
+	export COMPOSER_HOME="$(mktemp -d)"; \
+	composer create-project --no-interaction "drupal/recommended-project:$DRUPAL_VERSION" ./; \
+	chown -R www-data:www-data web/sites web/modules web/themes; \
+	rmdir /var/www/html; \
+	ln -sf /opt/drupal/web /var/www/html; \
+	# delete composer cache
+	rm -rf "$COMPOSER_HOME"
+
+ENV PATH=${PATH}:/opt/drupal/vendor/bin
 
 # vim:set ft=dockerfile:
