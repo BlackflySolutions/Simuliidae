@@ -16,13 +16,13 @@ This is a work-in-progress. Only the current Drupal versions are in use, any oth
 
 Current Drupal versions have been in use on production sites [since Oct 2022](http://homeofficekernel.blogspot.com/2022/10/welcome-to-simuliidae-v2.html).
 
-Here are some longer versions of the story:
+Here is the longer version of the story:
 
-[My Journey Into Containers](http://homeofficekernel.blogspot.com/2018/10/my-journey-into-containers.html)
-[Docker: putting things together and pulling them apart](http://homeofficekernel.blogspot.com/2018/10/docker-putting-things-together-and.html)
-[Building and maintaining Drupal + CiviCRM application containers](http://homeofficekernel.blogspot.com/2019/03/building-and-maintaining-drupal-civicrm.html)
-[Orchestrating Drupal + CiviCRM containers into a working site: describing the challenge](http://homeofficekernel.blogspot.com/2019/04/orchestrating-drupal-civicrm-containers.html)
-[Welcome to Simuliidae, v2](http://homeofficekernel.blogspot.com/2022/10/welcome-to-simuliidae-v2.html)
+1. [My Journey Into Containers](http://homeofficekernel.blogspot.com/2018/10/my-journey-into-containers.html)
+2. [Docker: putting things together and pulling them apart](http://homeofficekernel.blogspot.com/2018/10/docker-putting-things-together-and.html)
+3. [Building and maintaining Drupal + CiviCRM application containers](http://homeofficekernel.blogspot.com/2019/03/building-and-maintaining-drupal-civicrm.html)
+4. [Orchestrating Drupal + CiviCRM containers into a working site: describing the challenge](http://homeofficekernel.blogspot.com/2019/04/orchestrating-drupal-civicrm-containers.html)
+5. [Welcome to Simuliidae, v2](http://homeofficekernel.blogspot.com/2022/10/welcome-to-simuliidae-v2.html)
 
 ## What It Is, What It Includes
 This project includes instructions, docker compose files, files for building Docker images, and some bash scripts.
