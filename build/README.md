@@ -3,6 +3,8 @@
 
 This directory is responsible for the building of docker images. There are a few steps.
 
+This directory now includes building of CiviCRM docker images for Drupal, Wordpress and Standalone. Much of the design is Drupal-centric since that's what I did first, but I'm trying to be more structured and cms-agnostic by having a single structure that works for all of them.
+
 # General Notes
 
 As usual, the goal is to automate/script as much as possible. We'll use use the docker-library drupal and wordpress projects, but just building directly from those project's images isn't ideal.
