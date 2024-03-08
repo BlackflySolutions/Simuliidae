@@ -1,0 +1,96 @@
+# This is used to build extended versions of the standalone image for CiviCRM
+# including production goodies that are not needed for testing or local/dev.
+# Goodies include:
+# 1. msmtprc: a way to send mail via the host's mail system
+# 2. handling of varnish+hitch proxying by apache
+# by default, do local building, but we could build from the blackfly repository when using automated build processes.
+ARG REPOSITORY_FROM=
+# Requires the VARIANT_TAG argument, which may be either the base or non-base version [??]
+ARG VARIANT_TAG=
+# Step 1. build the basic web service, a slightly extended version of the corresonding standalone modified base image.
+FROM ${REPOSITORY_FROM}standalone:base-${VARIANT_TAG} as vhttp-base
+# We create a standalone user to own all the code, using 1978 as the uid
+RUN useradd -u 1978 -g www-data -ms /bin/bash standalone
+# change the document root as per https://hub.docker.com/_/php/
+# because I want to build my code with composer and this is how I've been doing it ...
+RUN mkdir -p /var/www/standalone
+ENV APACHE_DOCUMENT_ROOT /var/www/standalone/web
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+WORKDIR /var/www/standalone
+RUN chown standalone:www-data /var/www/standalone
+# Add a way to send mail out, assuming the host can do mail at port 25. 
+# The initialize.sh script sets up an entry in /etc/hosts to make it "easy".
+# Use iproute2 to figure my ip route out to the host.
+# Also include an ssh client and git as useful binaries for the vhttp image
+# e.g. for git checkouts of modules.
+RUN apt-get update && apt-get install -y msmtp iproute2 openssh-client git && \
+  apt-get clean && \
+  echo 'sendmail_path = "/usr/bin/msmtp -C /etc/msmtprc -t"' > /usr/local/etc/php/conf.d/mail.ini
+COPY msmtprc /etc/msmtprc
+# increase default php limits and other customizations
+COPY vhttp.ini /usr/local/etc/php/conf.d/
+# provide some handy apache configuration
+COPY vhttp.conf /etc/apache2/conf-available/
+RUN a2enconf vhttp
+# the initialize script needs to run after the container has been created. 
+# as well as setting up "mail" in /etc/hosts, it looks for some site-specific
+# apache and robots customization
+COPY initialize.sh /usr/local/bin/initialize.sh
+RUN chmod u+x /usr/local/bin/initialize.sh 
+# default entrypoint runs initialize and then default/inherited CMD to start apache
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod 775 /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+# inherited default CMD["apache2-foreground"], repeated here for good measure.
+CMD ["apache2-foreground"]
+# Step 2: build a basic admin service, adding some bits to the vhttp-base
+# Admin runs sshd as it's CMD by default, but can be used to, e.g. do automated setup.
+# We'll first build admin-minimal that we'll use later as a base for admin-build
+FROM vhttp-base as admin-minimal
+RUN apt-get update \
+  && apt-get install -y mariadb-client sudo vim less zip unzip netcat ssh rsync openssh-server \
+  && apt-get purge -y
+# Add this version's collection of admin convenience scripts [these are version specific and evolve!]
+COPY admin/*sh /usr/local/bin/
+# Include copy of the cv civicrm command line utility
+RUN curl -LsS https://download.civicrm.org/cv/cv.phar -o /usr/local/bin/cv
+# make sure all my scripts are executable
+RUN chmod ugo+x /usr/local/bin/cv && chmod ugo+x /usr/local/bin/*.sh 
+# The apache for the container shouldn't actually be functional, it doesn't get invoked, so minimize it's resource use
+# in case it's actually started.
+COPY admin.conf /etc/apache2/conf-available
+RUN a2enconf admin
+# We inherit the initialization script and entrypoint from vhttp-base
+# But we'll use a new entrypoint and cmd to run sshd
+COPY entrypoint-sshd.sh /entrypoint-sshd.sh
+RUN chmod 775 /entrypoint-sshd.sh && mkdir -p /var/run/sshd 
+ENTRYPOINT ["/entrypoint-sshd.sh"]
+CMD ["/entrypoint-sshd.sh"]
+COPY setup.sh /setup.sh
+RUN chmod 775 /setup.sh 
+FROM admin-minimal as admin-base
+# add composer, uses (default) version 2
+COPY --from=composer:{{ .composer.version }} /usr/bin/composer /usr/local/bin/
+# add additional dependencies for installing civicrm standalone using composer
+# TODO - do we actually need nodejs?
+RUN apt-get update && apt-get install -y ca-certificates curl gnupg && \
+  mkdir -p /etc/apt/keyrings && \
+  curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+  NODE_MAJOR=16 && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list && \
+  apt-get update && apt-get install -y nodejs && \
+  apt-get purge -y && apt-get clean
+RUN npm install -g bower
+# Step 3: from the admin-base, add the CMS code, and then copy it over to the vhttp-base as the vhttp-cms
+FROM admin-base as admin-build-crm
+USER standalone:www-data
+ENV CIVICRM_VERSION {{ .civicrmVersion }}
+RUN set -eux; \
+  git clone https://github.com/civicrm/civicrm-standalone /var/www/standalone; \
+  composer require --no-update -W "civicrm/civicrm-core:$CIVICRM_VERSION"; \
+  composer require --no-update -W "civicrm/civicrm-packages:$CIVICRM_VERSION"; \
+  composer update; 
+FROM vhttp-base as vhttp-crm
+COPY --from=admin-build-crm /var/www/standalone .
+FROM admin-minimal as admin-crm
+COPY --from=admin-build-crm /var/www/standalone .

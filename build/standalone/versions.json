@@ -1,0 +1,55 @@
+{
+  "5.72": {
+    "civicrmVersion": "5.72.beta1",
+    "phpVersions": [
+      "8.2",
+      "8.1"
+    ],
+    "variants": [
+      "apache-bullseye"
+    ],
+    "composer": {
+      "version": "2"
+    }
+  },
+  "5.71": {
+    "civicrmVersion": "5.71.0",
+    "phpVersions": [
+      "8.2",
+      "8.1"
+    ],
+    "variants": [
+      "apache-bullseye"
+    ],
+    "composer": {
+      "version": "2"
+    }
+  },
+  "5.70": {
+    "civicrmVersion": "5.70.2",
+    "phpVersions": [
+      "8.2",
+      "8.1"
+    ],
+    "variants": [
+      "apache-bullseye"
+    ],
+    "composer": {
+      "version": "2"
+    }
+  },
+  "5.69": {
+    "civicrmVersion": "5.69.5",
+    "phpVersions": [
+      "8.2",
+      "8.1",
+      "7.4"
+    ],
+    "variants": [
+      "apache-bullseye"
+    ],
+    "composer": {
+      "version": "2"
+    }
+  }
+}
