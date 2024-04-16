@@ -56,11 +56,6 @@ for version; do
 
 			{
 				generated_warning
-				gawk -f "$jqt" Dockerfile.template
-			} > "$dir/Dockerfile"
-
-			{
-				generated_warning
 				gawk -f "$jqt" Simuliidae.template
 			} > "$dir/Simuliidae"
 		        fi
