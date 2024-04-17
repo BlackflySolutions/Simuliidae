@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+
+  vhttp:
+    volumes:
+      - vall:/var/www/html/sites/all
+
+  admin:
+    volumes:
+      - vall:/var/www/html/sites/all
+
+volumes:
+  vall:

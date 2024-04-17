@@ -1,0 +1,72 @@
+version: '3.4'
+
+services:
+
+  vsql:
+    image: blackflysolutions/mariadb:{VSITE_MARIADB_VER-10.3}
+    volumes:
+      - vdb:/var/lib/mysql
+    environment:
+      - VSITE_ENVIRONMENT
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+   
+  vhttp:
+    image: blackflysolutions/simuliidae-drupal:vhttp-base-7-php8.2-apache-bullseye
+    ports:
+           - "80/tcp"
+    expose:
+           - "80"
+    volumes:
+      - vdrupal:/var/www/html
+    environment:
+      - VSITE_ENVIRONMENT
+      - VSITE
+      - VSITE_SITE
+      - VSITE_DOMAIN
+      - VSITE_DOMAIN_ALTERNATIVES
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+      - DRUPAL_DATABASE
+      - CIVICRM_DATABASE
+    depends_on:
+      - vsql
+
+  admin:
+    image: blackflysolutions/simuliidae-drupal:admin-base-7-php8.2-apache-bullseye
+    volumes:
+      - vdrupal:/var/www/html
+    environment:
+      - VSITE_ENVIRONMENT
+      - VSITE
+      - VSITE_SITE
+      - VSITE_SITE_NAME
+      - VSITE_DOMAIN
+      - VSITE_DOMAIN_ALTERNATIVES
+      - VSITE_CIVICRM_VER
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+      - DRUPAL_DATABASE
+      - CIVICRM_DATABASE
+      - VSITE_NAME
+      - VSITE_ADMIN_NAME
+      - VSITE_ADMIN_MAIL
+      - VSITE_USER_NAME
+      - VSITE_USER_MAIL
+      - VSITE_USER_ROLE
+      - VSITE_FEATURE
+      - VSITE_THEME
+
+    depends_on:
+      - vsql
+      - vhttp
+
+volumes:
+    vdrupal:
+    vdb:
