@@ -1,5 +1,6 @@
 7/php7.4/apache-bullseye
 7/php8.1/apache-bullseye
+7/php8.2/apache-bullseye
 10.1/php8.1/apache-bullseye
 10.1/php8.2/apache-bullseye
 10.2/php8.2/apache-bullseye

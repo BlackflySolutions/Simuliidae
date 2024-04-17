@@ -59,11 +59,12 @@ RUN apt-get update \
 {{ if env.version | startswith("7") then ( -}}
 # hard-coded drush version, may need updating sometimes
 RUN curl -L -o /usr/local/bin/drush https://github.com/drush-ops/drush/releases/download/8.4.11/drush.phar
-{{ ) else ( -}}
-# drush launcher, drush will be installed by composer
-RUN curl -L -o /usr/local/bin/drush https://github.com/drush-ops/drush-launcher/releases/latest/download/drush.phar
-{{ ) end -}}
 RUN chmod u+x /usr/local/bin/drush
+{{ ) else ( -}}
+# For composer projects, we can just extend $PATH to get access to drush
+# No longer using drush launcher
+ENV PATH="${PATH}:/var/www/drupal/vendor/bin"
+{{ ) end -}}
 # Add this version's collection of admin convenience scripts [these are version specific and evolve!]
 COPY admin/*sh /usr/local/bin/
 # Include copy of the cv civicrm command line utility
