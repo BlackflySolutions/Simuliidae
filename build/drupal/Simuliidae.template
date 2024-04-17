@@ -80,6 +80,9 @@ COPY entrypoint-sshd.sh /entrypoint-sshd.sh
 RUN chmod 775 /entrypoint-sshd.sh && mkdir -p /var/run/sshd 
 ENTRYPOINT ["/entrypoint-sshd.sh"]
 CMD ["/entrypoint-sshd.sh"]
+# setup.sh runs the drupal and civicrm setup scripts and handles some ownership/permissions
+COPY setup.sh /setup.sh
+RUN chmod 775 /setup.sh
 FROM admin-minimal as admin-base
 {{ if env.version | startswith("7") then "" else ( -}}
 # add composer, uses (default) version 2
