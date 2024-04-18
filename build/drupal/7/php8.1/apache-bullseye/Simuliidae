@@ -59,7 +59,7 @@ COPY admin/*sh /usr/local/bin/
 # Include copy of the cv civicrm command line utility
 RUN curl -LsS https://download.civicrm.org/cv/cv.phar -o /usr/local/bin/cv
 # make sure all my scripts are executable
-RUN chmod ugo+x /usr/local/bin/drush && chmod ugo+x /usr/local/bin/cv && chmod ugo+x /usr/local/bin/*.sh 
+RUN chmod ugo+x /usr/local/bin/cv && chmod ugo+x /usr/local/bin/*.sh
 # The apache for the container shouldn't actually be functional, it doesn't get invoked, so minimize it's resource use
 # in case it's actually started.
 COPY admin.conf /etc/apache2/conf-available
@@ -70,6 +70,9 @@ COPY entrypoint-sshd.sh /entrypoint-sshd.sh
 RUN chmod 775 /entrypoint-sshd.sh && mkdir -p /var/run/sshd 
 ENTRYPOINT ["/entrypoint-sshd.sh"]
 CMD ["/entrypoint-sshd.sh"]
+# setup.sh runs the drupal and civicrm setup scripts and handles some ownership/permissions
+COPY setup.sh /setup.sh
+RUN chmod 775 /setup.sh
 FROM admin-minimal as admin-base
 # Step 3: from the admin-base, add the CMS code, and then copy it over to the vhttp-base as the vhttp-cms
 FROM admin-base as admin-build-cms
