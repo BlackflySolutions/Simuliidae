@@ -1,1 +1,9 @@
+5.69/php7.4/apache-bullseye
+5.69/php8.2/apache-bullseye
+5.69/php8.1/apache-bullseye
+5.71/php8.2/apache-bullseye
 5.71/php8.1/apache-bullseye
+5.72/php8.2/apache-bullseye
+5.72/php8.1/apache-bullseye
+5.73/php8.2/apache-bullseye
+5.73/php8.1/apache-bullseye
