@@ -90,7 +90,7 @@ RUN npm install -g bower
 # Step 3: from the admin-base, add the CMS code, and then copy it over to the vhttp-base as the vhttp-cms
 FROM admin-base as admin-build-crm
 USER standalone:www-data
-ENV CIVICRM_VERSION 5.71.0
+ENV CIVICRM_VERSION 5.71.2
 RUN set -eux; \
   git clone https://github.com/civicrm/civicrm-standalone /var/www/standalone; \
   composer require --no-update -W "civicrm/civicrm-core:$CIVICRM_VERSION"; \
