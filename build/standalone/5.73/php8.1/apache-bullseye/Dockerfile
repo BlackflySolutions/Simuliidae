@@ -6,7 +6,7 @@
 
 # Layer 1
 # Provide an option to build a "base" target that doesn't include the code
-FROM php:8.2-apache-bullseye AS standalone-base
+FROM php:8.1-apache-bullseye AS standalone-base
 
 # Layer 2
 # install the PHP extensions we need
@@ -88,7 +88,7 @@ RUN mkdir -p /var/www/html
 RUN chown standalone:www-data /var/www/html
 WORKDIR /var/www/html
 USER standalone:www-data
-ENV CIVICRM_VERSION 5.72.1
+ENV CIVICRM_VERSION 5.73.beta1
 RUN set -eux; \
   git clone https://github.com/civicrm/civicrm-standalone /var/www/standalone; \
   composer require --no-update -W "civicrm/civicrm-core:$CIVICRM_VERSION"; \

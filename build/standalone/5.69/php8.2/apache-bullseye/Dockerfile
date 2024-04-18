@@ -4,9 +4,11 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-# create as a "base" that doesn't include the code
+# Layer 1
+# Provide an option to build a "base" target that doesn't include the code
 FROM php:8.2-apache-bullseye AS standalone-base
 
+# Layer 2
 # install the PHP extensions we need
 RUN set -eux; \
 	\
@@ -22,10 +24,8 @@ RUN set -eux; \
 		libjpeg-dev \
 		libpng-dev \
 		libpq-dev \
-		libwebp-dev \
 		libzip-dev \
 		libxml2-dev \
-		libmagickwand-dev \
 		libicu-dev \
 		libc-client-dev \
 		libkrb5-dev \
@@ -35,7 +35,6 @@ RUN set -eux; \
 	docker-php-ext-configure gd \
 		--with-freetype \
 		--with-jpeg=/usr \
-		--with-webp \
 	; \
 	\
 	docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
@@ -55,8 +54,6 @@ RUN set -eux; \
 		imap \
 	; \
 	\
-        pecl install -o imagick && docker-php-ext-enable imagick; \
-        pecl install -o redis && docker-php-ext-enable redis; \
         pecl install -o apcu && docker-php-ext-enable apcu; \
         docker-php-ext-install exif; \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
@@ -82,4 +79,34 @@ RUN { \
 		echo 'opcache.revalidate_freq=60'; \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
+# Layer 3 with build bits to allow for future upgrades in the container
+FROM standalone-base as standalone-build-crm
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
+# We create a standalone user to own all the code, using 1978 as the uid
+RUN useradd -u 1978 -g www-data -ms /bin/bash standalone
+RUN mkdir -p /var/www/html
+RUN chown standalone:www-data /var/www/html
+WORKDIR /var/www/html
+USER standalone:www-data
+ENV CIVICRM_VERSION 5.69.5
+RUN set -eux; \
+  git clone https://github.com/civicrm/civicrm-standalone /var/www/standalone; \
+  composer require --no-update -W "civicrm/civicrm-core:$CIVICRM_VERSION"; \
+  composer require --no-update -W "civicrm/civicrm-packages:$CIVICRM_VERSION"; \
+  composer update; 
+
+# Add what is now an empty initialize script
+COPY commands/initialize.sh /usr/local/bin/initialize.sh
+COPY commands/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod u+x /usr/local/bin/*.sh 
+# default entrypoint runs initialize and then default/inherited CMD to start apache
+RUN chmod 775 /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+# inherited default CMD["apache2-foreground"], repeated here for good measure.
+CMD ["apache2-foreground"]
+# Now create with a different more minimal Layer 3 without build bits
+# This image would only be upgraded via image update
+FROM standalone-base as standalone-crm
+COPY --from=standalone-build-crm /var/www/html  /var/www/html
+COPY --from=standalone-build-crm /usr/local/bin  /usr/local/bin
 # vim:set ft=dockerfile:
