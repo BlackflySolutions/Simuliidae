@@ -7,7 +7,7 @@ fi
 # Hand off to the CMD
 if test -z "$@"
 then
-  exec /usr/sbin/sshd -D
+  exec /usr/sbin/sshd -D -e
 else
   exec "$@"
 fi
