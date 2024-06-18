@@ -14,3 +14,4 @@ while read VARIANT_DIR; do
     echo "Missing $REFERENCE_DOCKERFILE"
   fi
 done <variants.txt
+cp ../../reference/drupal/Dockerfile.template .
