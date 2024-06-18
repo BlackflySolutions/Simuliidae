@@ -30,10 +30,14 @@ RUN chown drupal:www-data /var/www/drupal
 # Use iproute2 to figure my ip route out to the host.
 # Also include an ssh client and git as useful binaries for the vhttp image
 # e.g. for git checkouts of modules.
-RUN apt-get update && apt-get install -y msmtp iproute2 openssh-client git && \
+RUN apt-get update && apt-get install -y msmtp iproute2 openssh-client git imagemagick && \
   apt-get clean && \
   echo 'sendmail_path = "/usr/bin/msmtp -C /etc/msmtprc -t"' > /usr/local/etc/php/conf.d/mail.ini
 COPY msmtprc /etc/msmtprc
+ARG imagemagic_config=/etc/ImageMagick-6/policy.xml
+RUN if [ -f $imagemagic_config ] ; then \
+ sed -i 's/<policy domain="coder" rights="none" pattern="PDF" \/>/<policy domain="coder" rights="read|write" pattern="PDF" \/>/g' $imagemagic_config ; \
+ fi
 # increase default php limits and other customizations
 COPY vhttp.ini /usr/local/etc/php/conf.d/
 # provide some handy apache configuration
@@ -56,7 +60,9 @@ CMD ["apache2-foreground"]
 FROM vhttp-base as admin-minimal
 RUN apt-get update \
   && apt-get install -y mariadb-client sudo vim less zip unzip netcat ssh rsync openssh-server \
-  && apt-get purge -y
+  && apt-get purge -y && \
+  sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config && \
+  sed -i 's/#LogLevel INFO/LogLevel DEBUG/g' /etc/ssh/sshd_config
 # For composer projects, we can just extend $PATH to get access to drush
 # No longer using drush launcher
 ENV PATH="${PATH}:/var/www/drupal/vendor/bin"
@@ -95,7 +101,7 @@ RUN npm install -g bower
 # Step 3: from the admin-base, add the CMS code, and then copy it over to the vhttp-base as the vhttp-cms
 FROM admin-base as admin-build-cms
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 10.2.2
+ENV DRUPAL_VERSION 10.2.5
 USER drupal:www-data
 RUN set -eux; \
 	composer create-project --no-interaction --no-install "drupal/recommended-project:$DRUPAL_VERSION" ./;
@@ -107,7 +113,7 @@ RUN composer require --no-update drupal/core:${DRUPAL_VERSION} --update-with-all
 RUN composer update 
 #	chown -R drupal:www-data web/sites web/modules web/themes; 
 FROM admin-build-cms as admin-build-crm
-ENV CIVICRM_VERSION 5.69.2
+ENV CIVICRM_VERSION 5.72.2
 RUN set -eux; \
   composer config extra.enable-patching true; \
   composer config minimum-stability dev; \

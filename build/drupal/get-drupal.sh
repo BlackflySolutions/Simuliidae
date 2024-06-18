@@ -15,3 +15,4 @@ while read VARIANT_DIR; do
   fi
 done <variants.txt
 cp ../../reference/drupal/Dockerfile.template .
+cp ../../reference/drupal/versions.json .
