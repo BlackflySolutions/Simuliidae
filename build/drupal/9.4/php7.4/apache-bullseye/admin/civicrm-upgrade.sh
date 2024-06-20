@@ -27,5 +27,5 @@ if  [[ '-y' != $ARG1 ]]; then
 fi
 sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer update
 sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer civicrm:publish
-cv upgrade:db
+cv upgrade:db $ARG1
 chown -R www-data:www-data /var/www/drupal/web/sites/default/files/civicrm
