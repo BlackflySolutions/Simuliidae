@@ -65,7 +65,7 @@ RUN apt-get update \
 {{ if env.version | startswith("7") then ( -}}
 # hard-coded drush version, may need updating sometimes
 RUN curl -L -o /usr/local/bin/drush https://github.com/drush-ops/drush/releases/download/8.4.11/drush.phar
-RUN chmod u+x /usr/local/bin/drush
+RUN chmod ugo+x /usr/local/bin/drush
 {{ ) else ( -}}
 # For composer projects, we can just extend $PATH to get access to drush
 # No longer using drush launcher
