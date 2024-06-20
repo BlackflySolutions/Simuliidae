@@ -31,6 +31,10 @@ for version; do
 	export version
 
 	# rm -rf "$version/"
+	if jq -e '.[env.version] | not' versions.json > /dev/null; then
+		echo "ignoring $version ..."
+		continue
+	fi
 
 	phpVersions="$(jq -r '.[env.version].phpVersions | map(@sh) | join(" ")' versions.json)"
 	eval "phpVersions=( $phpVersions )"
@@ -39,7 +43,7 @@ for version; do
 
 	for phpVersion in "${phpVersions[@]}"; do
 		export phpVersion
-
+                echo "processing $phpVersion"
 		for variant in "${variants[@]}"; do
 			export variant
 
