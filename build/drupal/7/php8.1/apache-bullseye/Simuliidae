@@ -59,7 +59,7 @@ RUN apt-get update \
   sed -i 's/#LogLevel INFO/LogLevel DEBUG/g' /etc/ssh/sshd_config
 # hard-coded drush version, may need updating sometimes
 RUN curl -L -o /usr/local/bin/drush https://github.com/drush-ops/drush/releases/download/8.4.11/drush.phar
-RUN chmod u+x /usr/local/bin/drush
+RUN chmod ugo+x /usr/local/bin/drush
 # Add this version's collection of admin convenience scripts [these are version specific and evolve!]
 COPY admin/*sh /usr/local/bin/
 # Include copy of the cv civicrm command line utility
@@ -83,8 +83,8 @@ FROM admin-minimal as admin-base
 # Step 3: from the admin-base, add the CMS code, and then copy it over to the vhttp-base as the vhttp-cms
 FROM admin-base as admin-build-cms
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 7.100
-ENV DRUPAL_MD5 e1e0963944555bee14bf54af5467192a
+ENV DRUPAL_VERSION 7.101
+ENV DRUPAL_MD5 ddcd8cb4e885ae865a3d1a8b06707a67
 RUN set -eux; \
 	curl -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_VERSION}.tar.gz" -o drupal.tar.gz; \
 	echo "${DRUPAL_MD5} *drupal.tar.gz" | md5sum -c -; \
@@ -92,7 +92,7 @@ RUN set -eux; \
 	rm drupal.tar.gz; \
 	chown -R drupal:www-data sites modules themes;
 FROM admin-build-cms as admin-build-crm
-ENV CIVICRM_VERSION 5.72.2
+ENV CIVICRM_VERSION 5.74.3
 RUN set -eux; \
         cd sites/all/modules; \
         curl -L "https://download.civicrm.org/civicrm-${CIVICRM_VERSION}-drupal.tar.gz" | tar xvz; \
