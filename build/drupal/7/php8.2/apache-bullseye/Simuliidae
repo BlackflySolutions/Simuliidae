@@ -92,7 +92,7 @@ RUN set -eux; \
 	rm drupal.tar.gz; \
 	chown -R drupal:www-data sites modules themes;
 FROM admin-build-cms as admin-build-crm
-ENV CIVICRM_VERSION 5.74.3
+ENV CIVICRM_VERSION 5.74.4
 RUN set -eux; \
         cd sites/all/modules; \
         curl -L "https://download.civicrm.org/civicrm-${CIVICRM_VERSION}-drupal.tar.gz" | tar xvz; \
