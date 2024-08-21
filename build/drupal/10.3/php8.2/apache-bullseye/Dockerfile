@@ -6,7 +6,7 @@
 
 # https://www.drupal.org/docs/system-requirements/php-requirements
 # create as a "base" that doesn't include the drupal code
-FROM php:8.3-apache-bullseye AS drupal-base
+FROM php:8.2-apache-bullseye AS drupal-base
 
 # install the PHP extensions we need
 RUN set -eux; \
@@ -87,8 +87,8 @@ RUN { \
 FROM drupal-base
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
 
-# 2024-06-06: https://www.drupal.org/project/drupal/releases/10.2.7
-ENV DRUPAL_VERSION 10.2.7
+# 2024-08-08: https://www.drupal.org/project/drupal/releases/10.3.2
+ENV DRUPAL_VERSION 10.3.2
 
 # https://github.com/docker-library/drupal/pull/259
 # https://github.com/moby/buildkit/issues/4503

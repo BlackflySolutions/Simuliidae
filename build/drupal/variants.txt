@@ -5,3 +5,6 @@
 10.1/php8.2/apache-bullseye
 10.2/php8.2/apache-bullseye
 10.2/php8.3/apache-bullseye
+10.3/php8.2/apache-bullseye
+10.3/php8.3/apache-bullseye
+11.0/php8.3/apache-bookworm
