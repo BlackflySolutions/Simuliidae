@@ -53,7 +53,7 @@ CMD ["apache2-foreground"]
 # We'll first build admin-minimal that we'll use later as a base for admin-build
 FROM vhttp-base as admin-minimal
 RUN apt-get update \
-  && apt-get install -y mariadb-client sudo vim less zip unzip netcat ssh rsync openssh-server \
+  && apt-get install -y mariadb-client sudo vim less zip unzip netcat-traditional ssh rsync openssh-server \
   && apt-get purge -y && \
   sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config && \
   sed -i 's/#LogLevel INFO/LogLevel DEBUG/g' /etc/ssh/sshd_config
@@ -92,7 +92,7 @@ RUN set -eux; \
 	rm drupal.tar.gz; \
 	chown -R drupal:www-data sites modules themes;
 FROM admin-build-cms as admin-build-crm
-ENV CIVICRM_VERSION 5.74.4
+ENV CIVICRM_VERSION 5.76.2
 RUN set -eux; \
         cd sites/all/modules; \
         curl -L "https://download.civicrm.org/civicrm-${CIVICRM_VERSION}-drupal.tar.gz" | tar xvz; \
