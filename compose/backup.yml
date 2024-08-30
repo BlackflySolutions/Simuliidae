@@ -1,0 +1,34 @@
+# create an ssh server with access to the drupal site backup
+# to use this, we need to define:
+# VSITE_BACKUP_USER, VSITE_BACKUP_PORT
+version: '3.4'
+services:
+  openssh-server:
+    image: lscr.io/linuxserver/openssh-server:latest
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - PUBLIC_KEY_FILE=/etc/id_rsa.pub 
+      - SUDO_ACCESS=false
+      - PASSWORD_ACCESS=false
+      - USER_NAME={VSITE_BACKUP_USER}
+      - LOG_STDOUT=true
+    volumes:
+      - /var/backup/docker/{VSITE}:/var/backup:ro
+      - /var/www/ssh-keys/{VSITE_BACKUP_USER}/id_rsa.pub:/etc/id_rsa.pub:ro
+    ports:
+      - target: 2222
+        published: "${VSITE_BACKUP_PORT}"
+        protocol: tcp
+        mode: ingress
+    restart: unless-stopped
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname=={VSITE_NODE-$THIS_NODE}
+      resources:
+        limits:
+          cpus: "1"
+          memory: "120M"
