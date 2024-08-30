@@ -5,6 +5,7 @@ export VSITE_SFTP_PORT=60666
 export VSITE_SSH_PORT=60667
 export VSITE_MYSQL_PORT=60668
 export VSITE_PHPMYADMIN_PORT=60669
+export VSITE_BACKUP_PORT=60670
 export THIS_NODE=`hostname`
 echo "Using $THIS_NODE"
 export VSITE_COMPOSE_PROJECT_VARIANT=$1
@@ -29,4 +30,4 @@ do
   shift
 done
 #echo "-f ${VSITE_COMPOSE_PROJECT_VARIANT}/${BASE}.yml $CONFIGS config | sed 's/{VSITE/\${VSITE/g' | sed \"s/ \([^[:space:]]*\): ''$/ - \1/\" > ${VSITE_COMPOSE_PROJECT_VARIANT}/${GENNAME}.yml"
-bin/docker-compose -f ${VSITE_COMPOSE_PROJECT_VARIANT}/${BASE}.yml $CONFIGS config | sed 's/{VSITE/\${VSITE/g' | sed "s/ \([^[:space:]]*\): ''$/ - \1/" | sed 's/60666/\${VSITE_SFTP_PORT}/' | sed 's/60667/\${VSITE_SSH_PORT}/' | sed 's/60668/${VSITE_MYSQL_PORT}/' | sed 's/60669/${VSITE_PHPMYADMIN_PORT}/' > ${VSITE_COMPOSE_PROJECT_VARIANT}/${GENNAME}.yml
+bin/docker-compose -f ${VSITE_COMPOSE_PROJECT_VARIANT}/${BASE}.yml $CONFIGS config | sed 's/{VSITE/\${VSITE/g' | sed "s/ \([^[:space:]]*\): ''$/ - \1/" | sed 's/60666/\${VSITE_SFTP_PORT}/' | sed 's/60667/\${VSITE_SSH_PORT}/' | sed 's/60668/${VSITE_MYSQL_PORT}/' | sed 's/60669/${VSITE_PHPMYADMIN_PORT}/' | sed 's/60670/${VSITE_BACKUP_PORT}/' > ${VSITE_COMPOSE_PROJECT_VARIANT}/${GENNAME}.yml
