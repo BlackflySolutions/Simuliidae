@@ -1,6 +1,6 @@
 {
   "11.0": {
-    "civicrmVersion": "5.78.1",
+    "civicrmVersion": "5.78.2",
     "version": "11.0.5",
     "url": "https://ftp.drupal.org/files/projects/drupal-11.0.5.tar.gz",
     "md5": "f62f72f1420cf374030f4cdc95e70dc6",
@@ -17,7 +17,7 @@
     }
   },
   "10.3": {
-    "civicrmVersion": "5.78.1",
+    "civicrmVersion": "5.78.2",
     "version": "10.3.6",
     "url": "https://ftp.drupal.org/files/projects/drupal-10.3.6.tar.gz",
     "md5": "7b0f59c9fc1e3a0b753343cd0893eea6",
@@ -35,7 +35,7 @@
     }
   },
   "10.2": {
-    "civicrmVersion": "5.78.1",
+    "civicrmVersion": "5.78.2",
     "version": "10.2.9",
     "url": "https://ftp.drupal.org/files/projects/drupal-10.2.9.tar.gz",
     "md5": "599453278ecdae4a673b0d05e91c3b44",
@@ -53,7 +53,7 @@
     }
   },
   "10.1": {
-    "civicrmVersion": "5.78.1",
+    "civicrmVersion": "5.78.2",
     "version": "10.1.8",
     "url": "https://ftp.drupal.org/files/projects/drupal-10.1.8.tar.gz",
     "md5": "2ea6f94091de2760908557dd3bb1956a",
@@ -71,7 +71,7 @@
     }
   },
   "7": {
-    "civicrmVersion": "5.78.1",
+    "civicrmVersion": "5.78.2",
     "version": "7.101",
     "url": "https://ftp.drupal.org/files/projects/drupal-7.101.tar.gz",
     "md5": "ddcd8cb4e885ae865a3d1a8b06707a67",
