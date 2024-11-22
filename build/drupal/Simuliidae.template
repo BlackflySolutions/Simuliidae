@@ -64,7 +64,11 @@ RUN apt-get update \
   sed -i 's/#LogLevel INFO/LogLevel DEBUG/g' /etc/ssh/sshd_config
 {{ if env.version | startswith("7") then ( -}}
 # hard-coded drush version, may need updating sometimes
+{{ if env.phpVersion | startswith("8") then ( -}}
+RUN curl -L -o /usr/local/bin/drush https://github.com/drush-ops/drush/releases/download/8.4.12/drush.phar
+{{ ) else ( -}}
 RUN curl -L -o /usr/local/bin/drush https://github.com/drush-ops/drush/releases/download/8.4.11/drush.phar
+{{ ) end -}}
 RUN chmod ugo+x /usr/local/bin/drush
 {{ ) else ( -}}
 # For composer projects, we can just extend $PATH to get access to drush
@@ -129,7 +133,11 @@ RUN composer require --no-update drush/drush:11.x --dev
 {{ if env.version | startswith("9") then ( -}}
 RUN composer require --no-update drush/drush:11.x --dev
 {{ ) else ( -}}
+{{ if env.version | startswith("11") then ( -}}
 RUN composer require --no-update drush/drush --dev
+{{ ) else ( -}}
+RUN composer require --no-update drush/drush:12.x --dev
+{{ ) end -}}
 {{ ) end -}}
 {{ ) end -}}
 RUN echo "Building with Drupal version $DRUPAL_VERSION"
