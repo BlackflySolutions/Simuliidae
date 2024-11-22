@@ -58,7 +58,7 @@ RUN apt-get update \
   sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config && \
   sed -i 's/#LogLevel INFO/LogLevel DEBUG/g' /etc/ssh/sshd_config
 # hard-coded drush version, may need updating sometimes
-RUN curl -L -o /usr/local/bin/drush https://github.com/drush-ops/drush/releases/download/8.4.11/drush.phar
+RUN curl -L -o /usr/local/bin/drush https://github.com/drush-ops/drush/releases/download/8.4.12/drush.phar
 RUN chmod ugo+x /usr/local/bin/drush
 # Add this version's collection of admin convenience scripts [these are version specific and evolve!]
 COPY admin/*sh /usr/local/bin/

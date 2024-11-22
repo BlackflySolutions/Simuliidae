@@ -107,7 +107,7 @@ RUN set -eux; \
 	composer create-project --no-interaction --no-install "drupal/recommended-project:$DRUPAL_VERSION" ./;
 RUN composer config extra.enable-patching true
 RUN composer config --no-plugins allow-plugins.cweagans/composer-patches true
-RUN composer require --no-update drush/drush --dev
+RUN composer require --no-update drush/drush:12.x --dev
 RUN echo "Building with Drupal version $DRUPAL_VERSION"
 RUN composer require --no-update drupal/core:${DRUPAL_VERSION} --update-with-all-dependencies
 RUN composer update 
