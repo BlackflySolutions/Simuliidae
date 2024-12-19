@@ -1,0 +1,27 @@
+# additions and changes to base.yml to 
+# provide host-mounted shared code analogous to a distro
+# if the host-mounted directories don't exist, you'll get errors starting up containers
+version: '3.4'
+
+services:
+
+  vhttp:
+    volumes:
+    - /var/www/drupal/git_deploy_cache:/tmp/git_deploy:rw
+    - /var/www/drupal/10.3/host:/var/www/drupal/web/sites/all/host:ro
+    - /var/www/drupal/libraries:/var/www/drupal/web/sites/all/libraries:ro
+    - /var/www/drupal/10.3/modules:/var/www/drupal/web/sites/all/modules/contrib:ro
+    - /var/www/drupal/10.3/features:/var/www/drupal/web/sites/all/modules/features:ro
+    - /var/www/drupal/10.3/themes:/var/www/drupal/web/sites/all/themes/contrib:ro
+    - /var/www/civicrm/vendor:/var/www/drupal/web/vendor/host:ro
+
+  admin:
+    volumes:
+    - /var/backup/docker/{VSITE}:/var/backup:rw
+    - /var/www/drupal/git_deploy_cache:/tmp/git_deploy:rw
+    - /var/www/drupal/10.3/host:/var/www/drupal/web/sites/all/host:ro
+    - /var/www/drupal/libraries:/var/www/drupal/web/sites/all/libraries:ro
+    - /var/www/drupal/10.3/modules:/var/www/drupal/web/sites/all/modules/contrib:ro
+    - /var/www/drupal/10.3/features:/var/www/drupal/web/sites/all/modules/features:ro
+    - /var/www/drupal/10.3/themes:/var/www/drupal/web/sites/all/themes/contrib:ro
+    - /var/www/civicrm/vendor:/var/www/drupal/web/vendor/host:ro
