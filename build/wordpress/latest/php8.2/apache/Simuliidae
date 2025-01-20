@@ -84,8 +84,8 @@ FROM admin-base as admin-build-cms
 # copied from the wordpress Dockerfile, the non-cli bits - build it in /usr/src and then use the CP
 # to get it in the admin-cms image
 RUN set -eux; \
-	version='6.3.1'; \
-	sha1='052777aef40e7f627c63c8a26eefe37b843a44df'; \
+	version='6.7.1'; \
+	sha1='dfb745d4067368bb9a9491f2b6f7e8d52d740fd1'; \
 	\
 	curl -o wordpress.tar.gz -fL "https://wordpress.org/wordpress-$version.tar.gz"; \
 	echo "$sha1 *wordpress.tar.gz" | sha1sum -c -; \
@@ -117,7 +117,7 @@ VOLUME /var/www/html
 
 # Step 4: from the admin-build-cms, add the crm files
 FROM admin-build-cms as admin-build-crm
-ENV CIVICRM_VERSION 5.65.0
+ENV CIVICRM_VERSION 5.81.0
 
 RUN mkdir /var/www/html/wp-content/uploads
 

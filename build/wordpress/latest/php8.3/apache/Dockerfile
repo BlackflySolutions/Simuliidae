@@ -5,7 +5,7 @@
 #
 
 # create as a "base" without the wordpress code
-FROM php:8.1-apache as wordpress-base
+FROM php:8.3-apache as wordpress-base
 
 # persistent dependencies
 RUN set -eux; \

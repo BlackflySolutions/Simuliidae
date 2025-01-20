@@ -1,4 +1,4 @@
+latest/php8.3/apache
 latest/php8.2/apache
 latest/php8.1/apache
-latest/php8.0/apache
 latest/php7.4/apache
