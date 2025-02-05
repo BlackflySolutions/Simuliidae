@@ -10,7 +10,7 @@
     "variants": [
       "apache"
     ],
-    "civicrmVersion": "5.81.0",
+    "civicrmVersion": "5.81.1",
     "version": "6.7.1"
   }
 }
