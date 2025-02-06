@@ -83,8 +83,8 @@ FROM admin-minimal as admin-base
 # Step 3: from the admin-base, add the CMS code, and then copy it over to the vhttp-base as the vhttp-cms
 FROM admin-base as admin-build-cms
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 7.102
-ENV DRUPAL_MD5 3e97344b47cc87b0f51fc2048f38ee0b
+ENV DRUPAL_VERSION 7.103
+ENV DRUPAL_MD5 9330ed0dd9926e82b06afb9cf236d5f6
 RUN set -eux; \
 	curl -fSL "https://ftp.drupal.org/files/projects/drupal-${DRUPAL_VERSION}.tar.gz" -o drupal.tar.gz; \
 	echo "${DRUPAL_MD5} *drupal.tar.gz" | md5sum -c -; \
@@ -92,7 +92,7 @@ RUN set -eux; \
 	rm drupal.tar.gz; \
 	chown -R drupal:www-data sites modules themes;
 FROM admin-build-cms as admin-build-crm
-ENV CIVICRM_VERSION 5.79.0
+ENV CIVICRM_VERSION 5.82.0
 RUN set -eux; \
         cd sites/all/modules; \
         curl -L "https://download.civicrm.org/civicrm-${CIVICRM_VERSION}-drupal.tar.gz" | tar xvz; \
