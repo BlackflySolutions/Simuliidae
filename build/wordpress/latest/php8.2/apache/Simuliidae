@@ -118,7 +118,7 @@ VOLUME /var/www/html
 
 # Step 4: from the admin-build-cms, add the crm files
 FROM admin-build-cms as admin-build-crm
-ENV CIVICRM_VERSION 5.81.0
+ENV CIVICRM_VERSION 5.81.1
 
 RUN mkdir /var/www/html/wp-content/uploads
 
