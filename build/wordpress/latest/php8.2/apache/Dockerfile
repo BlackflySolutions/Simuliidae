@@ -23,6 +23,7 @@ RUN set -ex; \
 	\
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
+		libavif-dev \
 		libfreetype6-dev \
 		libicu-dev \
 		libjpeg-dev \
@@ -37,6 +38,7 @@ RUN set -ex; \
 	; \
 	\
 	docker-php-ext-configure gd \
+		--with-avif \
 		--with-freetype \
 		--with-jpeg \
 		--with-webp \
@@ -56,11 +58,18 @@ RUN set -ex; \
 		imap \
 	; \
 # https://pecl.php.net/package/imagick
-	pecl install imagick-3.6.0; \
-	docker-php-ext-enable imagick; \
-	pecl install -o redis && docker-php-ext-enable redis; \
-	pecl install -o apcu && docker-php-ext-enable apcu; \
-	rm -r /tmp/pear; \
+# https://github.com/Imagick/imagick/commit/5ae2ecf20a1157073bad0170106ad0cf74e01cb6 (causes a lot of build failures, but strangely only intermittent ones 🤔)
+# see also https://github.com/Imagick/imagick/pull/641
+# this is "pecl install imagick-3.7.0", but by hand so we can apply a small hack / part of the above commit
+	curl -fL -o imagick.tgz 'https://pecl.php.net/get/imagick-3.7.0.tgz'; \
+	echo '5a364354109029d224bcbb2e82e15b248be9b641227f45e63425c06531792d3e *imagick.tgz' | sha256sum -c -; \
+	tar --extract --directory /tmp --file imagick.tgz imagick-3.7.0; \
+	grep '^//#endif$' /tmp/imagick-3.7.0/Imagick.stub.php; \
+	test "$(grep -c '^//#endif$' /tmp/imagick-3.7.0/Imagick.stub.php)" = '1'; \
+	sed -i -e 's!^//#endif$!#endif!' /tmp/imagick-3.7.0/Imagick.stub.php; \
+	grep '^//#endif$' /tmp/imagick-3.7.0/Imagick.stub.php && exit 1 || :; \
+	docker-php-ext-install /tmp/imagick-3.7.0; \
+	rm -rf imagick.tgz /tmp/imagick-3.7.0; \
 	\
 # some misbehaving extensions end up outputting to stdout 🙈 (https://github.com/docker-library/wordpress/issues/669#issuecomment-993945967)
 	out="$(php -r 'exit(0);')"; \
@@ -74,7 +83,7 @@ RUN set -ex; \
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
 	ldd "$extDir"/*.so \
-		| awk '/=>/ { so = $(NF-1); if (index(so, "/usr/local/") == 1) { next }; gsub("^/(usr/)?", "", so); print so }' \
+		| awk '/=>/ { so = $(NF-1); if (index(so, "/usr/local/") == 1) { next }; gsub("^/(usr/)?", "", so); printf "*%s\n", so }' \
 		| sort -u \
 		| xargs -r dpkg-query --search \
 		| cut -d: -f1 \
@@ -134,8 +143,8 @@ RUN set -eux; \
 	find /etc/apache2 -type f -name '*.conf' -exec sed -ri 's/([[:space:]]*LogFormat[[:space:]]+"[^"]*)%h([^"]*")/\1%a\2/g' '{}' +
 FROM wordpress-base
 RUN set -eux; \
-	version='6.3.1'; \
-	sha1='052777aef40e7f627c63c8a26eefe37b843a44df'; \
+	version='6.7.1'; \
+	sha1='dfb745d4067368bb9a9491f2b6f7e8d52d740fd1'; \
 	\
 	curl -o wordpress.tar.gz -fL "https://wordpress.org/wordpress-$version.tar.gz"; \
 	echo "$sha1 *wordpress.tar.gz" | sha1sum -c -; \

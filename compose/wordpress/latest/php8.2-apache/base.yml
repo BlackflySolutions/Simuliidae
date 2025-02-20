@@ -26,7 +26,7 @@ services:
       - vwp:/var/www/html
 
   vsql:
-    image: blackflysolutions/mariadb:10.4
+    image: blackflysolutions/mariadb:{VSITE_MARIADB_VER-10.4}
     environment:
       - MYSQL_DATABASE
       - MYSQL_USER

@@ -59,6 +59,7 @@ RUN curl -L -o /usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/builds
 RUN chmod u+x /usr/local/bin/wp
 # Add this version's collection of admin convenience scripts [these are version specific and evolve!]
 COPY admin/*sh /usr/local/bin/
+COPY wp-config-docker.php /usr/local/bin/
 # Include a copy of the cv civicrm command line utility
 RUN curl -LsS https://download.civicrm.org/cv/cv.phar -o /usr/local/bin/cv
 # make sure all my scripts are executable
@@ -84,8 +85,8 @@ FROM admin-base as admin-build-cms
 # copied from the wordpress Dockerfile, the non-cli bits - build it in /usr/src and then use the CP
 # to get it in the admin-cms image
 RUN set -eux; \
-	version='6.3.1'; \
-	sha1='052777aef40e7f627c63c8a26eefe37b843a44df'; \
+	version='6.7.1'; \
+	sha1='dfb745d4067368bb9a9491f2b6f7e8d52d740fd1'; \
 	\
 	curl -o wordpress.tar.gz -fL "https://wordpress.org/wordpress-$version.tar.gz"; \
 	echo "$sha1 *wordpress.tar.gz" | sha1sum -c -; \
@@ -117,7 +118,7 @@ VOLUME /var/www/html
 
 # Step 4: from the admin-build-cms, add the crm files
 FROM admin-build-cms as admin-build-crm
-ENV CIVICRM_VERSION 5.65.0
+ENV CIVICRM_VERSION 5.81.1
 
 RUN mkdir /var/www/html/wp-content/uploads
 
