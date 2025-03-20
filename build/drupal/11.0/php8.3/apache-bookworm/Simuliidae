@@ -101,7 +101,7 @@ RUN npm install -g bower
 # Step 3: from the admin-base, add the CMS code, and then copy it over to the vhttp-base as the vhttp-cms
 FROM admin-base as admin-build-cms
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 11.0.12
+ENV DRUPAL_VERSION 11.0.13
 USER drupal:www-data
 RUN set -eux; \
 	composer create-project --no-interaction --no-install "drupal/recommended-project:$DRUPAL_VERSION" ./;
@@ -113,7 +113,7 @@ RUN composer require --no-update drupal/core:${DRUPAL_VERSION} --update-with-all
 RUN composer update 
 #	chown -R drupal:www-data web/sites web/modules web/themes; 
 FROM admin-build-cms as admin-build-crm
-ENV CIVICRM_VERSION 5.82.0
+ENV CIVICRM_VERSION 6.0.2
 RUN set -eux; \
   composer config extra.enable-patching true; \
   composer config minimum-stability dev; \
