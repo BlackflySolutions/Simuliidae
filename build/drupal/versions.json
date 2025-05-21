@@ -1,11 +1,11 @@
 {
   "11.1": {
-    "civicrmVersion": "6.0.2",
-    "version": "11.1.5",
-    "url": "https://ftp.drupal.org/files/projects/drupal-11.1.5.tar.gz",
-    "md5": "7411355140798b10877987ac5c3457fe",
-    "date": 1742407823,
-    "notes": "https://www.drupal.org/project/drupal/releases/11.1.5",
+    "civicrmVersion": "6.2.0",
+    "version": "11.1.7",
+    "url": "https://ftp.drupal.org/files/projects/drupal-11.1.7.tar.gz",
+    "md5": "31c4313357bb0fac1a0f52135d766539",
+    "date": 1746678183,
+    "notes": "https://www.drupal.org/project/drupal/releases/11.1.7",
     "phpVersions": [
       "8.4",
       "8.3"
@@ -18,14 +18,13 @@
     }
   },
   "11.0": {
-    "civicrmVersion": "6.0.2",
+    "civicrmVersion": "6.2.0",
     "version": "11.0.13",
     "url": "https://ftp.drupal.org/files/projects/drupal-11.0.13.tar.gz",
     "md5": "9800603f7abeb684189ac4ec17d79a3e",
     "date": 1742408477,
     "notes": "https://www.drupal.org/project/drupal/releases/11.0.13",
     "phpVersions": [
-      "8.4",
       "8.3"
     ],
     "variants": [
@@ -36,12 +35,12 @@
     }
   },
   "10.4": {
-    "civicrmVersion": "6.0.2",
-    "version": "10.4.5",
-    "url": "https://ftp.drupal.org/files/projects/drupal-10.4.5.tar.gz",
-    "md5": "d9d2e0e3b43fb64f4fa3e41b0e2a5f21",
-    "date": 1742409107,
-    "notes": "https://www.drupal.org/project/drupal/releases/10.4.5",
+    "civicrmVersion": "6.2.0",
+    "version": "10.4.7",
+    "url": "https://ftp.drupal.org/files/projects/drupal-10.4.7.tar.gz",
+    "md5": "3ee542f57bfb6140ae05d29d11918df5",
+    "date": 1746678757,
+    "notes": "https://www.drupal.org/project/drupal/releases/10.4.7",
     "phpVersions": [
       "8.4",
       "8.3"
@@ -54,7 +53,7 @@
     }
   },
   "10.3": {
-    "civicrmVersion": "6.0.2",
+    "civicrmVersion": "6.2.0",
     "version": "10.3.14",
     "url": "https://ftp.drupal.org/files/projects/drupal-10.3.14.tar.gz",
     "md5": "0511f20f69caa44181fadbe23bc4d03f",

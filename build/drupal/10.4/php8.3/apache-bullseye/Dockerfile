@@ -87,8 +87,8 @@ RUN { \
 FROM drupal-base
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
 
-# 2025-03-19: https://www.drupal.org/project/drupal/releases/10.4.5
-ENV DRUPAL_VERSION 10.4.5
+# 2025-05-08: https://www.drupal.org/project/drupal/releases/10.4.7
+ENV DRUPAL_VERSION 10.4.7
 
 # https://github.com/docker-library/drupal/pull/259
 # https://github.com/moby/buildkit/issues/4503
