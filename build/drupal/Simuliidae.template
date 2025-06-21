@@ -8,7 +8,7 @@ ARG REPOSITORY_FROM=
 # Requires the VARIANT_TAG argument, which may be either the base or non-base version [??]
 ARG VARIANT_TAG=
 # Step 1. build the basic web service, a slightly extended version of the corresonding drupal modified base image.
-FROM ${REPOSITORY_FROM}drupal:base-${VARIANT_TAG} as vhttp-base
+FROM ${REPOSITORY_FROM}drupal:base-${VARIANT_TAG} AS vhttp-base
 # We create a drupal user to own all the code, using Dries birth year as the uid
 RUN useradd -u 1978 -g www-data -ms /bin/bash drupal
 {{ if env.version | startswith("7") then ( -}}
@@ -56,7 +56,7 @@ CMD ["apache2-foreground"]
 # Step 2: build a basic admin service, adding some bits to the vhttp-base
 # Admin runs sshd as it's CMD by default, but can be used to, e.g. do automated setup.
 # We'll first build admin-minimal that we'll use later as a base for admin-build
-FROM vhttp-base as admin-minimal
+FROM vhttp-base AS admin-minimal
 RUN apt-get update \
   && apt-get install -y mariadb-client sudo vim less zip unzip netcat-traditional ssh rsync openssh-server restic \
   && apt-get purge -y && \
@@ -96,7 +96,7 @@ CMD ["/entrypoint-sshd.sh"]
 # setup.sh runs the drupal and civicrm setup scripts and handles some ownership/permissions
 COPY setup.sh /setup.sh
 RUN chmod 775 /setup.sh
-FROM admin-minimal as admin-base
+FROM admin-minimal AS admin-base
 {{ if env.version | startswith("7") then "" else ( -}}
 # add composer, uses (default) version 2
 COPY --from=composer:{{ .composer.version }} /usr/bin/composer /usr/local/bin/
@@ -110,7 +110,7 @@ RUN apt-get update && apt-get install -y ca-certificates curl gnupg && \
 RUN npm install -g bower
 {{ ) end -}}
 # Step 3: from the admin-base, add the CMS code, and then copy it over to the vhttp-base as the vhttp-cms
-FROM admin-base as admin-build-cms
+FROM admin-base AS admin-build-cms
 # https://www.drupal.org/node/3060/release
 ENV DRUPAL_VERSION {{ .version }}
 {{ if env.version | startswith("7") then ( -}}
@@ -145,7 +145,7 @@ RUN composer require --no-update drupal/core:${DRUPAL_VERSION} --update-with-all
 RUN composer update 
 #	chown -R drupal:www-data web/sites web/modules web/themes; 
 {{ ) end -}}
-FROM admin-build-cms as admin-build-crm
+FROM admin-build-cms AS admin-build-crm
 ENV CIVICRM_VERSION {{ .civicrmVersion }}
 {{ if env.version | startswith("7") then ( -}}
 RUN set -eux; \
@@ -166,25 +166,25 @@ RUN \
   composer config --no-plugins allow-plugins.civicrm/composer-compile-plugin true; \
   composer update;
 {{ ) end -}}
-FROM vhttp-base as vhttp-cms
+FROM vhttp-base AS vhttp-cms
 {{ if env.version | startswith("7") then ( -}}
 COPY --from=admin-build-cms /var/www/html .
 {{ ) else ( -}}
 COPY --from=admin-build-cms /var/www/drupal .
 {{ ) end -}}
-FROM vhttp-base as vhttp-crm
+FROM vhttp-base AS vhttp-crm
 {{ if env.version | startswith("7") then ( -}}
 COPY --from=admin-build-crm /var/www/html .
 {{ ) else ( -}}
 COPY --from=admin-build-crm /var/www/drupal .
 {{ ) end -}}
-FROM admin-minimal as admin-cms
+FROM admin-minimal AS admin-cms
 {{ if env.version | startswith("7") then ( -}}
 COPY --from=admin-build-cms /var/www/html .
 {{ ) else ( -}}
 COPY --from=admin-build-cms /var/www/drupal .
 {{ ) end -}}
-FROM admin-minimal as admin-crm
+FROM admin-minimal AS admin-crm
 {{ if env.version | startswith("7") then ( -}}
 COPY --from=admin-build-crm /var/www/html .
 {{ ) else ( -}}
