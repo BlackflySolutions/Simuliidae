@@ -18,7 +18,7 @@ WORKDIR /var/www/html
 # change the document root as per https://hub.docker.com/_/php/
 # because I want to build my code with composer and this is how I've been doing it ...
 RUN mkdir -p /var/www/drupal
-ENV APACHE_DOCUMENT_ROOT /var/www/drupal/web
+ENV APACHE_DOCUMENT_ROOT=/var/www/drupal/web
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 WORKDIR /var/www/drupal
