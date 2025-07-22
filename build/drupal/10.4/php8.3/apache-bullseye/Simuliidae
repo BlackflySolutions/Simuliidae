@@ -20,7 +20,7 @@ RUN useradd -u 1978 -g www-data -ms /bin/bash drupal
 # change the document root as per https://hub.docker.com/_/php/
 # because I want to build my code with composer and this is how I've been doing it ...
 RUN mkdir -p /var/www/drupal
-ENV APACHE_DOCUMENT_ROOT /var/www/drupal/web
+ENV APACHE_DOCUMENT_ROOT=/var/www/drupal/web
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 WORKDIR /var/www/drupal
@@ -59,7 +59,7 @@ CMD ["apache2-foreground"]
 # We'll first build admin-minimal that we'll use later as a base for admin-build
 FROM vhttp-base AS admin-minimal
 RUN apt-get update \
-  && apt-get install -y mariadb-client sudo vim less zip unzip netcat-traditional ssh rsync openssh-server restic \
+  && apt-get install -y mariadb-client sudo vim less zip unzip netcat-traditional ssh rsync openssh-server \
   && apt-get purge -y && \
   sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config && \
   sed -i 's/#LogLevel INFO/LogLevel DEBUG/g' /etc/ssh/sshd_config
@@ -87,6 +87,7 @@ CMD ["/entrypoint-sshd.sh"]
 # setup.sh runs the drupal and civicrm setup scripts and handles some ownership/permissions
 COPY setup.sh /setup.sh
 RUN chmod 775 /setup.sh
+COPY --from=restic/restic:0.18.0 /usr/bin/restic /usr/bin/
 FROM admin-minimal AS admin-base
 # add composer, uses (default) version 2
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
@@ -101,7 +102,7 @@ RUN npm install -g bower
 # Step 3: from the admin-base, add the CMS code, and then copy it over to the vhttp-base as the vhttp-cms
 FROM admin-base AS admin-build-cms
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 10.4.5
+ENV DRUPAL_VERSION 10.4.7
 USER drupal:www-data
 RUN set -eux; \
 	composer create-project --no-interaction --no-install "drupal/recommended-project:$DRUPAL_VERSION" ./;
@@ -113,7 +114,7 @@ RUN composer require --no-update drupal/core:${DRUPAL_VERSION} --update-with-all
 RUN composer update 
 #	chown -R drupal:www-data web/sites web/modules web/themes; 
 FROM admin-build-cms AS admin-build-crm
-ENV CIVICRM_VERSION 6.0.2
+ENV CIVICRM_VERSION 6.2.0
 RUN set -eux; \
   composer config extra.enable-patching true; \
   composer config minimum-stability dev; \

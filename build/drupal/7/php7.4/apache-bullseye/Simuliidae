@@ -53,7 +53,7 @@ CMD ["apache2-foreground"]
 # We'll first build admin-minimal that we'll use later as a base for admin-build
 FROM vhttp-base AS admin-minimal
 RUN apt-get update \
-  && apt-get install -y mariadb-client sudo vim less zip unzip netcat-traditional ssh rsync openssh-server restic \
+  && apt-get install -y mariadb-client sudo vim less zip unzip netcat-traditional ssh rsync openssh-server \
   && apt-get purge -y && \
   sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config && \
   sed -i 's/#LogLevel INFO/LogLevel DEBUG/g' /etc/ssh/sshd_config
@@ -79,6 +79,7 @@ CMD ["/entrypoint-sshd.sh"]
 # setup.sh runs the drupal and civicrm setup scripts and handles some ownership/permissions
 COPY setup.sh /setup.sh
 RUN chmod 775 /setup.sh
+COPY --from=restic/restic:0.18.0 /usr/bin/restic /usr/bin/
 FROM admin-minimal AS admin-base
 # Step 3: from the admin-base, add the CMS code, and then copy it over to the vhttp-base as the vhttp-cms
 FROM admin-base AS admin-build-cms

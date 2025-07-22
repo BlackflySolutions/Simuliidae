@@ -1,0 +1,15 @@
+# additions and changes to base.yml to 
+# provide host-mounted shared code analogous to a distro
+# if the host-mounted directories don't exist, you'll get errors starting up containers
+version: '3.4'
+
+services:
+
+  vhttp:
+    volumes:
+    - /var/www/drupal/10.4/host:/var/www/drupal/web/sites/all/host:ro
+
+  admin:
+    volumes:
+    - /var/backup/docker/{VSITE}:/var/backup:rw
+    - /var/www/drupal/10.4/host:/var/www/drupal/web/sites/all/host:ro
