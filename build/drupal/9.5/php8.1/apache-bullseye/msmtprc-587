@@ -1,0 +1,20 @@
+# A system wide configuration file is optional.
+# If it exists, it usually defines a default account.
+# This allows msmtp to be used like /usr/sbin/sendmail.
+account default
+
+# The SMTP smarthost, our docker host
+host mail
+
+# Use port 587 because I'm going to shut down port 25!
+port 587
+tls on
+tls_starttls on
+# because my host above doesn't match the ssl name!
+tls_certcheck off
+
+# Construct envelope-from addresses of the form "user@oursite.example"
+#from %U@oursite.example
+
+# Syslog logging with facility LOG_MAIL instead of the default LOG_USER
+syslog LOG_MAIL

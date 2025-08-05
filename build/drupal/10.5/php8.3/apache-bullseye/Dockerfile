@@ -6,7 +6,7 @@
 
 # https://www.drupal.org/docs/system-requirements/php-requirements
 # create as a "base" that doesn't include the drupal code
-FROM php:8.2-apache-bullseye AS drupal-base
+FROM php:8.3-apache-bullseye AS drupal-base
 
 # install the PHP extensions we need
 RUN set -eux; \
@@ -60,7 +60,6 @@ RUN set -eux; \
         pecl install -o imagick && docker-php-ext-enable imagick; \
         pecl install -o redis && docker-php-ext-enable redis; \
         pecl install -o apcu && docker-php-ext-enable apcu; \
-        pecl install -o mcrypt-1.0.5 && docker-php-ext-enable mcrypt; \
         docker-php-ext-install exif; \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
@@ -86,6 +85,7 @@ RUN { \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
 FROM drupal-base
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
 
 # https://www.drupal.org/node/3298550
 # Drupal now recommends sites enable PHP output buffering by default, if PHP is run as a server module
@@ -95,16 +95,28 @@ RUN { \
       } > /usr/local/etc/php/conf.d/docker-php-drupal-recommended.ini
 
 
-# 2024-12-04: https://www.drupal.org/project/drupal/releases/7.103
-ENV DRUPAL_VERSION 7.103
-ENV DRUPAL_URL https://ftp.drupal.org/files/projects/drupal-7.103.tar.gz
-ENV DRUPAL_MD5 9330ed0dd9926e82b06afb9cf236d5f6
+# 2025-06-26: https://www.drupal.org/project/drupal/releases/10.5.1
+ENV DRUPAL_VERSION 10.5.1
 
+# https://github.com/docker-library/drupal/pull/259
+# https://github.com/moby/buildkit/issues/4503
+# https://github.com/composer/composer/issues/11839
+# https://github.com/composer/composer/issues/11854
+# https://github.com/composer/composer/blob/94fe2945456df51e122a492b8d14ac4b54c1d2ce/src/Composer/Console/Application.php#L217-L218
+ENV COMPOSER_ALLOW_SUPERUSER 1
+
+WORKDIR /opt/drupal
 RUN set -eux; \
-	curl -fSL "$DRUPAL_URL" -o drupal.tar.gz; \
-	echo "${DRUPAL_MD5} *drupal.tar.gz" | md5sum -c -; \
-	tar -xz --strip-components=1 -f drupal.tar.gz; \
-	rm drupal.tar.gz; \
-	chown -R www-data:www-data sites modules themes
+	export COMPOSER_HOME="$(mktemp -d)"; \
+	composer create-project --no-interaction "drupal/recommended-project:$DRUPAL_VERSION" ./; \
+# https://github.com/docker-library/drupal/pull/266#issuecomment-2273985526
+	composer check-platform-reqs; \
+	chown -R www-data:www-data web/sites web/modules web/themes; \
+	rmdir /var/www/html; \
+	ln -sf /opt/drupal/web /var/www/html; \
+	# delete composer cache
+	rm -rf "$COMPOSER_HOME"
+
+ENV PATH=${PATH}:/opt/drupal/vendor/bin
 
 # vim:set ft=dockerfile:
