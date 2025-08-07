@@ -95,8 +95,8 @@ RUN { \
       } > /usr/local/etc/php/conf.d/docker-php-drupal-recommended.ini
 
 
-# 2025-06-26: https://www.drupal.org/project/drupal/releases/10.5.1
-ENV DRUPAL_VERSION 10.5.1
+# 2025-08-07: https://www.drupal.org/project/drupal/releases/10.5.2
+ENV DRUPAL_VERSION 10.5.2
 
 # https://github.com/docker-library/drupal/pull/259
 # https://github.com/moby/buildkit/issues/4503
