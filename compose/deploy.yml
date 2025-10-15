@@ -70,7 +70,7 @@ services:
       simuliidae.civicrm.version: "{VSITE_CIVICRM_VER}"
     volumes:
       - /var/backup/{VSITE_ORIGIN_NODE-docker}/{VSITE}/:/var/restore/
-      - /home/drupal/.ssh:/home/drupal/.ssh:ro
+      - /home/drupal:/home/drupal:ro
       - /home/backup/.ssh:/root/.backup-ssh:ro
     deploy:
       placement:

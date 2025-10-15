@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+
+  admin:
+    volumes:
+      - vuser:/home/drupal
+
+volumes:
+  vuser:
