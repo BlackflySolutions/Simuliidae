@@ -57,19 +57,13 @@ RUN set -ex; \
 		gettext \
 		imap \
 	; \
+       # docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
 # https://pecl.php.net/package/imagick
-# https://github.com/Imagick/imagick/commit/5ae2ecf20a1157073bad0170106ad0cf74e01cb6 (causes a lot of build failures, but strangely only intermittent ones 🤔)
-# see also https://github.com/Imagick/imagick/pull/641
-# this is "pecl install imagick-3.7.0", but by hand so we can apply a small hack / part of the above commit
-	curl -fL -o imagick.tgz 'https://pecl.php.net/get/imagick-3.7.0.tgz'; \
-	echo '5a364354109029d224bcbb2e82e15b248be9b641227f45e63425c06531792d3e *imagick.tgz' | sha256sum -c -; \
-	tar --extract --directory /tmp --file imagick.tgz imagick-3.7.0; \
-	grep '^//#endif$' /tmp/imagick-3.7.0/Imagick.stub.php; \
-	test "$(grep -c '^//#endif$' /tmp/imagick-3.7.0/Imagick.stub.php)" = '1'; \
-	sed -i -e 's!^//#endif$!#endif!' /tmp/imagick-3.7.0/Imagick.stub.php; \
-	grep '^//#endif$' /tmp/imagick-3.7.0/Imagick.stub.php && exit 1 || :; \
-	docker-php-ext-install /tmp/imagick-3.7.0; \
-	rm -rf imagick.tgz /tmp/imagick-3.7.0; \
+	pecl install imagick-3.8.0; \
+	docker-php-ext-enable imagick; \
+	pecl install -o redis && docker-php-ext-enable redis; \
+	pecl install -o apcu && docker-php-ext-enable apcu; \
+	rm -r /tmp/pear; \
 	\
 # some misbehaving extensions end up outputting to stdout 🙈 (https://github.com/docker-library/wordpress/issues/669#issuecomment-993945967)
 	out="$(php -r 'exit(0);')"; \
@@ -143,8 +137,8 @@ RUN set -eux; \
 	find /etc/apache2 -type f -name '*.conf' -exec sed -ri 's/([[:space:]]*LogFormat[[:space:]]+"[^"]*)%h([^"]*")/\1%a\2/g' '{}' +
 FROM wordpress-base
 RUN set -eux; \
-	version='6.7.1'; \
-	sha1='dfb745d4067368bb9a9491f2b6f7e8d52d740fd1'; \
+	version='6.8.3'; \
+	sha1='fd56bcdc15f1877e45dce67942ea75949ed650e8'; \
 	\
 	curl -o wordpress.tar.gz -fL "https://wordpress.org/wordpress-$version.tar.gz"; \
 	echo "$sha1 *wordpress.tar.gz" | sha1sum -c -; \
@@ -184,6 +178,8 @@ VOLUME /var/www/html
 
 COPY --chown=www-data:www-data wp-config-docker.php /usr/src/wordpress/
 COPY docker-entrypoint.sh /usr/local/bin/
+# https://github.com/docker-library/wordpress/issues/969
+RUN ln -svfT docker-entrypoint.sh /usr/local/bin/docker-ensure-installed.sh
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]

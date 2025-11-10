@@ -5,7 +5,7 @@
 #
 
 # create as a "base" without the wordpress code
-FROM php:8.1-apache as wordpress-base
+FROM php:8.4-apache as wordpress-base
 
 # persistent dependencies
 RUN set -eux; \
@@ -43,7 +43,7 @@ RUN set -ex; \
 		--with-jpeg \
 		--with-webp \
 	; \
-	docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
+#	docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
 	docker-php-ext-install -j "$(nproc)" \
 		bcmath \
 		exif \
@@ -55,9 +55,10 @@ RUN set -ex; \
 		soap \
 		sockets \
 		gettext \
-		imap \
+#		imap \
 	; \
-       # docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
+       pecl install imap; \
+       docker-php-ext-enable imap; \
 # https://pecl.php.net/package/imagick
 	pecl install imagick-3.8.0; \
 	docker-php-ext-enable imagick; \
