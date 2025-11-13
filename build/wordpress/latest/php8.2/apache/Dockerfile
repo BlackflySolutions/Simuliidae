@@ -32,7 +32,6 @@ RUN set -ex; \
 		libwebp-dev \
 		libzip-dev \
 		libxml2-dev \
-		libc-client-dev \
 		libkrb5-dev \
 		libmcrypt-dev \
 	; \
