@@ -43,7 +43,6 @@ RUN set -eux; \
 	docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
 	docker-php-ext-install -j "$(nproc)" \
 		gd \
-		opcache \
 		pdo_mysql \
 		pdo_pgsql \
 		zip \
@@ -95,8 +94,8 @@ RUN { \
       } > /usr/local/etc/php/conf.d/docker-php-drupal-recommended.ini
 
 
-# 2025-06-06: https://www.drupal.org/project/drupal/releases/10.4.8
-ENV DRUPAL_VERSION 10.4.8
+# 2025-11-12: https://www.drupal.org/project/drupal/releases/10.4.9
+ENV DRUPAL_VERSION 10.4.9
 
 # https://github.com/docker-library/drupal/pull/259
 # https://github.com/moby/buildkit/issues/4503
