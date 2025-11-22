@@ -1,2 +1,4 @@
-latest/php8.2/apache
-latest/php8.3/apache
+latest/php8.1/apache-bookworm
+latest/php8.2/apache-bookworm
+latest/php8.3/apache-bookworm
+latest/php8.4/apache-bookworm

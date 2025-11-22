@@ -43,7 +43,6 @@ RUN set -eux; \
 	docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
 	docker-php-ext-install -j "$(nproc)" \
 		gd \
-		opcache \
 		pdo_mysql \
 		pdo_pgsql \
 		zip \
@@ -86,6 +85,15 @@ RUN { \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
 FROM drupal-base
+
+# https://www.drupal.org/node/3298550
+# Drupal now recommends sites enable PHP output buffering by default, if PHP is run as a server module
+# e.g. with Apache's mod_php
+RUN { \
+              echo 'output_buffering=true'; \
+      } > /usr/local/etc/php/conf.d/docker-php-drupal-recommended.ini
+
+
 # 2024-12-04: https://www.drupal.org/project/drupal/releases/7.103
 ENV DRUPAL_VERSION 7.103
 ENV DRUPAL_URL https://ftp.drupal.org/files/projects/drupal-7.103.tar.gz

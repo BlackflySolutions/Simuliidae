@@ -1,8 +1,7 @@
 7/php7.4/apache-bullseye
 7/php8.1/apache-bullseye
 7/php8.2/apache-bullseye
-10.3/php8.2/apache-bullseye
-10.3/php8.3/apache-bullseye
 10.4/php8.3/apache-bullseye
-11.0/php8.3/apache-bookworm
+10.5/php8.3/apache-bullseye
 11.1/php8.3/apache-bookworm
+11.2/php8.3/apache-bookworm

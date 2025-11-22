@@ -43,7 +43,6 @@ RUN set -eux; \
 	docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
 	docker-php-ext-install -j "$(nproc)" \
 		gd \
-		opcache \
 		pdo_mysql \
 		pdo_pgsql \
 		zip \
@@ -87,8 +86,16 @@ RUN { \
 FROM drupal-base
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
 
-# 2025-05-08: https://www.drupal.org/project/drupal/releases/11.1.7
-ENV DRUPAL_VERSION 11.1.7
+# https://www.drupal.org/node/3298550
+# Drupal now recommends sites enable PHP output buffering by default, if PHP is run as a server module
+# e.g. with Apache's mod_php
+RUN { \
+              echo 'output_buffering=true'; \
+      } > /usr/local/etc/php/conf.d/docker-php-drupal-recommended.ini
+
+
+# 2025-11-13: https://www.drupal.org/project/drupal/releases/11.1.9
+ENV DRUPAL_VERSION 11.1.9
 
 # https://github.com/docker-library/drupal/pull/259
 # https://github.com/moby/buildkit/issues/4503
