@@ -14,7 +14,7 @@ ARG REPOSITORY_FROM=
 # Requires the VARIANT_TAG argument, which may be either the base or non-base version [??]
 ARG VARIANT_TAG=
 # Step 1. build the basic web service, a slightly extended version of the corresonding drupal modified base image.
-FROM ${REPOSITORY_FROM}drupal:base-${VARIANT_TAG} as vhttp-base
+FROM ${REPOSITORY_FROM}drupal:base-${VARIANT_TAG} AS vhttp-base
 # We create a drupal user to own all the code, using Dries birth year as the uid
 RUN useradd -u 1978 -g www-data -ms /bin/bash drupal
 # use the default document root inherited from php/apache
@@ -51,7 +51,7 @@ CMD ["apache2-foreground"]
 # Step 2: build a basic admin service, adding some bits to the vhttp-base
 # Admin runs sshd as it's CMD by default, but can be used to, e.g. do automated setup.
 # We'll first build admin-minimal that we'll use later as a base for admin-build
-FROM vhttp-base as admin-minimal
+FROM vhttp-base AS admin-minimal
 RUN apt-get update \
   && apt-get install -y mariadb-client sudo vim less zip unzip netcat-traditional ssh rsync openssh-server \
   && apt-get purge -y && \
@@ -79,9 +79,10 @@ CMD ["/entrypoint-sshd.sh"]
 # setup.sh runs the drupal and civicrm setup scripts and handles some ownership/permissions
 COPY setup.sh /setup.sh
 RUN chmod 775 /setup.sh
-FROM admin-minimal as admin-base
+COPY --from=restic/restic:0.18.0 /usr/bin/restic /usr/bin/
+FROM admin-minimal AS admin-base
 # Step 3: from the admin-base, add the CMS code, and then copy it over to the vhttp-base as the vhttp-cms
-FROM admin-base as admin-build-cms
+FROM admin-base AS admin-build-cms
 # https://www.drupal.org/node/3060/release
 ENV DRUPAL_VERSION 7.103
 ENV DRUPAL_MD5 9330ed0dd9926e82b06afb9cf236d5f6
@@ -91,17 +92,17 @@ RUN set -eux; \
 	tar -xz --strip-components=1 -f drupal.tar.gz; \
 	rm drupal.tar.gz; \
 	chown -R drupal:www-data sites modules themes;
-FROM admin-build-cms as admin-build-crm
-ENV CIVICRM_VERSION 5.81.2
+FROM admin-build-cms AS admin-build-crm
+ENV CIVICRM_VERSION 5.82.0
 RUN set -eux; \
         cd sites/all/modules; \
         curl -L "https://download.civicrm.org/civicrm-${CIVICRM_VERSION}-drupal.tar.gz" | tar xvz; \
 	chown -R drupal:www-data civicrm;
-FROM vhttp-base as vhttp-cms
+FROM vhttp-base AS vhttp-cms
 COPY --from=admin-build-cms /var/www/html .
-FROM vhttp-base as vhttp-crm
+FROM vhttp-base AS vhttp-crm
 COPY --from=admin-build-crm /var/www/html .
-FROM admin-minimal as admin-cms
+FROM admin-minimal AS admin-cms
 COPY --from=admin-build-cms /var/www/html .
-FROM admin-minimal as admin-crm
+FROM admin-minimal AS admin-crm
 COPY --from=admin-build-crm /var/www/html .

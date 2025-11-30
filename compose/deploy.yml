@@ -53,7 +53,7 @@ services:
       replicas: 1
       resources:
         limits:
-          cpus: "{VSITE_HTTP_CPUS-2}"
+          cpus: "2"
           memory: "{VSITE_HTTP_MEMORY-800M}"
       restart_policy:
         max_attempts: 2
