@@ -1,0 +1,16 @@
+# to use this, we need to define:
+# VSITE_NETWORK
+version: '3.4'
+networks:
+  vsite_network:
+    external: true
+    name: "{VSITE_NETWORK}"
+services:
+  admin:
+    networks:
+      - default
+      - vsite_network
+  vhttp:
+    networks:
+      - default
+      - vsite_network
