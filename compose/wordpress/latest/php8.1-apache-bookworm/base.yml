@@ -1,0 +1,68 @@
+version: '3.4'
+
+services:
+
+  vhttp:
+    #image: simuliidae-wordpress:vhttp-base-latest-php8.1-apache
+    image: blackflysolutions/simuliidae-wordpress:vhttp-base-latest-php8.1-apache-bookworm
+    ports:
+      - "80/tcp"
+    expose:
+      - "80"
+    environment:
+      - WORDPRESS_DB_HOST
+      - WORDPRESS_DB_USER
+      - WORDPRESS_DB_PASSWORD
+      - WORDPRESS_DB_NAME
+      - WORDPRESS_TABLE_PREFIX
+      - VSITE
+      - VSITE_DOMAIN
+      - VSITE_DOMAIN_ALTERNATIVES
+      - WP_HOME=https://{VSITE_DOMAIN}
+      - WP_SITE_URL=https://{VSITE_DOMAIN}
+      - WP_MEMORY_LIMIT={VSITE_WP_MEMORY_LIMIT}
+
+    volumes:
+      - vwp:/var/www/html
+
+  vsql:
+    image: blackflysolutions/mariadb:10.4
+    environment:
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD
+    volumes:
+      - vdb:/var/lib/mysql
+
+  admin:
+    #image: simuliidae-wordpress:admin-base-latest-php8.1-apache
+    image: blackflysolutions/simuliidae-wordpress:admin-base-latest-php8.1-apache-bookworm
+    volumes:
+      - vwp:/var/www/html
+    environment:
+      - WORDPRESS_DB_HOST
+      - WORDPRESS_DB_USER
+      - WORDPRESS_DB_PASSWORD
+      - WORDPRESS_DB_NAME
+      - WORDPRESS_TABLE_PREFIX
+      - VSITE_SITE_NAME
+      - VSITE_ADMIN_MAIL
+      - VSITE_ADMIN_NAME
+      - VSITE
+      - VSITE_DOMAIN
+      - VSITE_DOMAIN_ALTERNATIVES
+      - VSITE_CIVICRM_VER
+      - VSITE_WORDPRESS_VER
+      - WP_HOME=https://{VSITE_DOMAIN}
+      - WP_SITE_URL=https://{VSITE_DOMAIN}
+      - WP_MEMORY_LIMIT={VSITE_WP_MEMORY_LIMIT}
+
+    depends_on:
+      - vsql
+      - vhttp
+
+
+volumes:
+  vwp:
+  vdb:
