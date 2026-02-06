@@ -58,11 +58,6 @@ services:
       - WP_SITE_URL=https://{VSITE_DOMAIN}
       - WP_MEMORY_LIMIT={VSITE_WP_MEMORY_LIMIT}
 
-    depends_on:
-      - vsql
-      - vhttp
-
-
 volumes:
   vwp:
   vdb:
