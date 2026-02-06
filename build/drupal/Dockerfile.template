@@ -53,6 +53,9 @@ RUN set -eux; \
 	docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
 	docker-php-ext-install -j "$(nproc)" \
 		gd \
+{{ if env.version | startswith("7") then ( -}}
+		opcache \
+{{ ) else "" end -}}
 		pdo_mysql \
 		pdo_pgsql \
 		zip \

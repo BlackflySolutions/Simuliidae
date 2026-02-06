@@ -14,13 +14,13 @@ ARG REPOSITORY_FROM=
 # Requires the VARIANT_TAG argument, which may be either the base or non-base version [??]
 ARG VARIANT_TAG=
 # Step 1. build the basic web service, a slightly extended version of the corresonding drupal modified base image.
-FROM ${REPOSITORY_FROM}drupal:base-${VARIANT_TAG} as vhttp-base
+FROM ${REPOSITORY_FROM}drupal:base-${VARIANT_TAG} AS vhttp-base
 # We create a drupal user to own all the code, using Dries birth year as the uid
 RUN useradd -u 1978 -g www-data -ms /bin/bash drupal
 # change the document root as per https://hub.docker.com/_/php/
 # because I want to build my code with composer and this is how I've been doing it ...
 RUN mkdir -p /var/www/drupal
-ENV APACHE_DOCUMENT_ROOT /var/www/drupal/web
+ENV APACHE_DOCUMENT_ROOT=/var/www/drupal/web
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 WORKDIR /var/www/drupal
@@ -57,7 +57,7 @@ CMD ["apache2-foreground"]
 # Step 2: build a basic admin service, adding some bits to the vhttp-base
 # Admin runs sshd as it's CMD by default, but can be used to, e.g. do automated setup.
 # We'll first build admin-minimal that we'll use later as a base for admin-build
-FROM vhttp-base as admin-minimal
+FROM vhttp-base AS admin-minimal
 RUN apt-get update \
   && apt-get install -y mariadb-client sudo vim less zip unzip netcat-traditional ssh rsync openssh-server \
   && apt-get purge -y && \
@@ -87,7 +87,8 @@ CMD ["/entrypoint-sshd.sh"]
 # setup.sh runs the drupal and civicrm setup scripts and handles some ownership/permissions
 COPY setup.sh /setup.sh
 RUN chmod 775 /setup.sh
-FROM admin-minimal as admin-base
+COPY --from=restic/restic:0.18.0 /usr/bin/restic /usr/bin/
+FROM admin-minimal AS admin-base
 # add composer, uses (default) version 2
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
 # add additional dependencies for installing civicrm with D9 + composer
@@ -99,9 +100,9 @@ RUN apt-get update && apt-get install -y ca-certificates curl gnupg && \
   apt-get purge -y && apt-get clean
 RUN npm install -g bower
 # Step 3: from the admin-base, add the CMS code, and then copy it over to the vhttp-base as the vhttp-cms
-FROM admin-base as admin-build-cms
+FROM admin-base AS admin-build-cms
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION 11.1.9
+ENV DRUPAL_VERSION=11.1.9
 USER drupal:www-data
 RUN set -eux; \
 	composer create-project --no-interaction --no-install "drupal/recommended-project:$DRUPAL_VERSION" ./;
@@ -112,8 +113,8 @@ RUN echo "Building with Drupal version $DRUPAL_VERSION"
 RUN composer require --no-update drupal/core:${DRUPAL_VERSION} --update-with-all-dependencies
 RUN composer update 
 #	chown -R drupal:www-data web/sites web/modules web/themes; 
-FROM admin-build-cms as admin-build-crm
-ENV CIVICRM_VERSION 6.8.0
+FROM admin-build-cms AS admin-build-crm
+ENV CIVICRM_VERSION=6.8.0
 RUN set -eux; \
   composer config extra.enable-patching true; \
   composer config minimum-stability dev; \
@@ -126,11 +127,11 @@ RUN \
   composer config --no-plugins allow-plugins.civicrm/composer-downloads-plugin true; \
   composer config --no-plugins allow-plugins.civicrm/composer-compile-plugin true; \
   composer update;
-FROM vhttp-base as vhttp-cms
+FROM vhttp-base AS vhttp-cms
 COPY --from=admin-build-cms /var/www/drupal .
-FROM vhttp-base as vhttp-crm
+FROM vhttp-base AS vhttp-crm
 COPY --from=admin-build-crm /var/www/drupal .
-FROM admin-minimal as admin-cms
+FROM admin-minimal AS admin-cms
 COPY --from=admin-build-cms /var/www/drupal .
-FROM admin-minimal as admin-crm
+FROM admin-minimal AS admin-crm
 COPY --from=admin-build-crm /var/www/drupal .
