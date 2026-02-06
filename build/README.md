@@ -69,10 +69,12 @@ Copy code form admin-cms-crm-builder</pre>
 
 # Maintenance
 
+
 1. Merge/update the forked drupal and wordpress projects and run apply-template.sh to get the latest versions 
   a. throw away any the file modifications that are/have been generated with apply-template.sh (put them in a stash if you're weak!).
   b. merge in the remote upstream - i.e. the docker-library master branches - either via the command line, or in the github interface, followed by pulling in the updated branch here.
   c. run apply-template.sh
+  d. refresh your local php images, e.g. docker pull php:8.1-apache --disable-content-trust
 
 2. Check for new CMS versions, and variants. With Drupal, new patch versions should be handled automatically, but new major and minor versions require a new directory and sometimes updates to the build scripts when the underlying OS version changes, for example. With Wordpress, there's generally only one "latest" version, but it may incorporate breaking changes over time.
   a. Any new 'variants' will need their own directory and to be entered in the variants.txt file.
