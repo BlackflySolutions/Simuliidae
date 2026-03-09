@@ -7,3 +7,5 @@ if [ -f "/var/www/html/conf/apache-custom.conf" ]; then
   cp /var/www/html/conf/apache-custom.conf /etc/apache2/conf-available/vsite-custom.conf
   a2enconf vsite-custom
 fi
+# improve the bash prompt string with the primary domain name of the site
+echo 'export PS1="\u@${VSITE_DOMAIN}:\w$"' >> /etc/bash.bashrc
