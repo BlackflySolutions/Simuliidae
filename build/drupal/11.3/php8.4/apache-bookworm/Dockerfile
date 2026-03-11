@@ -6,7 +6,7 @@
 
 # https://www.drupal.org/docs/system-requirements/php-requirements
 # create as a "base" that doesn't include the drupal code
-FROM php:8.3-apache-bookworm AS drupal-base
+FROM php:8.4-apache-bookworm AS drupal-base
 
 # install the PHP extensions we need
 RUN set -eux; \
@@ -32,14 +32,13 @@ RUN set -eux; \
 		libc-client-dev \
 		libkrb5-dev \
 		libmcrypt-dev \
+		libssl-dev \
 	; \
-	\
 	docker-php-ext-configure gd \
 		--with-freetype \
 		--with-jpeg=/usr \
 		--with-webp \
 	; \
-	\
 	docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
 	docker-php-ext-install -j "$(nproc)" \
 		gd \
@@ -94,8 +93,8 @@ RUN { \
       } > /usr/local/etc/php/conf.d/docker-php-drupal-recommended.ini
 
 
-# 2025-12-10: https://www.drupal.org/project/drupal/releases/11.2.10
-ENV DRUPAL_VERSION 11.2.10
+# 2026-03-06: https://www.drupal.org/project/drupal/releases/11.3.5
+ENV DRUPAL_VERSION 11.3.5
 
 # https://github.com/docker-library/drupal/pull/259
 # https://github.com/moby/buildkit/issues/4503

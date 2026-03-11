@@ -21,3 +21,5 @@ fi
 if [ -f "/var/www/drupal/web/sites/default/conf/robots.txt" ]; then
   cp /var/www/drupal/web/sites/default/conf/robots.txt /var/www/html/
 fi 
+# improve the bash prompt string with the primary domain name of the site
+echo 'export PS1="\u@${VSITE_DOMAIN}:\w# "' >> /etc/bash.bashrc
