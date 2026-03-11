@@ -58,6 +58,11 @@ services:
       - MYSQL_DATABASE
       - DRUPAL_DATABASE
       - CIVICRM_DATABASE
+      - VSITE_EXPIRY
+      - VSITE_L10N
+      - VSITE_ADMIN
+      - VSITE_ADMIN_MAIL
+      - VSITE_NAME
 
     depends_on:
       - vsql
