@@ -29,3 +29,6 @@ sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer update
 sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer civicrm:publish
 cv upgrade:db -n
 chown -R www-data:www-data /var/www/drupal/web/sites/default/files/civicrm
+sudo -E -u www-data cv flush
+sudo -E -u www-data drush updatedb
+sudo -E -u www-data drush cr
