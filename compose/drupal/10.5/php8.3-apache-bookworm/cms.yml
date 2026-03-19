@@ -15,7 +15,7 @@ services:
       - MYSQL_ROOT_PASSWORD
       - MYSQL_DATABASE
       - MARIADB_AUTO_UPGRADE=1
-      - MARIADB_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MARIADB_ROOT_PASSWORD={MYSQL_ROOT_PASSWORD}
    
   vhttp:
     image: simuliidae-drupal:vhttp-cms-10.5-php8.3-apache-bookworm
