@@ -3,7 +3,7 @@ version: '3.4'
 services:
 
   vsql:
-    image: blackflysolutions/mariadb:{VSITE_MARIADB_VER-10.5}
+    image: blackflysolutions/mariadb:{VSITE_MARIADB_VER-10.6}
     expose:
            - "3306"
     volumes:
@@ -14,6 +14,8 @@ services:
       - MYSQL_PASSWORD
       - MYSQL_ROOT_PASSWORD
       - MYSQL_DATABASE
+      - MARIADB_AUTO_UPGRADE=1
+      - MARIADB_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
    
   vhttp:
     image: simuliidae-drupal:vhttp-crm-10.5-php8.3-apache-bookworm
