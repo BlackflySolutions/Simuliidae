@@ -15,8 +15,7 @@ RUN set -eux; \
 		ghostscript \
 # pull in AV1 & HEVC image encoding (and not just decoding)
 # https://github.com/docker-library/wordpress/issues/996
-		libheif-plugin-aomenc \
-		libheif-plugin-x265 \
+# These two lines commented out for using bookworm
 	; \
 	rm -rf /var/lib/apt/lists/*
 
