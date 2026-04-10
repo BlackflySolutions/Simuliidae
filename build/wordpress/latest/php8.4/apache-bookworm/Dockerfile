@@ -13,6 +13,10 @@ RUN set -eux; \
 	apt-get install -y --no-install-recommends \
 # Ghostscript is required for rendering PDF previews
 		ghostscript \
+# pull in AV1 & HEVC image encoding (and not just decoding)
+# https://github.com/docker-library/wordpress/issues/996
+		libheif-plugin-aomenc \
+		libheif-plugin-x265 \
 	; \
 	rm -rf /var/lib/apt/lists/*
 
@@ -60,7 +64,7 @@ RUN set -ex; \
        pecl install imap; \
        docker-php-ext-enable imap; \
 # https://pecl.php.net/package/imagick
-	pecl install imagick-3.8.0; \
+	pecl install imagick-3.8.1; \
 	docker-php-ext-enable imagick; \
 	pecl install -o redis && docker-php-ext-enable redis; \
 	pecl install -o apcu && docker-php-ext-enable apcu; \
@@ -95,16 +99,18 @@ RUN set -ex; \
 
 # set recommended PHP.ini settings
 # see https://secure.php.net/manual/en/opcache.installation.php
+# enabled by default in the php images: https://github.com/docker-library/php/pull/1587
 RUN set -eux; \
-	docker-php-ext-enable opcache; \
+        docker-php-ext-enable opcache; \
 	{ \
 		echo 'opcache.memory_consumption=128'; \
 		echo 'opcache.interned_strings_buffer=8'; \
 		echo 'opcache.max_accelerated_files=4000'; \
 		echo 'opcache.revalidate_freq=2'; \
-	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
+	} > "$PHP_INI_DIR/conf.d/opcache-recommended.ini"
 # https://wordpress.org/support/article/editing-wp-config-php/#configure-error-logging
-RUN { \
+RUN set -eux; \
+	{ \
 # https://www.php.net/manual/en/errorfunc.constants.php
 # https://github.com/docker-library/wordpress/issues/420#issuecomment-517839670
 		echo 'error_reporting = E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_CORE_WARNING | E_COMPILE_ERROR | E_COMPILE_WARNING | E_RECOVERABLE_ERROR'; \
@@ -116,7 +122,7 @@ RUN { \
 		echo 'ignore_repeated_errors = On'; \
 		echo 'ignore_repeated_source = Off'; \
 		echo 'html_errors = Off'; \
-	} > /usr/local/etc/php/conf.d/error-logging.ini
+	} > "$PHP_INI_DIR/conf.d/error-logging.ini"
 
 RUN set -eux; \
 	a2enmod rewrite expires; \
@@ -138,8 +144,8 @@ RUN set -eux; \
 	find /etc/apache2 -type f -name '*.conf' -exec sed -ri 's/([[:space:]]*LogFormat[[:space:]]+"[^"]*)%h([^"]*")/\1%a\2/g' '{}' +
 FROM wordpress-base
 RUN set -eux; \
-	version='6.8.3'; \
-	sha1='fd56bcdc15f1877e45dce67942ea75949ed650e8'; \
+	version='6.9.4'; \
+	sha1='018542f4c3e15db0d8e38aaf0fcf1b5dc56dbb79'; \
 	\
 	curl -o wordpress.tar.gz -fL "https://wordpress.org/wordpress-$version.tar.gz"; \
 	echo "$sha1 *wordpress.tar.gz" | sha1sum -c -; \

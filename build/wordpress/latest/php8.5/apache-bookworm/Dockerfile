@@ -5,7 +5,7 @@
 #
 
 # create as a "base" without the wordpress code
-FROM php:8.3-apache-bookworm as wordpress-base
+FROM php:8.5-apache-bookworm as wordpress-base
 
 # persistent dependencies
 RUN set -eux; \

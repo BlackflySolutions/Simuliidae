@@ -1,17 +1,17 @@
 {
   "latest": {
     "phpVersions": [
-      "8.1",
       "8.2",
       "8.3",
-      "8.4"
+      "8.4",
+      "8.5"
     ],
-    "sha1": "fd56bcdc15f1877e45dce67942ea75949ed650e8",
-    "upstream": "6.8.3",
+    "sha1": "018542f4c3e15db0d8e38aaf0fcf1b5dc56dbb79",
+    "upstream": "6.9.4",
     "variants": [
       "apache-bookworm"
     ],
-    "civicrmVersion": "6.8.0",
-    "version": "6.8.3"
+    "civicrmVersion": "6.12.3",
+    "version": "6.9.4"
   }
 }
