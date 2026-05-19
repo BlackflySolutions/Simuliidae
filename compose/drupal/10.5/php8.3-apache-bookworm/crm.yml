@@ -18,7 +18,7 @@ services:
       - MARIADB_ROOT_PASSWORD={MYSQL_ROOT_PASSWORD}
    
   vhttp:
-    image: simuliidae-drupal:vhttp-crm-10.5-php8.3-apache-bookworm
+    image: blackflysolutions/simuliidae-drupal:vhttp-crm-10.5-php8.3-apache-bookworm
     deploy:
       labels:
         simuliidae.domain: "{VSITE_DOMAIN}"
@@ -42,7 +42,7 @@ services:
 
   admin:
     # use an extended version of the above image for administrative tasks
-    image: simuliidae-drupal:admin-crm-10.5-php8.3-apache-bookworm
+    image: blackflysolutions/simuliidae-drupal:admin-crm-10.5-php8.3-apache-bookworm
     volumes:
       - vsite:/var/www/drupal/web/sites/default
     environment:
