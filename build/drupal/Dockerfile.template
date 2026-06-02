@@ -2,10 +2,21 @@
 	def is_alpine:
 		env.variant | index("alpine")
 -}}
+{{
+	def manual_imap:
+		(env.variant | index("trixie")) and (env.phpVersion >= "8.4")
+-}}
+{{
+	def pecl_imap:
+		(env.variant | index("bookworm")) and (env.phpVersion >= "8.4")
+-}}
 # https://www.drupal.org/docs/system-requirements/php-requirements
 # create as a "base" that doesn't include the drupal code
 FROM php:{{ env.phpVersion }}-{{ env.variant }} AS drupal-base
-
+{{ if manual_imap then ( -}}
+# Copy the extension installer script into your container
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+{{ ) else "" end -}}
 # install the PHP extensions we need
 RUN set -eux; \
 	\
@@ -38,7 +49,9 @@ RUN set -eux; \
 		libxml2-dev \
 		libmagickwand-dev \
 		libicu-dev \
+{{ if manual_imap then "" else ( -}}
 		libc-client-dev \
+{{ ) end -}}
 		libkrb5-dev \
 		libmcrypt-dev \
 {{ ) end -}}
@@ -50,7 +63,9 @@ RUN set -eux; \
 		--with-webp \
 	; \
 	\
+{{ if  env.phpVersion < "8.4" then ( -}}
 	docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
+{{ ) else "" end -}}
 	docker-php-ext-install -j "$(nproc)" \
 		gd \
 {{ if env.version | startswith("7") then ( -}}
@@ -60,22 +75,34 @@ RUN set -eux; \
 		pdo_pgsql \
 		zip \
 		mysqli \
+{{ if  env.phpVersion < "8.4" then ( -}}
 		dom \
+{{ ) else "" end -}}
 		soap \
 		sockets \
 		intl \
 		bcmath \
 		gettext \
+{{ if  env.phpVersion < "8.4" then ( -}}
 		imap \
+{{ ) else "" end -}}
 	; \
 	\
-        pecl install -o imagick && docker-php-ext-enable imagick; \
-        pecl install -o redis && docker-php-ext-enable redis; \
-        pecl install -o apcu && docker-php-ext-enable apcu; \
+	pecl install -o imagick && docker-php-ext-enable imagick; \
+	pecl install -o redis && docker-php-ext-enable redis; \
+	pecl install -o apcu && docker-php-ext-enable apcu; \
 {{ if env.version | startswith("7") then ( -}}
-        pecl install -o mcrypt-1.0.5 && docker-php-ext-enable mcrypt; \
+	pecl install -o mcrypt-1.0.5 && docker-php-ext-enable mcrypt; \
 {{ ) else "" end -}}
-        docker-php-ext-install exif; \
+{{ if manual_imap then ( -}}
+	install-php-extensions imap; \
+{{ ) else ( }}
+{{ if pecl_imap then ( -}}
+	pecl install imap; \
+	docker-php-ext-enable imap; \
+{{ ) else "" end -}}
+{{ ) end -}}
+	docker-php-ext-install exif; \
 {{ if is_alpine then ( -}}
 	runDeps="$( \
 		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
@@ -120,7 +147,7 @@ COPY --from=composer:{{ .composer.version }} /usr/bin/composer /usr/local/bin/
 # Drupal now recommends sites enable PHP output buffering by default, if PHP is run as a server module
 # e.g. with Apache's mod_php
 RUN { \
-              echo 'output_buffering=true'; \
+      echo 'output_buffering=true'; \
       } > /usr/local/etc/php/conf.d/docker-php-drupal-recommended.ini
 
 {{ ) end -}}
