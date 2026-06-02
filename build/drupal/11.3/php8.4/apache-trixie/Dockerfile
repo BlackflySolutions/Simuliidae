@@ -6,8 +6,9 @@
 
 # https://www.drupal.org/docs/system-requirements/php-requirements
 # create as a "base" that doesn't include the drupal code
-FROM php:8.4-apache-bookworm AS drupal-base
-
+FROM php:8.4-apache-trixie AS drupal-base
+# Copy the extension installer script into your container
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 # install the PHP extensions we need
 RUN set -eux; \
 	\
@@ -29,35 +30,34 @@ RUN set -eux; \
 		libxml2-dev \
 		libmagickwand-dev \
 		libicu-dev \
-		libc-client-dev \
 		libkrb5-dev \
 		libmcrypt-dev \
-		libssl-dev \
-	; 
-RUN	docker-php-ext-configure gd \
+	; \
+	\
+	docker-php-ext-configure gd \
 		--with-freetype \
 		--with-jpeg=/usr \
-		--with-webp ;
-RUN	docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
+		--with-webp \
+	; \
+	\
 	docker-php-ext-install -j "$(nproc)" \
 		gd \
 		pdo_mysql \
 		pdo_pgsql \
 		zip \
 		mysqli \
-		dom \
 		soap \
 		sockets \
 		intl \
 		bcmath \
 		gettext \
-		imap \
 	; \
 	\
-        pecl install -o imagick && docker-php-ext-enable imagick; \
-        pecl install -o redis && docker-php-ext-enable redis; \
-        pecl install -o apcu && docker-php-ext-enable apcu; \
-        docker-php-ext-install exif; \
+	pecl install -o imagick && docker-php-ext-enable imagick; \
+	pecl install -o redis && docker-php-ext-enable redis; \
+	pecl install -o apcu && docker-php-ext-enable apcu; \
+	install-php-extensions imap; \
+	docker-php-ext-install exif; \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
@@ -88,12 +88,12 @@ COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
 # Drupal now recommends sites enable PHP output buffering by default, if PHP is run as a server module
 # e.g. with Apache's mod_php
 RUN { \
-              echo 'output_buffering=true'; \
+      echo 'output_buffering=true'; \
       } > /usr/local/etc/php/conf.d/docker-php-drupal-recommended.ini
 
 
-# 2026-03-06: https://www.drupal.org/project/drupal/releases/11.3.5
-ENV DRUPAL_VERSION 11.3.5
+# 2026-05-20: https://www.drupal.org/project/drupal/releases/11.3.10
+ENV DRUPAL_VERSION 11.3.10
 
 # https://github.com/docker-library/drupal/pull/259
 # https://github.com/moby/buildkit/issues/4503

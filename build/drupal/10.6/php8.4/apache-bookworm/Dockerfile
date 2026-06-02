@@ -6,7 +6,7 @@
 
 # https://www.drupal.org/docs/system-requirements/php-requirements
 # create as a "base" that doesn't include the drupal code
-FROM php:8.3-apache-bookworm AS drupal-base
+FROM php:8.4-apache-bookworm AS drupal-base
 # install the PHP extensions we need
 RUN set -eux; \
 	\
@@ -39,26 +39,25 @@ RUN set -eux; \
 		--with-webp \
 	; \
 	\
-	docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
 	docker-php-ext-install -j "$(nproc)" \
 		gd \
 		pdo_mysql \
 		pdo_pgsql \
 		zip \
 		mysqli \
-		dom \
 		soap \
 		sockets \
 		intl \
 		bcmath \
 		gettext \
-		imap \
 	; \
 	\
 	pecl install -o imagick && docker-php-ext-enable imagick; \
 	pecl install -o redis && docker-php-ext-enable redis; \
 	pecl install -o apcu && docker-php-ext-enable apcu; \
 
+	pecl install imap; \
+	docker-php-ext-enable imap; \
 	docker-php-ext-install exif; \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
@@ -94,8 +93,8 @@ RUN { \
       } > /usr/local/etc/php/conf.d/docker-php-drupal-recommended.ini
 
 
-# 2026-05-28: https://www.drupal.org/project/drupal/releases/10.5.11
-ENV DRUPAL_VERSION 10.5.11
+# 2026-05-28: https://www.drupal.org/project/drupal/releases/10.6.10
+ENV DRUPAL_VERSION 10.6.10
 
 # https://github.com/docker-library/drupal/pull/259
 # https://github.com/moby/buildkit/issues/4503

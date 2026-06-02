@@ -6,8 +6,9 @@
 
 # https://www.drupal.org/docs/system-requirements/php-requirements
 # create as a "base" that doesn't include the drupal code
-FROM php:8.3-apache-bookworm AS drupal-base
-
+FROM php:8.4-apache-trixie AS drupal-base
+# Copy the extension installer script into your container
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 # install the PHP extensions we need
 RUN set -eux; \
 	\
@@ -29,7 +30,6 @@ RUN set -eux; \
 		libxml2-dev \
 		libmagickwand-dev \
 		libicu-dev \
-		libc-client-dev \
 		libkrb5-dev \
 		libmcrypt-dev \
 	; \
@@ -40,26 +40,24 @@ RUN set -eux; \
 		--with-webp \
 	; \
 	\
-	docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
 	docker-php-ext-install -j "$(nproc)" \
 		gd \
 		pdo_mysql \
 		pdo_pgsql \
 		zip \
 		mysqli \
-		dom \
 		soap \
 		sockets \
 		intl \
 		bcmath \
 		gettext \
-		imap \
 	; \
 	\
-        pecl install -o imagick && docker-php-ext-enable imagick; \
-        pecl install -o redis && docker-php-ext-enable redis; \
-        pecl install -o apcu && docker-php-ext-enable apcu; \
-        docker-php-ext-install exif; \
+	pecl install -o imagick && docker-php-ext-enable imagick; \
+	pecl install -o redis && docker-php-ext-enable redis; \
+	pecl install -o apcu && docker-php-ext-enable apcu; \
+	install-php-extensions imap; \
+	docker-php-ext-install exif; \
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
 	apt-mark manual $savedAptMark; \
@@ -90,12 +88,12 @@ COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
 # Drupal now recommends sites enable PHP output buffering by default, if PHP is run as a server module
 # e.g. with Apache's mod_php
 RUN { \
-              echo 'output_buffering=true'; \
+      echo 'output_buffering=true'; \
       } > /usr/local/etc/php/conf.d/docker-php-drupal-recommended.ini
 
 
-# 2026-04-15: https://www.drupal.org/project/drupal/releases/11.2.11
-ENV DRUPAL_VERSION 11.2.11
+# 2026-05-28: https://www.drupal.org/project/drupal/releases/11.2.13
+ENV DRUPAL_VERSION 11.2.13
 
 # https://github.com/docker-library/drupal/pull/259
 # https://github.com/moby/buildkit/issues/4503

@@ -6,7 +6,7 @@
 
 # https://www.drupal.org/docs/system-requirements/php-requirements
 # create as a "base" that doesn't include the drupal code
-FROM php:8.3-apache-bookworm AS drupal-base
+FROM php:8.3-apache-trixie AS drupal-base
 # install the PHP extensions we need
 RUN set -eux; \
 	\
@@ -94,8 +94,8 @@ RUN { \
       } > /usr/local/etc/php/conf.d/docker-php-drupal-recommended.ini
 
 
-# 2026-05-28: https://www.drupal.org/project/drupal/releases/10.5.11
-ENV DRUPAL_VERSION 10.5.11
+# 2026-05-28: https://www.drupal.org/project/drupal/releases/11.2.13
+ENV DRUPAL_VERSION 11.2.13
 
 # https://github.com/docker-library/drupal/pull/259
 # https://github.com/moby/buildkit/issues/4503
