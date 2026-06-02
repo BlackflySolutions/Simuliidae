@@ -1,3 +1,7 @@
 10.5/php8.3/apache-bookworm
 10.6/php8.3/apache-bookworm
-11.2/php8.3/apache-bookworm
+10.6/php8.4/apache-bookworm
+11.2/php8.3/apache-trixie
+11.2/php8.4/apache-trixie
+11.3/php8.4/apache-trixie
+11.3/php8.5/apache-trixie
