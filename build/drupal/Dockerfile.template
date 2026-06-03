@@ -4,7 +4,7 @@
 -}}
 {{
 	def manual_imap:
-		(env.variant | index("trixie")) and (env.phpVersion >= "8.4")
+		env.variant | index("trixie")
 -}}
 {{
 	def pecl_imap:
