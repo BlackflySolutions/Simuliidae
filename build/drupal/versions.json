@@ -25,8 +25,7 @@
     "date": 1779972673,
     "notes": "https://www.drupal.org/project/drupal/releases/11.2.13",
     "phpVersions": [
-      "8.4",
-      "8.3"
+      "8.4"
     ],
     "variants": [
       "apache-trixie"
