@@ -35,8 +35,6 @@ services:
       - MYSQL_DATABASE
       - DRUPAL_DATABASE
       - CIVICRM_DATABASE
-    depends_on:
-      - vsql
 
   admin:
     # use an extended version of the above image for administrative tasks
@@ -58,10 +56,6 @@ services:
       - MYSQL_DATABASE
       - DRUPAL_DATABASE
       - CIVICRM_DATABASE
-
-    depends_on:
-      - vsql
-      - vhttp
 
 volumes:
   vdb:
