@@ -97,6 +97,7 @@ CMD ["/entrypoint-sshd.sh"]
 COPY setup.sh /setup.sh
 RUN chmod 775 /setup.sh
 COPY --from=restic/restic:0.18.0 /usr/bin/restic /usr/bin/
+COPY --from=creativeprojects/resticprofile:0.32.0-amd64 /usr/bin/resticprofile /usr/bin/
 FROM admin-minimal AS admin-base
 {{ if env.version | startswith("7") then "" else ( -}}
 # add composer, uses (default) version 2
