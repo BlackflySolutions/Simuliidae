@@ -24,6 +24,7 @@ RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
 		coreutils \
 		freetype-dev \
+		libavif-dev \
 		libjpeg-turbo-dev \
 		libpng-dev \
 		libwebp-dev \
@@ -40,6 +41,7 @@ RUN set -eux; \
 	\
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
+		libavif-dev \
 		libfreetype6-dev \
 		libjpeg-dev \
 		libpng-dev \
@@ -58,6 +60,7 @@ RUN set -eux; \
 	; \
 	\
 	docker-php-ext-configure gd \
+		--with-avif \
 		--with-freetype \
 		--with-jpeg={{ if is_alpine then "/usr/include" else "/usr" end }} \
 		--with-webp \
