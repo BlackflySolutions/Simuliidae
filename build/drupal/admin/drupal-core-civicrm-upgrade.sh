@@ -1,0 +1,42 @@
+#!/bin/bash
+ARG1=$1
+# Use my composer --no-blocking to update my drupal and civicrm versions!
+if [ -z "$VSITE_DRUPAL_VER" ]; then
+  echo 'VSITE_DRUPAL_VER is not set.'
+  echo 'You probably want to run this script as root.'
+  exit
+fi
+if [ -z "$VSITE_CIVICRM_VER" ]; then
+  echo 'VSITE_CIVICRM_VER is not set.'
+  echo 'You probably want to run this script as root.'
+  exit
+fi
+echo "Preparing Drupal core codebase update to $VSITE_DRUPAL_VER using composer."
+cd /var/www/drupal
+sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking require --no-update drupal/core-recommended:${VSITE_DRUPAL_VER} --update-with-all-dependencies
+sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking require --no-update drupal/core-composer-scaffold:${VSITE_DRUPAL_VER} --update-with-all-dependencies
+sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking require --no-update drupal/core-project-message:${VSITE_DRUPAL_VER} --update-with-all-dependencies
+sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking config extra.enable-patching true
+sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking  require --no-update civicrm/civicrm-asset-plugin:'~1.1'
+sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking require --no-update civicrm/civicrm-core:${VSITE_CIVICRM_VER}
+sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking require --no-update civicrm/civicrm-packages:${VSITE_CIVICRM_VER}
+sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking require --no-update civicrm/civicrm-drupal-8:${VSITE_CIVICRM_VER}
+if  [[ '-y' != $ARG1 ]]; then
+  sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking update --dry-run
+  while true; do
+      read -p "Install this? " yn
+      case $yn in
+          [Yy]* ) echo 'Installing now ... '; break;;
+          [Nn]* ) echo 'Cancelled.'; exit;;
+          * ) echo "Please answer y or n.";;
+      esac
+  done
+fi
+sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking update
+sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking civicrm:publish
+# skip the snapshot
+CIVICRM_UPGRADE_SNAPSHOT=FALSE cv upgrade:db -n
+chown -R www-data:www-data /var/www/drupal/web/sites/default/files/civicrm
+sudo -E -u www-data cv flush
+sudo -E -u www-data drush updatedb -y
+sudo -E -u www-data drush cr
