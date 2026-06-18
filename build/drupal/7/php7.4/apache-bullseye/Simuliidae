@@ -80,6 +80,7 @@ CMD ["/entrypoint-sshd.sh"]
 COPY setup.sh /setup.sh
 RUN chmod 775 /setup.sh
 COPY --from=restic/restic:0.18.0 /usr/bin/restic /usr/bin/
+COPY --from=creativeprojects/resticprofile:0.32.0-amd64 /usr/bin/resticprofile /usr/bin/
 FROM admin-minimal AS admin-base
 # Step 3: from the admin-base, add the CMS code, and then copy it over to the vhttp-base as the vhttp-cms
 FROM admin-base AS admin-build-cms
