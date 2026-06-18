@@ -21,6 +21,7 @@ RUN set -eux; \
 	\
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
+		libavif-dev \
 		libfreetype6-dev \
 		libjpeg-dev \
 		libpng-dev \
@@ -35,6 +36,7 @@ RUN set -eux; \
 	; \
 	\
 	docker-php-ext-configure gd \
+		--with-avif \
 		--with-freetype \
 		--with-jpeg=/usr \
 		--with-webp \
@@ -92,8 +94,8 @@ RUN { \
       } > /usr/local/etc/php/conf.d/docker-php-drupal-recommended.ini
 
 
-# 2026-05-28: https://www.drupal.org/project/drupal/releases/11.2.13
-ENV DRUPAL_VERSION 11.2.13
+# 2026-06-17: https://www.drupal.org/project/drupal/releases/11.2.14
+ENV DRUPAL_VERSION 11.2.14
 
 # https://github.com/docker-library/drupal/pull/259
 # https://github.com/moby/buildkit/issues/4503
