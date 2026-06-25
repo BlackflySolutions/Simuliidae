@@ -1,6 +1,6 @@
 #!/bin/bash
 ARG1=$1
-# Use my composer to update my drupal version
+# Use my composer --no-blocking to update my drupal version
 if [ -z "$VSITE_DRUPAL_VER" ]; then
   echo 'VSITE_DRUPAL_VER is not set.'
   echo 'You probably want to run this script as root.'
@@ -8,13 +8,13 @@ if [ -z "$VSITE_DRUPAL_VER" ]; then
 fi
 echo "Preparing Drupal core codebase update to $VSITE_DRUPAL_VER using composer."
 cd /var/www/drupal
-sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer require --no-update drupal/core-recommended:${VSITE_DRUPAL_VER} --update-with-all-dependencies
-sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer require --no-update drupal/core-composer-scaffold:${VSITE_DRUPAL_VER} --update-with-all-dependencies
-sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer require --no-update drupal/core-project-message:${VSITE_DRUPAL_VER} --update-with-all-dependencies
-# sudo -u drupal composer update drupal/core drupal/core-* --with-all-dependencies
-# sudo -u drupal composer update drupal/core-recommended --with-dependencies
+sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking require --no-update drupal/core-recommended:${VSITE_DRUPAL_VER} --update-with-all-dependencies
+sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking require --no-update drupal/core-composer-scaffold:${VSITE_DRUPAL_VER} --update-with-all-dependencies
+sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking require --no-update drupal/core-project-message:${VSITE_DRUPAL_VER} --update-with-all-dependencies
+# sudo -u drupal composer --no-blocking update drupal/core drupal/core-* --with-all-dependencies
+# sudo -u drupal composer --no-blocking update drupal/core-recommended --with-dependencies
 if  [[ '-y' != $ARG1 ]]; then
-  sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer update --dry-run
+  sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking update --dry-run
   while true; do
       read -p "Install this? " yn
       case $yn in
@@ -24,6 +24,6 @@ if  [[ '-y' != $ARG1 ]]; then
       esac
   done
 fi
-sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer update
+sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking update
 sudo -E -u www-data drush updatedb -y
 sudo -E -u www-data drush cr
