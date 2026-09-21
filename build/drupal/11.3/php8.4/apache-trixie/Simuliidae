@@ -96,7 +96,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/local/bin/
 RUN apt-get update && apt-get install -y ca-certificates curl gnupg && \
   mkdir -p /etc/apt/keyrings && \
   curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
-  NODE_MAJOR=18 && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list && \
+  NODE_MAJOR=24 && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list && \
   apt-get update && apt-get install -y nodejs && \
   apt-get install -y npm && \
   apt-get purge -y && apt-get clean
@@ -104,7 +104,7 @@ RUN npm install -g bower
 # Step 3: from the admin-base, add the CMS code, and then copy it over to the vhttp-base as the vhttp-cms
 FROM admin-base AS admin-build-cms
 # https://www.drupal.org/node/3060/release
-ENV DRUPAL_VERSION=11.3.13
+ENV DRUPAL_VERSION=11.3.17
 USER drupal:www-data
 RUN set -eux; \
 	composer create-project --no-interaction --no-install "drupal/recommended-project:$DRUPAL_VERSION" ./;
@@ -116,7 +116,7 @@ RUN composer require --no-update drupal/core:${DRUPAL_VERSION} --update-with-all
 RUN composer update 
 #	chown -R drupal:www-data web/sites web/modules web/themes; 
 FROM admin-build-cms AS admin-build-crm
-ENV CIVICRM_VERSION=6.15.5
+ENV CIVICRM_VERSION=6.18.1
 RUN set -eux; \
   composer config extra.enable-patching true; \
   composer config minimum-stability dev; \
