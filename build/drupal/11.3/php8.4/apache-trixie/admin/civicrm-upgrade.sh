@@ -9,8 +9,8 @@ fi
 echo "Preparing CiviCRM Codebase update to $VSITE_CIVICRM_VER using composer."
 cd /var/www/drupal
 #  sudo -u drupal composer update civicrm/civicrm-core civicrm/civicrm-drupal-8 roundearth/civicrm-composer-plugin --with-dependencies
-sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking config extra.enable-patching true
-sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking  require --no-update civicrm/civicrm-asset-plugin:'~1.1'
+sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer config extra.enable-patching true
+sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking require --no-update civicrm/civicrm-asset-plugin:'~1.1'
 sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking require --no-update civicrm/civicrm-core:${VSITE_CIVICRM_VER}
 sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking require --no-update civicrm/civicrm-packages:${VSITE_CIVICRM_VER}
 sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking require --no-update civicrm/civicrm-drupal-8:${VSITE_CIVICRM_VER}
@@ -26,10 +26,10 @@ if  [[ '-y' != $ARG1 ]]; then
   done
 fi
 sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking update
-sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer --no-blocking civicrm:publish
+sudo -u drupal php -d memory_limit=-1 /usr/local/bin/composer civicrm:publish
 # skip the snapshot
 CIVICRM_UPGRADE_SNAPSHOT=FALSE cv upgrade:db -n
 chown -R www-data:www-data /var/www/drupal/web/sites/default/files/civicrm
 sudo -E -u www-data cv flush
-sudo -E -u www-data drush updatedb
+sudo -E -u www-data drush updatedb -y
 sudo -E -u www-data drush cr
