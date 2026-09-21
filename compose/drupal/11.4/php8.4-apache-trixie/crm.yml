@@ -3,7 +3,7 @@ version: '3.4'
 services:
 
   vsql:
-    image: blackflysolutions/mariadb:{VSITE_MARIADB_VER-10.6}
+    image: blackflysolutions/mariadb:{VSITE_MARIADB_VER-11.4}
     expose:
            - "3306"
     volumes:
@@ -18,7 +18,7 @@ services:
       - MARIADB_ROOT_PASSWORD={MYSQL_ROOT_PASSWORD}
    
   vhttp:
-    image: blackflysolutions/simuliidae-drupal:vhttp-crm-11.4-php8.4-apache-bookworm
+    image: blackflysolutions/simuliidae-drupal:vhttp-crm-11.4-php8.4-apache-trixie
     deploy:
       labels:
         simuliidae.domain: "{VSITE_DOMAIN}"
@@ -40,7 +40,7 @@ services:
 
   admin:
     # use an extended version of the above image for administrative tasks
-    image: blackflysolutions/simuliidae-drupal:admin-crm-11.4-php8.4-apache-bookworm
+    image: blackflysolutions/simuliidae-drupal:admin-crm-11.4-php8.4-apache-trixie
     volumes:
       - vsite:/var/www/drupal/web/sites/default
     environment:

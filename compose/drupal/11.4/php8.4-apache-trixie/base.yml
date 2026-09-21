@@ -3,7 +3,7 @@ version: '3.4'
 services:
 
   vsql:
-    image: blackflysolutions/mariadb:{VSITE_MARIADB_VER-10.6}
+    image: blackflysolutions/mariadb:{VSITE_MARIADB_VER-11.4}
     expose:
            - "3306"
     volumes:
@@ -18,14 +18,14 @@ services:
       - MARIADB_ROOT_PASSWORD={MYSQL_ROOT_PASSWORD}
    
   vhttp:
-    image: blackflysolutions/simuliidae-drupal:vhttp-cms-11.4-php8.4-apache-bookworm
+    image: blackflysolutions/simuliidae-drupal:vhttp-base-11.4-php8.4-apache-trixie
     deploy:
       labels:
         simuliidae.domain: "{VSITE_DOMAIN}"
     ports:
       - 80/tcp
     volumes:
-      - vsite:/var/www/drupal/web/sites/default
+      - vdrupal:/var/www/drupal
     environment:
       - VSITE
       - VSITE_SITES
@@ -40,9 +40,9 @@ services:
 
   admin:
     # use an extended version of the above image for administrative tasks
-    image: blackflysolutions/simuliidae-drupal:admin-cms-11.4-php8.4-apache-bookworm
+    image: blackflysolutions/simuliidae-drupal:admin-base-11.4-php8.4-apache-trixie
     volumes:
-      - vsite:/var/www/drupal/web/sites/default
+      - vdrupal:/var/www/drupal
     environment:
       - VSITE
       - VSITE_SITES
@@ -61,6 +61,6 @@ services:
 
 volumes:
   vdb:
-  vsite:
+  vdrupal:
     labels:
       simuliidae.backup.exclude: "{VSITE_BACKUP_EXCLUDE}"
