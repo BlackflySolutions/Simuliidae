@@ -5,8 +5,9 @@
 #
 
 # create as a "base" without the wordpress code
-FROM php:8.5-apache-bookworm as wordpress-base
-
+FROM php:8.5-apache as wordpress-base
+# Copy the extension installer script into your container
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 # persistent dependencies
 RUN set -eux; \
 	apt-get update; \
@@ -15,7 +16,8 @@ RUN set -eux; \
 		ghostscript \
 # pull in AV1 & HEVC image encoding (and not just decoding)
 # https://github.com/docker-library/wordpress/issues/996
-# These two lines commented out for using bookworm
+		libheif-plugin-aomenc \
+		libheif-plugin-x265 \
 	; \
 	rm -rf /var/lib/apt/lists/*
 
@@ -35,7 +37,6 @@ RUN set -ex; \
 		libwebp-dev \
 		libzip-dev \
 		libxml2-dev \
-		libc-client-dev \
 		libkrb5-dev \
 		libmcrypt-dev \
 	; \
@@ -46,7 +47,6 @@ RUN set -ex; \
 		--with-jpeg \
 		--with-webp \
 	; \
-	docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
 	docker-php-ext-install -j "$(nproc)" \
 		bcmath \
 		exif \
@@ -54,13 +54,12 @@ RUN set -ex; \
 		intl \
 		mysqli \
 		zip \
-		dom \
 		soap \
 		sockets \
 		gettext \
-		imap \
 	; \
-       # docker-php-ext-configure imap --with-imap-ssl --with-kerberos; \
+        install-php-extensions imap; \
+
 # https://pecl.php.net/package/imagick
 	pecl install imagick-3.8.1; \
 	docker-php-ext-enable imagick; \
@@ -99,7 +98,6 @@ RUN set -ex; \
 # see https://secure.php.net/manual/en/opcache.installation.php
 # enabled by default in the php images: https://github.com/docker-library/php/pull/1587
 RUN set -eux; \
-        docker-php-ext-enable opcache; \
 	{ \
 		echo 'opcache.memory_consumption=128'; \
 		echo 'opcache.interned_strings_buffer=8'; \
@@ -140,10 +138,11 @@ RUN set -eux; \
 # https://github.com/docker-library/wordpress/issues/383#issuecomment-507886512
 # (replace all instances of "%h" with "%a" in LogFormat)
 	find /etc/apache2 -type f -name '*.conf' -exec sed -ri 's/([[:space:]]*LogFormat[[:space:]]+"[^"]*)%h([^"]*")/\1%a\2/g' '{}' +
+
 FROM wordpress-base
 RUN set -eux; \
-	version='6.9.4'; \
-	sha1='018542f4c3e15db0d8e38aaf0fcf1b5dc56dbb79'; \
+	version='7.0'; \
+	sha1='e50bb75667ecaa0eac0694fb3c7b024afc96fde0'; \
 	\
 	curl -o wordpress.tar.gz -fL "https://wordpress.org/wordpress-$version.tar.gz"; \
 	echo "$sha1 *wordpress.tar.gz" | sha1sum -c -; \
