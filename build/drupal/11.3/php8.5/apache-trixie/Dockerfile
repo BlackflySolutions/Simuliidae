@@ -94,8 +94,8 @@ RUN { \
       } > /usr/local/etc/php/conf.d/docker-php-drupal-recommended.ini
 
 
-# 2026-09-28: https://www.drupal.org/project/drupal/releases/11.3.18
-ENV DRUPAL_VERSION 11.3.18
+# 2026-10-14: https://www.drupal.org/project/drupal/releases/11.3.19
+ENV DRUPAL_VERSION 11.3.19
 
 # https://github.com/docker-library/drupal/pull/259
 # https://github.com/moby/buildkit/issues/4503
