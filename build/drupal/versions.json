@@ -14,7 +14,7 @@
     "composer": {
       "version": "2"
     },
-    "civicrmVersion": "6.19.4"
+    "civicrmVersion": "6.20.1"
   },
   "11.5-rc": {
     "version": "11.5.0-beta1",
@@ -32,14 +32,14 @@
     "composer": {
       "version": "2"
     },
-    "civicrmVersion": "6.19.4"
+    "civicrmVersion": "6.20.1"
   },
   "11.4": {
-    "version": "11.4.11",
-    "url": "https://ftp.drupal.org/files/projects/drupal-11.4.11.tar.gz",
-    "md5": "7be4f59239b421684573764a8809cfb1",
-    "date": 1792579269,
-    "notes": "https://www.drupal.org/project/drupal/releases/11.4.11",
+    "version": "11.4.13",
+    "url": "https://ftp.drupal.org/files/projects/drupal-11.4.13.tar.gz",
+    "md5": "38c2e36374e9b10b7cc80bde88a036e6",
+    "date": 1795020768,
+    "notes": "https://www.drupal.org/project/drupal/releases/11.4.13",
     "phpVersions": [
       "8.5",
       "8.4"
@@ -50,14 +50,14 @@
     "composer": {
       "version": "2"
     },
-    "civicrmVersion": "6.19.4"
+    "civicrmVersion": "6.20.1"
   },
   "11.3": {
-    "version": "11.3.20",
-    "url": "https://ftp.drupal.org/files/projects/drupal-11.3.20.tar.gz",
-    "md5": "23260b87e132f2e37c108c21fd3b9393",
-    "date": 1792582278,
-    "notes": "https://www.drupal.org/project/drupal/releases/11.3.20",
+    "version": "11.3.22",
+    "url": "https://ftp.drupal.org/files/projects/drupal-11.3.22.tar.gz",
+    "md5": "df0103a1550b06127954d388fcd6043c",
+    "date": 1795023020,
+    "notes": "https://www.drupal.org/project/drupal/releases/11.3.22",
     "phpVersions": [
       "8.5",
       "8.4"
@@ -68,14 +68,14 @@
     "composer": {
       "version": "2"
     },
-    "civicrmVersion": "6.19.4"
+    "civicrmVersion": "6.20.1"
   },
   "10.6": {
-    "version": "10.6.20",
-    "url": "https://ftp.drupal.org/files/projects/drupal-10.6.20.tar.gz",
-    "md5": "09db32a36d452ff9e90612399a5557a4",
-    "date": 1792580764,
-    "notes": "https://www.drupal.org/project/drupal/releases/10.6.20",
+    "version": "10.6.22",
+    "url": "https://ftp.drupal.org/files/projects/drupal-10.6.22.tar.gz",
+    "md5": "5f6084382da48ff69fac9699f7e8b24a",
+    "date": 1795021904,
+    "notes": "https://www.drupal.org/project/drupal/releases/10.6.22",
     "phpVersions": [
       "8.4",
       "8.3"
@@ -86,7 +86,7 @@
     "composer": {
       "version": "2"
     },
-    "civicrmVersion": "6.19.4"
+    "civicrmVersion": "6.20.1"
   },
   "7": {
     "civicrmVersion": "5.81.2",
